@@ -40,7 +40,7 @@ export const Header = () => {
           />
         </div>
         <div className={style.headerItems}>
-          <Link href="/collections/0x4f98e821CcE773AE69439B0ED0F4a55e63F7bDaC">
+          <Link href="/collections">
             <div className={style.headerItem}> Collections </div>
           </Link>
           <div className={style.headerItem}> Stats </div>

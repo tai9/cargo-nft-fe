@@ -1,21 +1,17 @@
-import React, { useEffect, useState, useMemo } from 'react'
-import { useRouter } from 'next/router'
-import Link from 'next/link'
-import { client } from '../../lib/sanityClient'
-import { CgWebsite } from 'react-icons/cg'
-import { AiOutlineInstagram, AiOutlineTwitter } from 'react-icons/ai'
-import { HiDotsVertical } from 'react-icons/hi'
-import NFTCard from '../../components/NFTCard'
 import {
-  useAddress,
+  useContract,
   useMarketplace,
   useNFTCollection,
-  useNFT,
-  useContract,
 } from '@thirdweb-dev/react'
-import { ethers } from 'ethers'
 import { MainLayout } from 'components/layout'
 import { NextPageWithLayout } from 'models'
+import { useRouter } from 'next/router'
+import React, { useEffect, useState } from 'react'
+import { AiOutlineInstagram, AiOutlineTwitter } from 'react-icons/ai'
+import { CgWebsite } from 'react-icons/cg'
+import { HiDotsVertical } from 'react-icons/hi'
+import NFTCard from 'components/NFTCard'
+import { client } from 'lib/sanityClient'
 
 const style = {
   bannerImageContainer: `h-[20vh] w-screen overflow-hidden flex justify-center items-center`,
@@ -45,8 +41,6 @@ const Collection: NextPageWithLayout = () => {
   const [collection, setCollection] = useState<any>({})
   const [nfts, setNfts] = useState<any>([])
   const [listings, setListings] = useState<any>([])
-
-  const contractItem = useContract('0x4f98e821CcE773AE69439B0ED0F4a55e63F7bDaC')
 
   const marketplace = useMarketplace(
     process.env.NEXT_PUBLIC_MARKETPLACE_CONTRACT_ADDRESS

@@ -1,11 +1,12 @@
-import Header from '../../components/Header'
-import { useEffect, useMemo, useState } from 'react'
-import { useRouter } from 'next/router'
-import NFTImage from '../../components/nft/NFTImage'
-import GeneralDetails from '../../components/nft/GeneralDetails'
-import ItemActivity from '../../components/nft/ItemActivity'
-import Purchase from '../../components/nft/Purchase'
+import { MainLayout } from 'components/layout'
 import { ethers } from 'ethers'
+import { NextPageWithLayout } from 'models'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import GeneralDetails from 'components/nft/GeneralDetails'
+import ItemActivity from 'components/nft/ItemActivity'
+import NFTImage from 'components/nft/NFTImage'
+import Purchase from 'components/nft/Purchase'
 
 const style = {
   wrapper: `flex flex-col items-center container-lg text-[#e5e8eb]`,
@@ -15,7 +16,7 @@ const style = {
   detailsContainer: `flex-[2] ml-4`,
 }
 
-const Nft = () => {
+const Nft: NextPageWithLayout = () => {
   const [selectedNft, setSelectedNft] = useState<any>()
   const [listings, setListings] = useState<any>([])
   const router = useRouter()
@@ -70,7 +71,6 @@ const Nft = () => {
 
   return (
     <div>
-      <Header />
       <div className={style.wrapper}>
         <div className={style.container}>
           <div className={style.topContent}>
@@ -92,5 +92,7 @@ const Nft = () => {
     </div>
   )
 }
+
+Nft.Layout = MainLayout
 
 export default Nft

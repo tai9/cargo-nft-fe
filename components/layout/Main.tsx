@@ -6,7 +6,7 @@ export const MainLayout = ({ children }: LayoutProps) => {
     <div className="relative flex flex-col grow min-h-screen">
       <Header />
 
-      <main className="grow">{children}</main>
+      <main className="grow mb-12">{children}</main>
 
       <Footer />
     </div>

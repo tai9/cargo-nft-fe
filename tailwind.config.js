@@ -10,6 +10,8 @@ module.exports = {
         darkBlue: '#04111d',
         darkGrey: '#363840',
         lightGrey: '#4c505c',
+        grey1: '#8A939B',
+        grey2: '#303339',
       },
     },
   },
