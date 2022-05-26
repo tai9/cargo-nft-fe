@@ -48,7 +48,7 @@ const NFTCard = ({ nftItem, title, listings }: Props) => {
       className={style.wrapper}
       onClick={() => {
         Router.push({
-          pathname: `/nfts/${ethers.utils.formatEther(nftItem.metadata.id)}`,
+          pathname: `/nfts/${nftItem.metadata.id}`,
           query: { isListed: isListed },
         })
       }}

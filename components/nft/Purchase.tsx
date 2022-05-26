@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react'
 
 import { HiTag } from 'react-icons/hi'
 import { IoMdWallet } from 'react-icons/io'
+import { AiOutlineClockCircle } from 'react-icons/ai'
+
 import toast, { Toaster } from 'react-hot-toast'
 import { ethers } from 'ethers'
 import { useMarketplace } from '@thirdweb-dev/react'
 const style = {
-  button: `mr-8 flex items-center py-2 px-12 rounded-lg cursor-pointer`,
+  button: `flex items-center py-2 px-12 rounded-lg cursor-pointer`,
   buttonIcon: `text-xl`,
   buttonText: `ml-2 text-lg font-semibold`,
 }
@@ -23,22 +25,24 @@ const MakeOffer = ({
     '0x2FF80519C079980f458309d9f9c213AbE06a5069'
   )
 
-  console.log(selectedNft)
+  useEffect(() => {
+    if (!listings || isListed === 'false') return
+    ;(async () => {
+      setSelectedMarketNft(
+        listings.find(
+          (marketNft: any) =>
+            ethers.utils.formatEther(marketNft.asset.id) ===
+            ethers.utils.formatEther(selectedNft.metadata.id)
+        )
+      )
+    })()
+  }, [selectedNft, listings, isListed])
 
-  // useEffect(() => {
-  //   if (!listings || isListed === 'false') return
-  //   ;(async () => {
-  //     setSelectedMarketNft(
-  //       listings.find((marketNft) => marketNft.asset?.id === selectedNft.id)
-  //     )
-  //   })()
-  // }, [selectedNft, listings, isListed])
-
-  // useEffect(() => {
-  //   if (!selectedMarketNft || !selectedNft) return
-
-  //   setEnableButton(true)
-  // }, [selectedMarketNft, selectedNft])
+  useEffect(() => {
+    if (!selectedMarketNft || !selectedNft) return
+    setEnableButton(true)
+    console.log(selectedMarketNft)
+  }, [selectedMarketNft, selectedNft])
 
   const confirmPurchase = (toastHandler = toast) =>
     toastHandler.success(`Purchase successful!`, {
@@ -49,8 +53,6 @@ const MakeOffer = ({
     })
 
   const buyItem = async (listingId: any, quantityDesired = 1) => {
-    console.log(selectedNft?.id, listings, quantityDesired, module, 'david')
-
     // The listing ID of the asset you want to buy
     const listingId2 = 0
     // Quantity of the asset you want to buy
@@ -58,8 +60,7 @@ const MakeOffer = ({
 
     if (!marketplace) return
     try {
-      await marketplace.buyoutListing(selectedNft?.id, 1)
-      // console.log(data, '🔫')
+      await marketplace.buyoutListing(selectedMarketNft?.id, 1)
     } catch (error) {
       console.log(error)
     }
@@ -93,31 +94,46 @@ const MakeOffer = ({
   }
 
   return (
-    <div className="flex h-20 w-full items-center rounded-lg border border-[#151c22] bg-[#303339] px-12">
+    <div className="w-full items-center rounded-lg border border-[#151c22] bg-[#303339]">
       <Toaster position="bottom-left" reverseOrder={false} />
       {isListed === 'true' ? (
-        <>
-          <div>
-            Current price:{' '}
-            {selectedNft?.buyoutCurrencyValuePerToken?.displayValue}{' '}
-            {selectedNft?.buyoutCurrencyValuePerToken?.symbol}
+        <div className="">
+          <div className="bg-[#262b2f] flex gap-2 items-center px-4 py-3 text-grey1 rounded-t-lg">
+            <AiOutlineClockCircle className={style.buttonIcon} />
+            <div>Sale ends June 26, 2022 at 2:26pm GMT+7</div>
           </div>
-          <div
-            onClick={() => {
-              enableButton ? buyItem(selectedMarketNft?.id, 1) : null
-            }}
-            className={`${style.button} bg-[#2081e2] hover:bg-[#42a0ff]`}
-          >
-            <IoMdWallet className={style.buttonIcon} />
-            <div className={style.buttonText}>Buy Now</div>
+          <div className="flex flex-col px-4 py-4 gap-3">
+            <div className="space-y-1">
+              <p className="text-sm text-grey1">Current price:</p>
+              <div className="flex gap-2 items-center">
+                <span>
+                  {selectedMarketNft?.buyoutCurrencyValuePerToken?.symbol}
+                </span>
+                <span className="text-3xl font-bold">
+                  {selectedMarketNft?.buyoutCurrencyValuePerToken?.displayValue}
+                </span>
+                <span className="text-sm text-grey1">($137.95)</span>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <div
+                onClick={() => {
+                  enableButton ? buyItem(selectedMarketNft?.id, 1) : null
+                }}
+                className={`${style.button} bg-[#2081e2] hover:bg-[#42a0ff]`}
+              >
+                <IoMdWallet className={style.buttonIcon} />
+                <div className={style.buttonText}>Buy Now</div>
+              </div>
+              <div
+                className={`${style.button} border border-[#151c22]  bg-darkGrey hover:bg-lightGrey`}
+              >
+                <HiTag className={style.buttonIcon} />
+                <div className={style.buttonText}>Make Offer</div>
+              </div>
+            </div>
           </div>
-          <div
-            className={`${style.button} border border-[#151c22]  bg-darkGrey hover:bg-lightGrey`}
-          >
-            <HiTag className={style.buttonIcon} />
-            <div className={style.buttonText}>Make Offer</div>
-          </div>
-        </>
+        </div>
       ) : (
         <div className={`${style.button} bg-[#2081e2] hover:bg-[#42a0ff]`}>
           <IoMdWallet className={style.buttonIcon} />

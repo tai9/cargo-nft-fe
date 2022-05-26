@@ -1,12 +1,12 @@
 import { CgArrowsExchangeV } from 'react-icons/cg'
-import { AiOutlineDown, AiOutlineUp } from 'react-icons/ai'
+import { BiChevronDown, BiChevronUp } from 'react-icons/bi'
 import { useState } from 'react'
 import { dummyEvents } from '../../static/dummyEvents'
 import EventItem from './itemActivity/EventItem'
 
 const style = {
   wrapper: `w-full mt-8 border border-[#151b22] rounded-xl bg-[#303339] overflow-hidden`,
-  title: `bg-[#262b2f] px-6 py-4 flex items-center`,
+  title: `bg-[#262b2f] px-6 py-4 flex items-center cursor-pointer`,
   titleLeft: `flex-1 flex items-center text-xl font-bold`,
   titleIcon: `text-3xl mr-2`,
   titleRight: `text-xl`,
@@ -33,7 +33,11 @@ const ItemActivity = () => {
           Item Activity
         </div>
         <div className={style.titleRight}>
-          {toggle ? <AiOutlineUp /> : <AiOutlineDown />}
+          {toggle ? (
+            <BiChevronUp fontSize={24} />
+          ) : (
+            <BiChevronDown fontSize={24} />
+          )}
         </div>
       </div>
       {toggle && (
@@ -42,7 +46,7 @@ const ItemActivity = () => {
             <div className={style.filterTitle}>Filter</div>
             <div className={style.filterIcon}>
               {' '}
-              <AiOutlineDown />{' '}
+              <BiChevronDown fontSize={24} />{' '}
             </div>
           </div>
           <div className={style.tableHeader}>

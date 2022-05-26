@@ -23,7 +23,7 @@ const style = {
   socialIconsContainer: `flex text-3xl mb-[-2rem]`,
   socialIconsWrapper: `w-44`,
   socialIconsContent: `flex container justify-between text-[1.4rem] border-2 rounded-lg px-2`,
-  socialIcon: `my-2`,
+  socialIcon: `my-2 cursor-pointer`,
   divider: `border-r-2`,
   title: `text-5xl font-bold mb-4`,
   createdBy: `text-lg mb-4`,
@@ -58,7 +58,6 @@ const Collection: NextPageWithLayout = () => {
     if (!marketplace) return
     try {
       const list = await marketplace.getActiveListings()
-
       setListings(list)
     } catch (err) {
       console.error(err)
@@ -70,9 +69,6 @@ const Collection: NextPageWithLayout = () => {
     if (!nftCollection) return
     try {
       const nfts = await nftCollection.getAll()
-
-      // const n = await contract.nft.query.all()
-      // console.log(n)
       setNfts(nfts)
     } catch (err) {
       console.error(err)
@@ -96,8 +92,6 @@ const Collection: NextPageWithLayout = () => {
     try {
       const collectionData = await sanityClient.fetch(query)
 
-      console.log(collectionData, '🔥')
-
       // the query returns 1 object inside of an array
       setCollection(collectionData[0])
     } catch (error) {
@@ -106,8 +100,6 @@ const Collection: NextPageWithLayout = () => {
   }
 
   useEffect(() => {
-    console.log(collectionId)
-
     fetchCollectionData()
   }, [collectionId])
 

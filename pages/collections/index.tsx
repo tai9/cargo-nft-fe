@@ -1,4 +1,5 @@
 import { useNFTCollection } from '@thirdweb-dev/react'
+import { SkeletonCard } from 'components/common'
 import { MainLayout } from 'components/layout'
 import { client } from 'lib/sanityClient'
 import { NextPageWithLayout } from 'models'
@@ -29,20 +30,16 @@ const style = {
 const Collections: NextPageWithLayout = () => {
   const nftCollection = useNFTCollection()
   const [collections, setCollections] = useState<any>([])
+  const [loadingCollection, setLoadingCollection] = useState(false)
 
   useEffect(() => {
-    console.log('🔫')
     fetchCollectionData()
-
     getNFTCollection()
   }, [])
   const getNFTCollection = async () => {
-    console.log('🔫x')
     if (!nftCollection) return
     try {
       const nfts = await nftCollection.getAll()
-
-      console.log(nfts)
     } catch (err) {
       console.error(err)
       alert('Error fetching nfts')
@@ -63,13 +60,14 @@ const Collections: NextPageWithLayout = () => {
     }`
 
     try {
+      setLoadingCollection(true)
       const collectionData = await sanityClient.fetch(query)
-
-      console.log(collectionData, '🔥')
+      setLoadingCollection(false)
 
       // the query returns 1 object inside of an array
       setCollections(collectionData)
     } catch (error) {
+      setLoadingCollection(false)
       console.log(error)
     }
   }
@@ -83,27 +81,26 @@ const Collections: NextPageWithLayout = () => {
           alt="banner"
         />
       </div>
-      <div className="my-20">
+      <div className="my-20 max-w-7xl mx-auto">
         <div className={style.midRow}>
           <div className="text-5xl font-bold mb-12">All Collections</div>
         </div>
         <div className="border-darkBlue border-t-[0.1px]"></div>
       </div>
-      <div className="grid grid-cols-2 gap-10">
-        {collections.map((collection: any, index: number) => (
-          <Card key={index} data={collection} />
-        ))}
+      <div className="grid grid-cols-2 gap-10 max-w-7xl mx-auto">
+        {loadingCollection ? (
+          <>
+            <SkeletonCard />
+            <SkeletonCard />
+          </>
+        ) : (
+          <>
+            {collections.map((collection: any, index: number) => (
+              <Card key={index} data={collection} />
+            ))}
+          </>
+        )}
       </div>
-      {/* <div className="flex flex-wrap ">
-        {nfts.map((nftItem: any, id: number) => (
-          <NFTCard
-            key={id}
-            nftItem={nftItem}
-            title={collection?.title}
-            listings={listings}
-          />
-        ))}
-      </div> */}
     </div>
   )
 }
@@ -127,7 +124,7 @@ const style2 = {
 
 const Card = ({ data }: any) => (
   <Link href={`/collections/${data.contractAddress}`} passHref>
-    <a className="bg-grey2 flex-auto w-full h-[30rem] rounded-2xl overflow-hidden cursor-pointer">
+    <div className="bg-grey2 flex-auto w-full h-[30rem] rounded-2xl overflow-hidden cursor-pointer">
       <div className={style2.imgContainer}>
         <img
           src={data.bannerImageUrl}
@@ -156,7 +153,7 @@ const Card = ({ data }: any) => (
           {data.description}
         </div>
       </div>
-    </a>
+    </div>
   </Link>
 )
 

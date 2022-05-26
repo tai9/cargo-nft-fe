@@ -1,4 +1,5 @@
 import { BsFillCartFill } from 'react-icons/bs'
+import { MdOutlineOpenInNew } from 'react-icons/md'
 
 const style = {
   eventItem: `flex px-4 py-5 font-medium`,
@@ -8,7 +9,7 @@ const style = {
   eventPrice: `flex items-center`,
   eventPriceValue: `text-lg`,
   ethLogo: `h-5 mr-2`,
-  accent: `text-[#2081e2]`,
+  accent: `text-[#2081e2] cursor-pointer hover:text-greyBlue`,
 }
 
 const EventItem = ({ event }: any) => {
@@ -30,7 +31,9 @@ const EventItem = ({ event }: any) => {
       </div>
       <div className={`${style.accent} flex-[3]`}>{event.from}</div>
       <div className={`${style.accent} flex-[3]`}>{event.to}</div>
-      <div className={`${style.accent} flex-[2]`}>{event.date}</div>
+      <div className={`${style.accent} flex-[2] flex items-center gap-1`}>
+        {event.date} <MdOutlineOpenInNew fontSize={24} />
+      </div>
     </div>
   )
 }
