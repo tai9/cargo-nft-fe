@@ -1,7 +1,8 @@
 import type { NextPage } from 'next'
 import { useAddress, useMetamask } from '@thirdweb-dev/react'
 import { useEffect } from 'react'
-import toast, { Toaster } from 'react-hot-toast'
+import { toast } from 'react-toastify'
+
 import Hero from '../components/Hero'
 import { client } from '../lib/sanityClient'
 import { MainLayout } from 'components/layout'
@@ -21,14 +22,8 @@ const HomePage: NextPageWithLayout = () => {
   const address = useAddress()
 
   const welcomeUser = (userName: string, toastHandler = toast) => {
-    toastHandler.success(
-      `Welcome back${userName !== 'Unnamed' ? ` ${userName}` : ''}!`,
-      {
-        style: {
-          background: '#04111d',
-          color: '#fff',
-        },
-      }
+    toastHandler.info(
+      `Welcome back${userName !== 'Unnamed' ? ` ${userName}` : ''}!`
     )
   }
 
@@ -50,7 +45,6 @@ const HomePage: NextPageWithLayout = () => {
 
   return (
     <div className={style.wrapper}>
-      <Toaster position="top-center" reverseOrder={false} />
       {address ? (
         <Home />
       ) : (

@@ -1,4 +1,5 @@
 import { MainLayout } from 'components/layout'
+import { toast } from 'react-toastify'
 import { ethers } from 'ethers'
 import { NextPageWithLayout } from 'models'
 import { useRouter } from 'next/router'
@@ -57,13 +58,31 @@ const Nft: NextPageWithLayout = () => {
     })()
   }, [marketplace, nftCollection, isListed, nftId])
 
-  const handleBuyNFT = async (listingId: any, quantityDesired = 1) => {
-    // if (!marketplace) return
-    // try {
-    //   await marketplace.buyoutListing(listingId, quantityDesired)
-    // } catch (error) {
-    //   console.log(error)
-    // }
+  const handleBuyNFT = async (
+    listingId: ethers.BigNumberish,
+    quantityDesired = 1
+  ) => {
+    console.log(listingId)
+
+    if (!marketplace) return
+    try {
+      // toast.promise(
+      //   marketplace.buyoutListing(listingId, quantityDesired),
+      //   {
+      //     loading: 'Processing. \n Please do not close this window.',
+      //     success: 'Purchase successful!',
+      //     error: 'You declined the action in your wallet.',
+      //   },
+      //   {
+      //     style: {
+      //       background: '#04111d',
+      //       color: '#fff',
+      //     },
+      //   }
+      // )
+    } catch (error) {
+      console.log(error)
+    }
     setOpenModal(true)
   }
 
@@ -73,7 +92,16 @@ const Nft: NextPageWithLayout = () => {
 
   const handleConfirmCheckout = async () => {
     console.log('handleConfirmCheckout')
+    confirmPurchase()
   }
+
+  const confirmPurchase = (toastHandler = toast) =>
+    toast.success(`Purchase successful!`, {
+      style: {
+        background: '#04111d',
+        color: '#fff',
+      },
+    })
 
   return (
     <div>

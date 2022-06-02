@@ -1,8 +1,10 @@
 import '../styles/globals.css'
+import 'react-toastify/dist/ReactToastify.css'
 import Head from 'next/head'
 import { ChainId, ThirdwebProvider } from '@thirdweb-dev/react'
 import { AppPropsWithLayout } from 'models'
 import { EmptyLayout } from 'components/layout'
+import { ToastContainer } from 'react-toastify'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const Layout = Component.Layout ?? EmptyLayout
@@ -17,6 +19,18 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
         </Head>
         <Component {...pageProps} />
       </Layout>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
     </ThirdwebProvider>
   )
 }
