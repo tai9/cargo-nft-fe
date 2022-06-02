@@ -8,7 +8,7 @@ import ItemActivity from 'components/nft/ItemActivity'
 import NFTImage from 'components/nft/NFTImage'
 import Purchase from 'components/nft/Purchase'
 import { useMarketplace, useNFTCollection } from '@thirdweb-dev/react'
-import { Collapse } from 'components/common'
+import { Collapse, Modal } from 'components/common'
 import {
   MdTimeline,
   MdSubject,
@@ -29,31 +29,51 @@ const style = {
 }
 
 const Nft: NextPageWithLayout = () => {
+  const router = useRouter()
+  const { collectionId, nftId, isListed } = router.query
+
   const [selectedNft, setSelectedNft] = useState<any>()
   const [listings, setListings] = useState<any>([])
-  const router = useRouter()
+  const [openModal, setOpenModal] = useState(false)
 
   const marketplace = useMarketplace(
     process.env.NEXT_PUBLIC_MARKETPLACE_CONTRACT_ADDRESS
   )
-  const nftCollection = useNFTCollection(
-    '0x4f98e821CcE773AE69439B0ED0F4a55e63F7bDaC'
-  )
+  const nftCollection = useNFTCollection(collectionId as string)
 
   useEffect(() => {
     ;(async () => {
-      if (router.query.nftId) {
-        const data = await nftCollection?.get(+router.query.nftId)
+      if (nftId) {
+        const data = await nftCollection?.get(+nftId)
         setSelectedNft(data)
+        console.log(data)
       }
 
-      if (router.query.isListed === 'true') {
+      if (isListed === 'true') {
         const data = await marketplace?.getActiveListings()
         setListings(data)
         console.log(data)
       }
     })()
-  }, [marketplace, nftCollection, router.query.isListed, router.query.nftId])
+  }, [marketplace, nftCollection, isListed, nftId])
+
+  const handleBuyNFT = async (listingId: any, quantityDesired = 1) => {
+    // if (!marketplace) return
+    // try {
+    //   await marketplace.buyoutListing(listingId, quantityDesired)
+    // } catch (error) {
+    //   console.log(error)
+    // }
+    setOpenModal(true)
+  }
+
+  const handleListNFT = () => {
+    setOpenModal(true)
+  }
+
+  const handleConfirmCheckout = async () => {
+    console.log('handleConfirmCheckout')
+  }
 
   return (
     <div>
@@ -136,9 +156,11 @@ const Nft: NextPageWithLayout = () => {
             <div className={style.detailsContainer}>
               <GeneralDetails selectedNft={selectedNft} />
               <Purchase
-                isListed={router.query.isListed}
+                isListed={isListed}
                 selectedNft={selectedNft}
                 listings={listings}
+                handleBuyNFT={handleBuyNFT}
+                handleListNFT={handleListNFT}
               />
               <div className="flex flex-col gap-6 mt-6">
                 <Collapse icon={<MdTimeline />} title="Price History">
@@ -194,6 +216,59 @@ const Nft: NextPageWithLayout = () => {
           </Collapse>
         </div>
       </div>
+
+      <Modal
+        title="Complete checkout"
+        submitText="Confirm checkout"
+        open={openModal}
+        handleClose={() => setOpenModal(false)}
+        handleSubmit={handleConfirmCheckout}
+      >
+        <div className="flex flex-col gap-4">
+          <div className="flex justify-between font-bold border-b-[1px] border-darkLine p-1">
+            <div>Item</div>
+            <div>Subtotal</div>
+          </div>
+          <div className="flex justify-between items-center font-bold border-b-[1px] border-darkLine p-1 pb-4">
+            <div className="flex gap-3">
+              <img
+                className="object-cover w-20 rounded-md"
+                src={selectedNft?.metadata.image}
+                alt=""
+              />
+              <div className="flex flex-col">
+                <div className="text-primary font-normal">Collection</div>
+                <div className="">{selectedNft?.metadata.name}</div>
+              </div>
+            </div>
+            <div className="space-y-1">
+              <div className="text-primary flex">
+                <img
+                  src="https://openseauserdata.com/files/6f8e2979d428180222796ff4a33ab929.svg"
+                  alt="eth"
+                  className="h-5 mr-2"
+                />
+                9.99
+              </div>
+              <div className="text-sm font-normal">$17,6584</div>
+            </div>
+          </div>
+          <div className="flex justify-between items-center font-bold border-b-[1px] border-darkLine p-1">
+            <div>Total</div>
+            <div className="space-y-1">
+              <div className="text-primary flex">
+                <img
+                  src="https://openseauserdata.com/files/6f8e2979d428180222796ff4a33ab929.svg"
+                  alt="eth"
+                  className="h-5 mr-2"
+                />
+                9.99
+              </div>
+              <div className="text-sm font-normal">$17,6584</div>
+            </div>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }

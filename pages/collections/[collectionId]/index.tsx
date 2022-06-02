@@ -1,8 +1,4 @@
-import {
-  useContract,
-  useMarketplace,
-  useNFTCollection,
-} from '@thirdweb-dev/react'
+import { useMarketplace, useNFTCollection } from '@thirdweb-dev/react'
 import { MainLayout } from 'components/layout'
 import { NextPageWithLayout } from 'models'
 import { useRouter } from 'next/router'
@@ -32,11 +28,12 @@ const style = {
   statValue: `text-3xl font-bold w-full flex items-center justify-center`,
   ethLogo: `h-6 mr-2`,
   statName: `text-lg w-full text-center mt-1`,
-  description: `text-[#8a939b] text-xl w-max-1/4 flex-wrap mt-4`,
+  description: `text-[#8a939b] text-xl max-w-3xl flex-wrap mt-4 text-center`,
 }
 
 const Collection: NextPageWithLayout = () => {
   const router = useRouter()
+
   const { collectionId } = router.query
   const [collection, setCollection] = useState<any>({})
   const [nfts, setNfts] = useState<any>([])
@@ -45,9 +42,7 @@ const Collection: NextPageWithLayout = () => {
   const marketplace = useMarketplace(
     process.env.NEXT_PUBLIC_MARKETPLACE_CONTRACT_ADDRESS
   )
-  const nftCollection = useNFTCollection(
-    '0x4f98e821CcE773AE69439B0ED0F4a55e63F7bDaC'
-  )
+  const nftCollection = useNFTCollection(collectionId as string)
 
   useEffect(() => {
     getListings()
@@ -175,7 +170,7 @@ const Collection: NextPageWithLayout = () => {
             <div className={style.collectionStat}>
               <div className={style.statValue}>
                 <img
-                  src="https://storage.opensea.io/files/6f8e2979d428180222796ff4a33ab929.svg"
+                  src="https://openseauserdata.com/files/6f8e2979d428180222796ff4a33ab929.svg"
                   alt="eth"
                   className={style.ethLogo}
                 />
@@ -186,7 +181,7 @@ const Collection: NextPageWithLayout = () => {
             <div className={style.collectionStat}>
               <div className={style.statValue}>
                 <img
-                  src="https://storage.opensea.io/files/6f8e2979d428180222796ff4a33ab929.svg"
+                  src="https://openseauserdata.com/files/6f8e2979d428180222796ff4a33ab929.svg"
                   alt="eth"
                   className={style.ethLogo}
                 />
@@ -207,6 +202,7 @@ const Collection: NextPageWithLayout = () => {
             nftItem={nftItem}
             title={collection?.title}
             listings={listings}
+            collectionId={collectionId as string}
           />
         ))}
       </div>

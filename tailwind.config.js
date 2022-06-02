@@ -13,6 +13,8 @@ module.exports = {
         greyBlue: '#1868B7',
         grey1: '#8A939B',
         grey2: '#303339',
+        'black-rgba': 'rgba(0, 0, 0, 0.5)',
+        darkLine: '#151c22',
       },
     },
   },

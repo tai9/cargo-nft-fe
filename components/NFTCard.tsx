@@ -24,9 +24,10 @@ type Props = {
   nftItem: any
   title: any
   listings: any
+  collectionId?: string
 }
 
-const NFTCard = ({ nftItem, title, listings }: Props) => {
+const NFTCard = ({ nftItem, title, listings, collectionId }: Props) => {
   const [isListed, setIsListed] = useState(false)
   const [price, setPrice] = useState(0)
 
@@ -44,50 +45,52 @@ const NFTCard = ({ nftItem, title, listings }: Props) => {
   }, [listings, nftItem])
 
   return (
-    <div
-      className={style.wrapper}
-      onClick={() => {
-        Router.push({
-          pathname: `/nfts/${nftItem.metadata.id}`,
-          query: { isListed: isListed },
-        })
-      }}
-    >
-      <div className={style.imgContainer}>
-        <img
-          src={nftItem.metadata.image}
-          alt={nftItem.metadata.name}
-          className={style.nftImg}
-        />
-      </div>
-      <div className={style.details}>
-        <div className={style.info}>
-          <div className={style.infoLeft}>
-            <div className={style.collectionName}>{title}</div>
-            <div className={style.assetName}>{nftItem.metadata.name}</div>
-          </div>
-          {isListed && (
-            <div className={style.infoRight}>
-              <div className={style.priceTag}>Price</div>
-              <div className={style.priceValue}>
-                <img
-                  src="https://storage.opensea.io/files/6f8e2979d428180222796ff4a33ab929.svg"
-                  alt="eth"
-                  className={style.ethLogo}
-                />
-                {price}
-              </div>
+    <>
+      <div
+        className={style.wrapper}
+        onClick={() => {
+          Router.push({
+            pathname: `/collections/${collectionId}/nfts/${nftItem.metadata.id}`,
+            query: { isListed: isListed },
+          })
+        }}
+      >
+        <div className={style.imgContainer}>
+          <img
+            src={nftItem.metadata.image}
+            alt={nftItem.metadata.name}
+            className={style.nftImg}
+          />
+        </div>
+        <div className={style.details}>
+          <div className={style.info}>
+            <div className={style.infoLeft}>
+              <div className={style.collectionName}>{title}</div>
+              <div className={style.assetName}>{nftItem.metadata.name}</div>
             </div>
-          )}
-        </div>
-        <div className={style.likes}>
-          <span className={style.likeIcon}>
-            <BiHeart />
-          </span>{' '}
-          {nftItem.likes}
+            {isListed && (
+              <div className={style.infoRight}>
+                <div className={style.priceTag}>Price</div>
+                <div className={style.priceValue}>
+                  <img
+                    src="https://openseauserdata.com/files/6f8e2979d428180222796ff4a33ab929.svg"
+                    alt="eth"
+                    className={style.ethLogo}
+                  />
+                  {price}
+                </div>
+              </div>
+            )}
+          </div>
+          <div className={style.likes}>
+            <span className={style.likeIcon}>
+              <BiHeart />
+            </span>{' '}
+            {nftItem.likes}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 

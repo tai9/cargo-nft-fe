@@ -13,11 +13,12 @@ const style = {
   buttonText: `ml-2 text-lg font-semibold`,
 }
 
-const MakeOffer = ({
+const Purchase = ({
   isListed,
   selectedNft,
   listings,
-  marketPlaceModule,
+  handleBuyNFT,
+  handleListNFT,
 }: any) => {
   const [selectedMarketNft, setSelectedMarketNft] = useState<any>()
   const [enableButton, setEnableButton] = useState(true)
@@ -94,7 +95,7 @@ const MakeOffer = ({
   }
 
   return (
-    <div className="w-full items-center rounded-lg border border-[#151c22] bg-[#303339]">
+    <div className="w-full items-center rounded-lg border border-darkLine bg-[#303339] p-4">
       <Toaster position="bottom-left" reverseOrder={false} />
       {isListed === 'true' ? (
         <div className="">
@@ -118,7 +119,7 @@ const MakeOffer = ({
             <div className="flex gap-2">
               <div
                 onClick={() => {
-                  enableButton ? buyItem(selectedMarketNft?.id, 1) : null
+                  enableButton ? handleBuyNFT(selectedMarketNft?.id, 1) : null
                 }}
                 className={`${style.button} bg-[#2081e2] hover:bg-[#42a0ff]`}
               >
@@ -126,7 +127,7 @@ const MakeOffer = ({
                 <div className={style.buttonText}>Buy Now</div>
               </div>
               <div
-                className={`${style.button} border border-[#151c22]  bg-darkGrey hover:bg-lightGrey`}
+                className={`${style.button} border border-darkLine  bg-darkGrey hover:bg-lightGrey`}
               >
                 <HiTag className={style.buttonIcon} />
                 <div className={style.buttonText}>Make Offer</div>
@@ -135,13 +136,16 @@ const MakeOffer = ({
           </div>
         </div>
       ) : (
-        <div className={`${style.button} bg-[#2081e2] hover:bg-[#42a0ff]`}>
+        <button
+          className={`${style.button} bg-[#2081e2] hover:bg-[#42a0ff]`}
+          onClick={handleListNFT}
+        >
           <IoMdWallet className={style.buttonIcon} />
           <div className={style.buttonText}>List Item</div>
-        </div>
+        </button>
       )}
     </div>
   )
 }
 
-export default MakeOffer
+export default Purchase
