@@ -8,6 +8,8 @@ import { CgWebsite } from 'react-icons/cg'
 import { HiDotsVertical } from 'react-icons/hi'
 import NFTCard from 'components/NFTCard'
 import { client } from 'lib/sanityClient'
+import { Box, Tab, Tabs, Typography } from '@mui/material'
+import { Container } from '@mui/material'
 
 const style = {
   bannerImageContainer: `h-[20vh] w-screen overflow-hidden flex justify-center items-center`,
@@ -31,6 +33,38 @@ const style = {
   description: `text-[#8a939b] text-xl max-w-3xl flex-wrap mt-4 text-center`,
 }
 
+interface TabPanelProps {
+  children?: React.ReactNode
+  index: TabType
+  value: TabType
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Typography>{children}</Typography>}
+    </div>
+  )
+}
+
+function a11yProps(index: TabType) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+    value: index,
+  }
+}
+
+type TabType = 'items' | 'activity'
+
 const Collection: NextPageWithLayout = () => {
   const router = useRouter()
 
@@ -38,6 +72,7 @@ const Collection: NextPageWithLayout = () => {
   const [collection, setCollection] = useState<Collection>()
   const [nfts, setNfts] = useState<any>([])
   const [listings, setListings] = useState<any>([])
+  const [tabValue, setTabValue] = useState<TabType>('items')
 
   const marketplace = useMarketplace(
     process.env.NEXT_PUBLIC_MARKETPLACE_CONTRACT_ADDRESS
@@ -98,6 +133,10 @@ const Collection: NextPageWithLayout = () => {
   useEffect(() => {
     fetchCollectionData()
   }, [collectionId, fetchCollectionData])
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: TabType) => {
+    setTabValue(newValue)
+  }
 
   return (
     <div className="overflow-hidden">
@@ -204,16 +243,35 @@ const Collection: NextPageWithLayout = () => {
           <div className={style.description}>{collection?.description}</div>
         </div>
       </div>
-      <div className="flex flex-wrap ">
-        {nfts.map((nftItem: any, id: number) => (
-          <NFTCard
-            key={id}
-            nftItem={nftItem}
-            title={collection?.title || ''}
-            listings={listings}
-            collectionId={collectionId as string}
-          />
-        ))}
+      <div className="px-10">
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs
+            value={tabValue}
+            onChange={handleTabChange}
+            aria-label="basic tabs example"
+            textColor="secondary"
+            indicatorColor="secondary"
+          >
+            <Tab label="Items" disableRipple {...a11yProps('items')} />
+            <Tab label="Activity" disableRipple {...a11yProps('activity')} />
+          </Tabs>
+        </Box>
+        <TabPanel value={tabValue} index="items">
+          <div className="flex flex-wrap ">
+            {nfts.map((nftItem: any, id: number) => (
+              <NFTCard
+                key={id}
+                nftItem={nftItem}
+                title={collection?.title || ''}
+                listings={listings}
+                collectionId={collectionId as string}
+              />
+            ))}
+          </div>
+        </TabPanel>
+        <TabPanel value={tabValue} index="activity">
+          No item to display
+        </TabPanel>
       </div>
     </div>
   )

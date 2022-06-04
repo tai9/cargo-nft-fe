@@ -25,8 +25,9 @@ import {
   DirectListing,
   NFTMetadataOwner,
 } from '@thirdweb-dev/sdk'
-import CollectionCard from 'components/collection/CollectionCard'
 import NFTCard from 'components/NFTCard'
+import Link from 'next/link'
+import { Divider } from '@mui/material'
 
 const style = {
   wrapper: `flex flex-col items-center container-lg text-[#e5e8eb]`,
@@ -349,16 +350,24 @@ const Nft: NextPageWithLayout = () => {
             className="mt-6"
           >
             {nfts.length > 0 ? (
-              <div className="flex gap-4">
-                {nfts.map((nftItem, id: number) => (
-                  <NFTCard
-                    key={id}
-                    nftItem={nftItem}
-                    title={collection?.title || ''}
-                    listings={listings}
-                    collectionId={collectionId as string}
-                  />
-                ))}
+              <div className="text-center">
+                <div className="flex gap-4">
+                  {nfts.map((nftItem, id: number) => (
+                    <NFTCard
+                      key={id}
+                      nftItem={nftItem}
+                      title={collection?.title || ''}
+                      listings={listings}
+                      collectionId={collectionId as string}
+                    />
+                  ))}
+                </div>
+                <Divider sx={{ mb: 3 }} />
+                <Link passHref href={`/collections/${collectionId}`}>
+                  <button className="p-3 border border-darkBlue rounded-lg font-bold">
+                    View collection
+                  </button>
+                </Link>
               </div>
             ) : (
               <div className="opacity-50 text-center space-y-1">
@@ -368,9 +377,6 @@ const Nft: NextPageWithLayout = () => {
                   alt=""
                 />
                 <div>No listings yet</div>
-                <button className="p-3 border border-darkBlue bg-grey1 rounded-lg font-bold">
-                  View collection
-                </button>
               </div>
             )}
           </Collapse>

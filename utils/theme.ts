@@ -1,52 +1,51 @@
 import { createTheme, responsiveFontSizes } from '@mui/material/styles'
 
-export let theme = createTheme({
-  palette: {
-    primary: {
-      light: '#90caf9',
-      main: '#2081e2',
-      dark: '#1e88e5',
-    },
-    secondary: {
-      light: '#ede7f6',
-      main: '#673ab7',
-      dark: '#5e35b1',
-    },
-    error: {
-      light: '#ef9a9a',
-      main: '#f44336',
-      dark: '#c62828',
-    },
-    text: {
-      primary: '#212121',
-      secondary: '#9e9e9e',
-    },
+const colors = {
+  primary: {
+    light: '#90caf9',
+    main: '#2081e2',
+    dark: '#1e88e5',
   },
+  secondary: {
+    light: '#ede7f6',
+    main: '#ffffff',
+    dark: '#5e35b1',
+  },
+  error: {
+    light: '#ef9a9a',
+    main: '#f44336',
+    dark: '#c62828',
+  },
+  text: {
+    primary: '#212121',
+    secondary: '#9e9e9e',
+  },
+  darkBlue: '#04111d',
+  darkGrey: '#363840',
+  lightGrey: '#4c505c',
+  greyBlue: '#1868B7',
+  grey1: '#8A939B',
+  grey2: '#303339',
+  'black-rgba': 'rgba(0, 0, 0, 0.5)',
+  darkLine: '#151c22',
+}
+
+export let theme = createTheme({
+  palette: colors,
   components: {
-    MuiContainer: {
-      defaultProps: {
-        maxWidth: 'md',
-      },
-      styleOverrides: {
-        maxWidthSm: {
-          maxWidth: 680,
-          '@media (min-width: 600px)': {
-            maxWidth: 680,
-          },
-        },
-        maxWidthMd: {
-          maxWidth: 860,
-          '@media (min-width: 900px)': {
-            maxWidth: 860,
-          },
-        },
-      },
-      variants: [],
-    },
     MuiButton: {
       styleOverrides: {
         root: {
           borderRadius: '0.5rem',
+          textTransform: 'capitalize',
+        },
+      },
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          fontWeight: 'bold',
+          fontSize: '1.25rem',
           textTransform: 'capitalize',
         },
       },
