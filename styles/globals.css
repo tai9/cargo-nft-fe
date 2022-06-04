@@ -10,7 +10,7 @@
 
 html,
 body {
-  background-color: #363840;
+  background-color: #363840 !important;
   padding: 0;
   margin: 0;
 }

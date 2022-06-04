@@ -3,6 +3,7 @@ import { HiTag } from 'react-icons/hi'
 import { IoMdWallet } from 'react-icons/io'
 import { AiOutlineClockCircle } from 'react-icons/ai'
 import { ethers } from 'ethers'
+import Button from '@mui/material/Button'
 
 const style = {
   button: `flex items-center py-2 px-12 rounded-lg cursor-pointer`,
@@ -60,15 +61,20 @@ const Purchase = ({
               </div>
             </div>
             <div className="flex gap-2">
-              <div
+              <Button
+                disableRipple
+                variant="contained"
+                sx={{
+                  paddingX: '3rem',
+                }}
                 onClick={() => {
                   enableButton ? handleBuyNFT(selectedMarketNft?.id, 1) : null
                 }}
-                className={`${style.button} bg-[#2081e2] hover:bg-[#42a0ff]`}
               >
                 <IoMdWallet className={style.buttonIcon} />
                 <div className={style.buttonText}>Buy Now</div>
-              </div>
+              </Button>
+
               <div
                 className={`${style.button} border border-darkLine  bg-darkGrey hover:bg-lightGrey`}
               >

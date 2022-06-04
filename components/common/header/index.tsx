@@ -27,7 +27,7 @@ export const Header = () => {
         <Link href="/">
           <div className={style.logoContainer}>
             <Image src={openseaLogo} height={40} width={40} alt="" />
-            <div className={style.logoText}>Opensea</div>
+            <div className={style.logoText}>Cargo</div>
           </div>
         </Link>
         <div className={style.searchBar}>
