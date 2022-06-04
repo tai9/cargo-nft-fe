@@ -20,7 +20,11 @@ import {
 import { BsTagFill } from 'react-icons/bs'
 import { AiOutlineBars } from 'react-icons/ai'
 import { client } from 'lib/sanityClient'
-import { NFTMetadataOwner } from '@thirdweb-dev/sdk'
+import {
+  AuctionListing,
+  DirectListing,
+  NFTMetadataOwner,
+} from '@thirdweb-dev/sdk'
 import CollectionCard from 'components/collection/CollectionCard'
 import NFTCard from 'components/NFTCard'
 
@@ -33,6 +37,8 @@ const style = {
   hoverPrimaryText: `text-primary cursor-pointer hover:text-greyBlue`,
 }
 
+type Listing = AuctionListing | DirectListing
+
 const Nft: NextPageWithLayout = () => {
   const router = useRouter()
   const { collectionId, nftId, isListed } = router.query
@@ -43,6 +49,7 @@ const Nft: NextPageWithLayout = () => {
   const [openModal, setOpenModal] = useState(false)
   const [userData, setUserData] = useState<User[]>([])
   const [nfts, setNfts] = useState<NFTMetadataOwner[]>([])
+  const [nftListing, setNftListing] = useState<Listing>()
 
   const marketplace = useMarketplace(
     process.env.NEXT_PUBLIC_MARKETPLACE_CONTRACT_ADDRESS
@@ -61,7 +68,6 @@ const Nft: NextPageWithLayout = () => {
     try {
       const data: User[] = await sanityClient.fetch(query)
       setUserData(data)
-      console.log(data)
     } catch (error) {
       console.log(error)
     }
@@ -96,7 +102,6 @@ const Nft: NextPageWithLayout = () => {
     try {
       const nfts = await nftCollection.getAll()
       setNfts(nfts)
-      console.log(nfts, '🔫')
     } catch (err) {
       console.error(err)
       alert('Error fetching nfts')
@@ -115,11 +120,22 @@ const Nft: NextPageWithLayout = () => {
         const nft = await nftCollection?.get(+nftId)
         setSelectedNft(nft)
         console.log(nft, '🔫')
-      }
 
-      if (isListed === 'true') {
-        const data = await marketplace?.getActiveListings()
-        setListings(data)
+        if (isListed === 'true') {
+          const data: Listing[] | undefined =
+            await marketplace?.getActiveListings()
+
+          setListings(data)
+
+          if (data && nft) {
+            const listing = data?.find(
+              (x) =>
+                +ethers.utils.formatEther(x.tokenId) ===
+                +ethers.utils.formatEther(nft?.metadata.id)
+            )
+            setNftListing(listing)
+          }
+        }
       }
     })()
   }, [marketplace, nftCollection, isListed, nftId, fetchUserData])
@@ -128,8 +144,6 @@ const Nft: NextPageWithLayout = () => {
     listingId: ethers.BigNumberish,
     quantityDesired = 1
   ) => {
-    console.log(listingId)
-
     if (!marketplace) return
     try {
       // toast.promise(
@@ -157,7 +171,6 @@ const Nft: NextPageWithLayout = () => {
   }
 
   const handleConfirmCheckout = async () => {
-    console.log('handleConfirmCheckout')
     confirmPurchase()
   }
 
@@ -240,11 +253,25 @@ const Nft: NextPageWithLayout = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <div>Contract Address</div>
-                      <div className={style.hoverPrimaryText}>0x59...0e022</div>
+
+                      <a
+                        className={style.hoverPrimaryText}
+                        href={`https://rinkeby.etherscan.io/address/${nftListing?.assetContractAddress}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {nftListing?.assetContractAddress.slice(0, 7)}...
+                        {nftListing?.assetContractAddress.slice(
+                          nftListing?.assetContractAddress.length - 4,
+                          nftListing?.assetContractAddress.length
+                        )}
+                      </a>
                     </div>
                     <div className="flex justify-between">
                       <div>Token ID</div>
-                      <div className={style.hoverPrimaryText}>2708</div>
+                      <div className={style.hoverPrimaryText}>
+                        {nftListing?.id}
+                      </div>
                     </div>
                     <div className="flex justify-between">
                       <div>Token Standard</div>
@@ -252,11 +279,11 @@ const Nft: NextPageWithLayout = () => {
                     </div>
                     <div className="flex justify-between">
                       <div>Blockchain</div>
-                      <div className="text-grey1">Ethereum</div>
+                      <div className="text-grey1">Rinkeby</div>
                     </div>
                     <div className="flex justify-between">
                       <div>Creator Fees</div>
-                      <div className="text-grey1">5%</div>
+                      <div className="text-grey1">0%</div>
                     </div>
                   </div>
                 </Collapse>

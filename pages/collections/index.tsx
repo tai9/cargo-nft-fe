@@ -4,7 +4,6 @@ import { SkeletonCard } from 'components/common'
 import { MainLayout } from 'components/layout'
 import { client } from 'lib/sanityClient'
 import { NextPageWithLayout } from 'models'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 const style = {

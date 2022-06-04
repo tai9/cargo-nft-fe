@@ -1,8 +1,8 @@
 import { useMarketplace, useNFTCollection } from '@thirdweb-dev/react'
 import { MainLayout } from 'components/layout'
-import { NextPageWithLayout } from 'models'
+import { Collection, NextPageWithLayout } from 'models'
 import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { AiOutlineInstagram, AiOutlineTwitter } from 'react-icons/ai'
 import { CgWebsite } from 'react-icons/cg'
 import { HiDotsVertical } from 'react-icons/hi'
@@ -15,7 +15,7 @@ const style = {
   infoContainer: `w-screen px-4`,
   midRow: `w-full flex justify-center text-white`,
   endRow: `w-full flex justify-end text-white`,
-  profileImg: `w-40 h-40 object-cover rounded-full border-2 border-[#202225] mt-[-4rem]`,
+  profileImg: `w-40 h-40 object-cover rounded-full border-2 border-[#202225] mt-[-4rem] z-10`,
   socialIconsContainer: `flex text-3xl mb-[-2rem]`,
   socialIconsWrapper: `w-44`,
   socialIconsContent: `flex container justify-between text-[1.4rem] border-2 rounded-lg px-2`,
@@ -35,7 +35,7 @@ const Collection: NextPageWithLayout = () => {
   const router = useRouter()
 
   const { collectionId } = router.query
-  const [collection, setCollection] = useState<any>({})
+  const [collection, setCollection] = useState<Collection>()
   const [nfts, setNfts] = useState<any>([])
   const [listings, setListings] = useState<any>([])
 
@@ -71,8 +71,9 @@ const Collection: NextPageWithLayout = () => {
     }
   }
 
-  const fetchCollectionData = async (sanityClient = client) => {
-    const query = `*[_type == "marketItems" && contractAddress == "${collectionId}" ] {
+  const fetchCollectionData = useCallback(
+    async (sanityClient = client) => {
+      const query = `*[_type == "marketItems" && contractAddress == "${collectionId}" ] {
       "imageUrl": profileImage.asset->url,
       "bannerImageUrl": bannerImage.asset->url,
       volumeTraded,
@@ -84,44 +85,52 @@ const Collection: NextPageWithLayout = () => {
       description
     }`
 
-    try {
-      const collectionData = await sanityClient.fetch(query)
-
-      // the query returns 1 object inside of an array
-      setCollection(collectionData[0])
-    } catch (error) {
-      console.log(error)
-    }
-  }
+      try {
+        const collectionData: Collection[] = await sanityClient.fetch(query)
+        setCollection(collectionData[0])
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    [collectionId]
+  )
 
   useEffect(() => {
     fetchCollectionData()
-  }, [collectionId])
+  }, [collectionId, fetchCollectionData])
 
   return (
     <div className="overflow-hidden">
       <div className={style.bannerImageContainer}>
-        <img
-          className={style.bannerImage}
-          src={
-            collection?.bannerImageUrl
-              ? collection.bannerImageUrl
-              : 'https://via.placeholder.com/200'
-          }
-          alt="banner"
-        />
+        {collection?.bannerImageUrl ? (
+          <img
+            className={style.bannerImage}
+            src={collection?.bannerImageUrl}
+            alt="banner"
+          />
+        ) : (
+          <div className="shadow rounded-md p-4 h-full w-full mx-auto">
+            <div className="animate-pulse flex space-x-4">
+              <div className="flex-1 space-y-6 py-1">
+                <div className="h-72 bg-slate-700 rounded"></div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       <div className={style.infoContainer}>
         <div className={style.midRow}>
-          <img
-            className={style.profileImg}
-            src={
-              collection?.imageUrl
-                ? collection.imageUrl
-                : 'https://via.placeholder.com/200'
-            }
-            alt="profile image"
-          />
+          {collection?.imageUrl ? (
+            <img
+              className={style.profileImg}
+              src={collection?.imageUrl}
+              alt="profile image"
+            />
+          ) : (
+            <div className="animate-pulse rounded-full border-2 border-[#202225] mt-[-4rem]">
+              <div className="h-40 w-40 bg-slate-700 rounded-full"></div>
+            </div>
+          )}
         </div>
         <div className={style.endRow}>
           <div className={style.socialIconsContainer}>
@@ -200,7 +209,7 @@ const Collection: NextPageWithLayout = () => {
           <NFTCard
             key={id}
             nftItem={nftItem}
-            title={collection?.title}
+            title={collection?.title || ''}
             listings={listings}
             collectionId={collectionId as string}
           />
