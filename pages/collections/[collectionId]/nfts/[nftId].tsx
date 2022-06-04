@@ -1,9 +1,9 @@
 import { MainLayout } from 'components/layout'
 import { toast } from 'react-toastify'
 import { ethers } from 'ethers'
-import { NextPageWithLayout } from 'models'
+import { Collection, NextPageWithLayout, User } from 'models'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import GeneralDetails from 'components/nft/GeneralDetails'
 import ItemActivity from 'components/nft/ItemActivity'
 import NFTImage from 'components/nft/NFTImage'
@@ -19,6 +19,10 @@ import {
 } from 'react-icons/md'
 import { BsTagFill } from 'react-icons/bs'
 import { AiOutlineBars } from 'react-icons/ai'
+import { client } from 'lib/sanityClient'
+import { NFTMetadataOwner } from '@thirdweb-dev/sdk'
+import CollectionCard from 'components/collection/CollectionCard'
+import NFTCard from 'components/NFTCard'
 
 const style = {
   wrapper: `flex flex-col items-center container-lg text-[#e5e8eb]`,
@@ -33,30 +37,92 @@ const Nft: NextPageWithLayout = () => {
   const router = useRouter()
   const { collectionId, nftId, isListed } = router.query
 
-  const [selectedNft, setSelectedNft] = useState<any>()
+  const [collection, setCollection] = useState<Partial<Collection>>({})
+  const [selectedNft, setSelectedNft] = useState<NFTMetadataOwner>()
   const [listings, setListings] = useState<any>([])
   const [openModal, setOpenModal] = useState(false)
+  const [userData, setUserData] = useState<User[]>([])
+  const [nfts, setNfts] = useState<NFTMetadataOwner[]>([])
 
   const marketplace = useMarketplace(
     process.env.NEXT_PUBLIC_MARKETPLACE_CONTRACT_ADDRESS
   )
   const nftCollection = useNFTCollection(collectionId as string)
 
+  const fetchUserData = useCallback(async (sanityClient = client) => {
+    const query = `*[_type == "users" ] {
+          userName,
+          walletAddress,
+          profileImage,
+          bannerImage,
+          igHandle,
+      }`
+
+    try {
+      const data: User[] = await sanityClient.fetch(query)
+      setUserData(data)
+      console.log(data)
+    } catch (error) {
+      console.log(error)
+    }
+  }, [])
+
+  const fetchDetailCollectionData = useCallback(
+    async (sanityClient = client) => {
+      const query = `*[_type == "marketItems" && contractAddress == "${collectionId}" ] {
+        "imageUrl": profileImage.asset->url,
+        "bannerImageUrl": bannerImage.asset->url,
+        volumeTraded,
+        createdBy,
+        contractAddress,
+        "creator": createdBy->userName,
+        title, floorPrice,
+        "allOwners": owners[]->,
+        description
+      }`
+
+      try {
+        const collectionData: Collection[] = await sanityClient.fetch(query)
+        setCollection(collectionData[0])
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    [collectionId]
+  )
+
+  const getNFTCollection = useCallback(async () => {
+    if (!nftCollection) return
+    try {
+      const nfts = await nftCollection.getAll()
+      setNfts(nfts)
+      console.log(nfts, '🔫')
+    } catch (err) {
+      console.error(err)
+      alert('Error fetching nfts')
+    }
+  }, [nftCollection])
+
+  useEffect(() => {
+    fetchDetailCollectionData()
+    fetchUserData()
+    getNFTCollection()
+  }, [fetchDetailCollectionData, fetchUserData, getNFTCollection])
+
   useEffect(() => {
     ;(async () => {
       if (nftId) {
-        const data = await nftCollection?.get(+nftId)
-        setSelectedNft(data)
-        console.log(data)
+        const nft = await nftCollection?.get(+nftId)
+        setSelectedNft(nft)
+        console.log(nft, '🔫')
       }
 
       if (isListed === 'true') {
         const data = await marketplace?.getActiveListings()
         setListings(data)
-        console.log(data)
       }
     })()
-  }, [marketplace, nftCollection, isListed, nftId])
+  }, [marketplace, nftCollection, isListed, nftId, fetchUserData])
 
   const handleBuyNFT = async (
     listingId: ethers.BigNumberish,
@@ -117,37 +183,52 @@ const Nft: NextPageWithLayout = () => {
                   title="Description"
                   className="rounded-b-none"
                 >
-                  <p>
-                    Created by{' '}
-                    <span className={style.hoverPrimaryText}>abc</span>
-                  </p>
-                  <p className="mt-1">
-                    5,000 animated Invisible Friends hiding in the metaverse. A
-                    collection by Markus Magnusson & Random Character
-                    Collective.
-                  </p>
-                  <div className="opacity-50 text-center space-y-1">
-                    <img
-                      className="m-auto"
-                      src="https://opensea.io/static/images/empty-asks.svg"
-                      alt=""
-                    />
-                    <div>No listings yet</div>
+                  <div className="p-4">
+                    <p>
+                      Created by{' '}
+                      <span className={style.hoverPrimaryText}>
+                        {selectedNft
+                          ? userData.find(
+                              (u) => u.walletAddress === selectedNft?.owner
+                            )?.userName
+                          : ''}
+                      </span>
+                    </p>
+                    {selectedNft?.metadata.description ? (
+                      <p className="mt-1">
+                        {selectedNft?.metadata.description}
+                      </p>
+                    ) : (
+                      <div className="opacity-50 text-center space-y-1">
+                        <img
+                          className="m-auto"
+                          src="https://opensea.io/static/images/empty-asks.svg"
+                          alt=""
+                        />
+                        <div>No listings yet</div>
+                      </div>
+                    )}
                   </div>
                 </Collapse>
                 <Collapse
                   icon={<MdVerticalSplit />}
-                  title="About Collection"
+                  title={`About ${collection?.title}`}
                   className="rounded-none border-y-0"
                   defaultOpen={false}
                 >
-                  <div className="opacity-50 text-center space-y-1">
-                    <img
-                      className="m-auto"
-                      src="https://opensea.io/static/images/empty-asks.svg"
-                      alt=""
-                    />
-                    <div>No listings yet</div>
+                  <div className="p-4">
+                    {collection ? (
+                      <p>{collection.description}</p>
+                    ) : (
+                      <div className="opacity-50 text-center space-y-1">
+                        <img
+                          className="m-auto"
+                          src="https://opensea.io/static/images/empty-asks.svg"
+                          alt=""
+                        />
+                        <div>No listings yet</div>
+                      </div>
+                    )}
                   </div>
                 </Collapse>
                 <Collapse
@@ -182,7 +263,17 @@ const Nft: NextPageWithLayout = () => {
               </div>
             </div>
             <div className={style.detailsContainer}>
-              <GeneralDetails selectedNft={selectedNft} />
+              <GeneralDetails
+                collectionName={collection?.title}
+                NFTName={selectedNft?.metadata.name}
+                ownedBy={
+                  selectedNft
+                    ? userData.find(
+                        (u) => u.walletAddress === selectedNft?.owner
+                      )?.userName || ''
+                    : ''
+                }
+              />
               <Purchase
                 isListed={isListed}
                 selectedNft={selectedNft}
@@ -230,17 +321,31 @@ const Nft: NextPageWithLayout = () => {
             title="More From This Collection"
             className="mt-6"
           >
-            <div className="opacity-50 text-center space-y-1">
-              <img
-                className="m-auto"
-                src="https://opensea.io/static/images/empty-asks.svg"
-                alt=""
-              />
-              <div>No listings yet</div>
-              <button className="p-3 border border-darkBlue bg-grey1 rounded-lg font-bold">
-                View collection
-              </button>
-            </div>
+            {nfts.length > 0 ? (
+              <div className="flex gap-4">
+                {nfts.map((nftItem, id: number) => (
+                  <NFTCard
+                    key={id}
+                    nftItem={nftItem}
+                    title={collection?.title || ''}
+                    listings={listings}
+                    collectionId={collectionId as string}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="opacity-50 text-center space-y-1">
+                <img
+                  className="m-auto"
+                  src="https://opensea.io/static/images/empty-asks.svg"
+                  alt=""
+                />
+                <div>No listings yet</div>
+                <button className="p-3 border border-darkBlue bg-grey1 rounded-lg font-bold">
+                  View collection
+                </button>
+              </div>
+            )}
           </Collapse>
         </div>
       </div>
@@ -261,7 +366,7 @@ const Nft: NextPageWithLayout = () => {
             <div className="flex gap-3">
               <img
                 className="object-cover w-20 rounded-md"
-                src={selectedNft?.metadata.image}
+                src={selectedNft?.metadata.image || ''}
                 alt=""
               />
               <div className="flex flex-col">

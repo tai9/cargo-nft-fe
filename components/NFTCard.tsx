@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
-import { BiHeart } from 'react-icons/bi'
 import Router from 'next/router'
 import { ethers } from 'ethers'
+import { NFTMetadataOwner } from '@thirdweb-dev/sdk'
 
 const style = {
-  wrapper: `bg-[#303339] flex-auto w-[14rem] h-[22rem] my-10 mx-5 rounded-2xl overflow-hidden cursor-pointer`,
+  wrapper: `bg-[#303339] flex-auto my-10 mx-5 rounded-2xl overflow-hidden cursor-pointer border border-darkLine`,
   imgContainer: `h-2/3 w-full overflow-hidden flex justify-center items-center`,
   nftImg: `w-full object-cover`,
-  details: `p-3`,
+  details: `p-3 h-1/3`,
   info: `flex justify-between text-[#e4e8eb] drop-shadow-xl`,
   infoLeft: `flex-0.6 flex-wrap`,
   collectionName: `font-semibold text-sm text-[#8a939b]`,
@@ -16,13 +16,11 @@ const style = {
   priceTag: `font-semibold text-sm text-[#8a939b]`,
   priceValue: `flex items-center text-xl font-bold mt-2`,
   ethLogo: `h-5 mr-2`,
-  likes: `text-[#8a939b] font-bold flex items-center w-full justify-end mt-3`,
-  likeIcon: `text-xl mr-2`,
 }
 
 type Props = {
-  nftItem: any
-  title: any
+  nftItem: NFTMetadataOwner
+  title: string
   listings: any
   collectionId?: string
 }
@@ -47,7 +45,7 @@ const NFTCard = ({ nftItem, title, listings, collectionId }: Props) => {
   return (
     <>
       <div
-        className={style.wrapper}
+        className={`${style.wrapper} max-w-xs`}
         onClick={() => {
           Router.push({
             pathname: `/collections/${collectionId}/nfts/${nftItem.metadata.id}`,
@@ -81,12 +79,6 @@ const NFTCard = ({ nftItem, title, listings, collectionId }: Props) => {
                 </div>
               </div>
             )}
-          </div>
-          <div className={style.likes}>
-            <span className={style.likeIcon}>
-              <BiHeart />
-            </span>{' '}
-            {nftItem.likes}
           </div>
         </div>
       </div>

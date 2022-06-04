@@ -1,4 +1,5 @@
 import { useNFTCollection } from '@thirdweb-dev/react'
+import CollectionCard from 'components/collection/CollectionCard'
 import { SkeletonCard } from 'components/common'
 import { MainLayout } from 'components/layout'
 import { client } from 'lib/sanityClient'
@@ -96,7 +97,7 @@ const Collections: NextPageWithLayout = () => {
         ) : (
           <>
             {collections.map((collection: any, index: number) => (
-              <Card key={index} data={collection} />
+              <CollectionCard key={index} data={collection} />
             ))}
           </>
         )}
@@ -104,58 +105,6 @@ const Collections: NextPageWithLayout = () => {
     </div>
   )
 }
-
-const style2 = {
-  wrapper: ``,
-  imgContainer: `h-2/3 w-full overflow-hidden flex justify-center items-center`,
-  nftImg: `w-full object-cover`,
-  details: `p-3`,
-  info: `flex justify-between text-[#e4e8eb] drop-shadow-xl`,
-  infoLeft: `flex-0.6 flex-wrap`,
-  collectionName: `font-semibold text-sm text-[#8a939b]`,
-  assetName: `font-bold text-lg mt-2`,
-  infoRight: `flex-0.4 text-right`,
-  priceTag: `font-semibold text-sm text-[#8a939b]`,
-  priceValue: `flex items-center text-xl font-bold mt-2`,
-  ethLogo: `h-5 mr-2`,
-  likes: `text-[#8a939b] font-bold flex items-center w-full justify-end mt-3`,
-  likeIcon: `text-xl mr-2`,
-}
-
-const Card = ({ data }: any) => (
-  <Link href={`/collections/${data.contractAddress}`} passHref>
-    <div className="bg-grey2 flex-auto w-full h-[30rem] rounded-2xl overflow-hidden cursor-pointer">
-      <div className={style2.imgContainer}>
-        <img
-          src={data.bannerImageUrl}
-          // alt={nftItem.metadata.name}
-          className="w-full h-full object-cover"
-        />
-      </div>
-      <div className="flex justify-center">
-        <img
-          className="mt-[-3rem] mb-3 object-cover rounded-full border-2 border-[#202225]"
-          src={data.imageUrl}
-          alt=""
-          width={80}
-          height={80}
-        />
-      </div>
-      <div className="flex flex-col gap-3 max-w-[80%] justify-center items-center mx-auto">
-        <div className="text-white font-bold">{data.title}</div>
-        <div className="text-grey1 text-sm">
-          by{' '}
-          <a href="" className="text-primary">
-            {data.creator}
-          </a>
-        </div>
-        <div className="text-grey1 max-w-[80%] whitespace-nowrap overflow-hidden text-ellipsis">
-          {data.description}
-        </div>
-      </div>
-    </div>
-  </Link>
-)
 
 Collections.Layout = MainLayout
 
