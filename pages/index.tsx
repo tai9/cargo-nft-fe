@@ -31,7 +31,6 @@ const HomePage: NextPageWithLayout = () => {
         _id: address,
         userName: 'Unnamed',
         walletAddress: address,
-        createdAt: new Date().toISOString(),
       }
 
       const result = await client.createIfNotExists(userDoc)

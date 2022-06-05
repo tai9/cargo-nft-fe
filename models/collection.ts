@@ -10,4 +10,7 @@ export type Collection = {
   imageUrl: string
   title: string
   volumeTraded: number
+  _id: string
+  _createdAt: string
+  _updatedAt: string
 }
