@@ -86,6 +86,9 @@ export let theme = createTheme({
       },
     },
   },
+  typography: {
+    fontFamily: 'Poppins, Roboto',
+  },
 })
 
 theme = responsiveFontSizes(theme)
