@@ -28,6 +28,7 @@ import {
 import NFTCard from 'components/NFTCard'
 import Link from 'next/link'
 import { Divider } from '@mui/material'
+import { sliceAddress } from 'utils'
 
 const style = {
   wrapper: `flex flex-col items-center container-lg text-[#e5e8eb]`,
@@ -261,11 +262,7 @@ const Nft: NextPageWithLayout = () => {
                         target="_blank"
                         rel="noreferrer"
                       >
-                        {nftListing?.assetContractAddress.slice(0, 7)}...
-                        {nftListing?.assetContractAddress.slice(
-                          nftListing?.assetContractAddress.length - 4,
-                          nftListing?.assetContractAddress.length
-                        )}
+                        {sliceAddress(nftListing?.assetContractAddress)}
                       </a>
                     </div>
                     <div className="flex justify-between">

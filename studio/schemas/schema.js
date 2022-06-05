@@ -46,7 +46,17 @@ export default createSchema({
           title: 'Instagram Handle',
           type: 'string',
         },
+        {
+          name: 'createdAt',
+          title: 'Create At',
+          type: 'datetime',
+          readOnly: true,
+        },
       ],
+
+      initialValue: () => ({
+        createdAt: new Date().toISOString(),
+      }),
     },
     {
       name: 'marketItems',

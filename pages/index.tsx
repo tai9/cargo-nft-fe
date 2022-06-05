@@ -1,14 +1,10 @@
-import type { NextPage } from 'next'
 import { useAddress, useMetamask } from '@thirdweb-dev/react'
-import { useEffect } from 'react'
-import { toast } from 'react-toastify'
-
-import Hero from '../components/Hero'
-import { client } from '../lib/sanityClient'
+import Home from 'components/home'
 import { MainLayout } from 'components/layout'
 import { NextPageWithLayout } from 'models'
-import { Header } from 'components/common'
-import Home from 'components/home'
+import { useEffect } from 'react'
+import { toast } from 'react-toastify'
+import { client } from 'lib/sanityClient'
 
 const style = {
   wrapper: `hii`,
@@ -35,6 +31,7 @@ const HomePage: NextPageWithLayout = () => {
         _id: address,
         userName: 'Unnamed',
         walletAddress: address,
+        createdAt: new Date().toISOString(),
       }
 
       const result = await client.createIfNotExists(userDoc)
