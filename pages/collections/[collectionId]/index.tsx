@@ -3,13 +3,30 @@ import { MainLayout } from 'components/layout'
 import { Collection, NextPageWithLayout } from 'models'
 import { useRouter } from 'next/router'
 import React, { useCallback, useEffect, useState } from 'react'
-import { AiOutlineInstagram, AiOutlineTwitter } from 'react-icons/ai'
+import {
+  AiOutlineInstagram,
+  AiOutlineTwitter,
+  AiOutlineSearch,
+} from 'react-icons/ai'
 import { CgWebsite } from 'react-icons/cg'
 import { HiDotsVertical } from 'react-icons/hi'
+import { BiFilter } from 'react-icons/bi'
+import { RiLayoutGridLine } from 'react-icons/ri'
+import { GrGrid } from 'react-icons/gr'
 import NFTCard from 'components/NFTCard'
 import { client } from 'lib/sanityClient'
-import { Box, Tab, Tabs, Typography } from '@mui/material'
-import { Container } from '@mui/material'
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  FormControl,
+  IconButton,
+  MenuItem,
+  Select,
+  Tab,
+  Tabs,
+  Typography,
+} from '@mui/material'
 
 const style = {
   bannerImageContainer: `h-[20vh] w-screen overflow-hidden flex justify-center items-center`,
@@ -31,6 +48,10 @@ const style = {
   ethLogo: `h-6 mr-2`,
   statName: `text-lg w-full text-center mt-1`,
   description: `text-[#8a939b] text-xl max-w-3xl flex-wrap mt-4 text-center`,
+
+  searchBar: `flex flex-1 w-max-[520px] items-center bg-grey2 rounded-[0.8rem] hover:bg-darkGrey border border-darkLine`,
+  searchIcon: `text-[#8a939b] mx-3 font-bold text-lg`,
+  searchInput: `w-full border-0 bg-transparent outline-0 ring-0 text-[#e6e8eb] placeholder:text-[#8a939b]`,
 }
 
 interface TabPanelProps {
@@ -257,7 +278,57 @@ const Collection: NextPageWithLayout = () => {
           </Tabs>
         </Box>
         <TabPanel value={tabValue} index="items">
-          <div className="flex flex-wrap ">
+          <div className="flex gap-4 mt-6">
+            <IconButton>
+              <BiFilter fontSize={28} color="white" />
+            </IconButton>
+            <div className={style.searchBar}>
+              <div className={style.searchIcon}>
+                <AiOutlineSearch />
+              </div>
+              <input
+                className={style.searchInput}
+                placeholder="Search by name"
+              />
+            </div>
+            <FormControl>
+              <Select
+                size="small"
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                defaultValue={10}
+                sx={{
+                  background: '#303339',
+                  color: 'white',
+                  fontWeight: 'bold',
+                  height: '100%',
+                  borderColor: '#151c22',
+                }}
+              >
+                <MenuItem value={10}>Price: Low to High</MenuItem>
+                <MenuItem value={20}>Price: High to Low</MenuItem>
+                <MenuItem value={30}>Recently Listed</MenuItem>
+                <MenuItem value={40}>Recently Created</MenuItem>
+              </Select>
+            </FormControl>
+            <ButtonGroup
+              disableRipple
+              variant="outlined"
+              aria-label="outlined button group"
+              sx={{
+                background: '#303339',
+                borderColor: 'white',
+              }}
+            >
+              <Button>
+                <RiLayoutGridLine fontSize={24} color="white" />
+              </Button>
+              <Button>
+                <GrGrid fontSize={20} color="white" />
+              </Button>
+            </ButtonGroup>
+          </div>
+          <div className="flex flex-wrap">
             {nfts.map((nftItem: any, id: number) => (
               <NFTCard
                 key={id}

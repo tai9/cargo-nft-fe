@@ -50,38 +50,10 @@ export let theme = createTheme({
         },
       },
     },
-    MuiOutlinedInput: {
+    MuiButtonBase: {
       styleOverrides: {
         root: {
-          // background: color.grey50,
-          borderRadius: `4px`,
-          '& .MuiOutlinedInput-notchedOutline': {
-            // borderColor: color?.grey400,
-          },
-          '&:hover $notchedOutline': {
-            // borderColor: color?.primaryLight,
-          },
-          '&.MuiInputBase-multiline': {
-            padding: 1,
-          },
-        },
-        input: {
-          fontWeight: 500,
-          // background: color.grey50,
-          padding: '15.5px 14px',
-          borderRadius: `4px`,
-          '&.MuiInputBase-inputSizeSmall': {
-            padding: '10px 14px',
-            '&.MuiInputBase-inputAdornedStart': {
-              paddingLeft: 0,
-            },
-          },
-        },
-        inputAdornedStart: {
-          paddingLeft: 4,
-        },
-        notchedOutline: {
-          borderRadius: `4px`,
+          borderColor: '#151c22 !important',
         },
       },
     },
