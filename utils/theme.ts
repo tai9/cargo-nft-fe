@@ -45,7 +45,7 @@ export let theme = createTheme({
       styleOverrides: {
         root: {
           fontWeight: 'bold',
-          fontSize: '1.25rem',
+          fontSize: '1.1rem',
           textTransform: 'capitalize',
         },
       },

@@ -1,20 +1,81 @@
-import { Tooltip } from '@mui/material'
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Checkbox,
+  Divider,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  Grid,
+  IconButton,
+  MenuItem,
+  Radio,
+  RadioGroup,
+  Select,
+  Stack,
+  Tab,
+  Tabs,
+  Tooltip,
+  Typography,
+} from '@mui/material'
 import { useAddress } from '@thirdweb-dev/react'
 import CoverImg from 'assets/cover.jpeg'
 import { MainLayout } from 'components/layout'
 import { client } from 'lib/sanityClient'
-import { NextPageWithLayout, User } from 'models'
+import { Collection, NextPageWithLayout, User } from 'models'
 import Image from 'next/image'
 import { useCallback, useEffect, useState } from 'react'
 import { BsFillShareFill } from 'react-icons/bs'
 import { FiMoreHorizontal } from 'react-icons/fi'
 import { sliceAddress } from 'utils'
 import moment from 'moment'
+import { BiFilter } from 'react-icons/bi'
+import { GrGrid } from 'react-icons/gr'
+import { RiLayoutGridLine } from 'react-icons/ri'
+import { AiOutlineSearch } from 'react-icons/ai'
+import { CollapseOutline } from 'components/common'
+import NFTCard from 'components/NFTCard'
+
+interface TabPanelProps {
+  children?: React.ReactNode
+  index: TabType
+  value: TabType
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Typography>{children}</Typography>}
+    </div>
+  )
+}
+
+function a11yProps(index: TabType) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+    value: index,
+  }
+}
+
+type TabType = 'items' | 'activity'
 
 const AccountPage: NextPageWithLayout = () => {
   const address = useAddress()
   const [userInfo, setUserInfo] = useState<User>()
   const [isLoadingInfo, setIsLoadingInfo] = useState(false)
+  const [tabValue, setTabValue] = useState<TabType>('items')
+  const [isLoadingNFTs, setIsLoadingNFTs] = useState(false)
+  const [collection, setCollection] = useState<Collection>()
 
   const fetchUserData = useCallback(
     async (address: string, sanityClient = client) => {
@@ -44,6 +105,10 @@ const AccountPage: NextPageWithLayout = () => {
   useEffect(() => {
     address && fetchUserData(address)
   }, [address, fetchUserData])
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: TabType) => {
+    setTabValue(newValue)
+  }
 
   return (
     <div>
@@ -91,10 +156,227 @@ const AccountPage: NextPageWithLayout = () => {
             Joined {moment(userInfo?.createdAt).format('MMM Do YYYY')}
           </div>
         </div>
+
+        <div>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 3 }}>
+            <Tabs
+              value={tabValue}
+              onChange={handleTabChange}
+              aria-label="basic tabs example"
+              textColor="secondary"
+              indicatorColor="secondary"
+            >
+              <Tab label="Items" disableRipple {...a11yProps('items')} />
+              <Tab label="Activity" disableRipple {...a11yProps('activity')} />
+            </Tabs>
+          </Box>
+          <TabPanel value={tabValue} index="items">
+            <div className="flex gap-4 mt-6">
+              <IconButton>
+                <BiFilter fontSize={28} color="white" />
+              </IconButton>
+              <div className="flex flex-1 w-max-[520px] items-center bg-grey2 rounded-[0.8rem] hover:bg-darkGrey border border-darkLine">
+                <div className="text-[#8a939b] mx-3 font-bold text-lg">
+                  <AiOutlineSearch />
+                </div>
+                <input
+                  className="w-full border-0 bg-transparent outline-0 ring-0 text-[#e6e8eb] placeholder:text-[#8a939b]"
+                  placeholder="Search by name"
+                />
+              </div>
+              <FormControl>
+                <Select
+                  size="small"
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  defaultValue={10}
+                  sx={{
+                    background: '#303339',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    height: '100%',
+                    borderColor: '#151c22',
+                    borderRadius: '0.8rem',
+                  }}
+                >
+                  <MenuItem value={10}>Price: Low to High</MenuItem>
+                  <MenuItem value={20}>Price: High to Low</MenuItem>
+                  <MenuItem value={30}>Recently Listed</MenuItem>
+                  <MenuItem value={40}>Recently Created</MenuItem>
+                </Select>
+              </FormControl>
+              <ButtonGroup
+                disableRipple
+                variant="outlined"
+                aria-label="outlined button group"
+                sx={{
+                  background: '#303339',
+                  borderColor: 'white',
+                  borderRadius: '0.8rem',
+                }}
+              >
+                <Button>
+                  <RiLayoutGridLine fontSize={24} color="white" />
+                </Button>
+                <Button>
+                  <GrGrid fontSize={20} color="white" />
+                </Button>
+              </ButtonGroup>
+            </div>
+
+            <Grid container spacing={4}>
+              <Grid
+                item
+                xs={2}
+                sx={{
+                  marginTop: 3,
+                }}
+              >
+                <CollapseOutline title="Status">
+                  <Stack>
+                    <FormControl variant="standard" fullWidth>
+                      <FormGroup>
+                        <FormControlLabel
+                          sx={{
+                            justifyContent: 'space-between',
+                            ml: 0,
+                          }}
+                          control={<Checkbox name="buynow" />}
+                          label="Buy now"
+                          labelPlacement="start"
+                        />
+                        <FormControlLabel
+                          sx={{
+                            justifyContent: 'space-between',
+                            ml: 0,
+                          }}
+                          control={<Checkbox name="auction" />}
+                          label="On Auction"
+                          labelPlacement="start"
+                        />
+                        <FormControlLabel
+                          sx={{
+                            justifyContent: 'space-between',
+                            ml: 0,
+                          }}
+                          control={<Checkbox name="buyWithCard" />}
+                          label="Buy with Card"
+                          labelPlacement="start"
+                        />
+                      </FormGroup>
+                    </FormControl>
+                  </Stack>
+                </CollapseOutline>
+
+                <Divider
+                  sx={{
+                    marginY: 2,
+                    background: 'grey',
+                  }}
+                />
+
+                <CollapseOutline title="Item quantity">
+                  <Stack>
+                    <FormControl variant="standard" fullWidth>
+                      <RadioGroup defaultValue="singleItems">
+                        <FormControlLabel
+                          sx={{
+                            justifyContent: 'space-between',
+                            ml: 0,
+                          }}
+                          control={<Radio name="buynow" />}
+                          label="All items"
+                          labelPlacement="start"
+                          value="allItems"
+                        />
+                        <FormControlLabel
+                          sx={{
+                            justifyContent: 'space-between',
+                            ml: 0,
+                          }}
+                          control={<Radio name="auction" />}
+                          label="Single items"
+                          labelPlacement="start"
+                          value="singleItems"
+                        />
+                        <FormControlLabel
+                          sx={{
+                            justifyContent: 'space-between',
+                            ml: 0,
+                          }}
+                          control={<Radio name="buyWithCard" />}
+                          label="Bundles"
+                          labelPlacement="start"
+                          value="bundles"
+                        />
+                      </RadioGroup>
+                    </FormControl>
+                  </Stack>
+                </CollapseOutline>
+
+                <Divider
+                  sx={{
+                    marginY: 2,
+                    background: 'grey',
+                  }}
+                />
+
+                <CollapseOutline title="On sale in">
+                  <Stack>
+                    <FormControl variant="standard" fullWidth>
+                      <FormGroup>
+                        <FormControlLabel
+                          sx={{
+                            justifyContent: 'space-between',
+                            ml: 0,
+                          }}
+                          control={<Checkbox name="sale" defaultChecked />}
+                          label="ETH"
+                          labelPlacement="start"
+                        />
+                      </FormGroup>
+                    </FormControl>
+                  </Stack>
+                </CollapseOutline>
+              </Grid>
+
+              <Grid item>
+                <div className="flex flex-wrap">
+                  {/* {isLoadingNFTs
+                  ? [1, 2].map((x) => <NFTCardSkeleton key={x} />)
+                  : nfts.map((nftItem: any, id: number) => (
+                      <NFTCard
+                        key={id}
+                        nftItem={nftItem}
+                        title={collection?.title || ''}
+                        listings={listings}
+                        collectionId={collectionId as string}
+                      />
+                    ))} */}
+                </div>
+              </Grid>
+            </Grid>
+          </TabPanel>
+          <TabPanel value={tabValue} index="activity">
+            No item to display
+          </TabPanel>
+        </div>
       </div>
     </div>
   )
 }
+
+const NFTCardSkeleton = () => (
+  <div className="border border-slate-600 shadow rounded-md w-[318px] h-[428px] mx-5 my-6">
+    <div className="animate-pulse flex space-x-4">
+      <div className="flex-1 space-y-3">
+        <div className="h-72 bg-slate-700 rounded"></div>
+        <div className="h-4 bg-slate-700 rounded"></div>
+        <div className="h-5 bg-slate-700 rounded"></div>
+      </div>
+    </div>
+  </div>
+)
 
 AccountPage.Layout = MainLayout
 

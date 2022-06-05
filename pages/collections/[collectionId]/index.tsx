@@ -141,7 +141,7 @@ const Collection: NextPageWithLayout = () => {
   }
 
   const fetchCollectionData = useCallback(
-    async (sanityClient = client) => {
+    async (collectionId: string, sanityClient = client) => {
       const query = `*[_type == "marketItems" && contractAddress == "${collectionId}" ] {
       "imageUrl": profileImage.asset->url,
       "bannerImageUrl": bannerImage.asset->url,
@@ -161,11 +161,11 @@ const Collection: NextPageWithLayout = () => {
         console.log(error)
       }
     },
-    [collectionId]
+    []
   )
 
   useEffect(() => {
-    fetchCollectionData()
+    fetchCollectionData(collectionId as string)
   }, [collectionId, fetchCollectionData])
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: TabType) => {
