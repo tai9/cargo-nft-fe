@@ -46,17 +46,7 @@ export default createSchema({
           title: 'Instagram Handle',
           type: 'string',
         },
-        {
-          name: 'createdAt',
-          title: 'Create At',
-          type: 'datetime',
-          readOnly: true,
-        },
       ],
-
-      initialValue: () => ({
-        createdAt: new Date().toISOString(),
-      }),
     },
     {
       name: 'marketItems',
@@ -111,6 +101,73 @@ export default createSchema({
           type: 'image',
         },
       ],
+    },
+    {
+      name: 'nfts',
+      title: 'NFTs',
+      type: 'document',
+      fields: [
+        {
+          name: 'metadata',
+          title: 'Metadata',
+          type: 'object',
+          fields: [
+            {
+              name: 'id',
+              title: 'ID',
+              type: 'string',
+            },
+            {
+              name: 'description',
+              title: 'Description',
+              type: 'string',
+            },
+            {
+              name: 'name',
+              title: 'Name',
+              type: 'string',
+            },
+            {
+              name: 'image',
+              title: 'Image',
+              type: 'string',
+            },
+            {
+              name: 'uri',
+              title: 'URI',
+              type: 'string',
+            },
+            {
+              name: 'background_color',
+              title: 'Background Color',
+              type: 'string',
+            },
+            {
+              name: 'external_url',
+              title: 'External URL',
+              type: 'string',
+            },
+          ],
+        },
+        {
+          name: 'owner',
+          title: 'Owner',
+          type: 'reference',
+          to: [{ type: 'users' }],
+        },
+        {
+          name: 'collection',
+          title: 'Collection',
+          type: 'reference',
+          to: [{ type: 'marketItems' }],
+        },
+      ],
+
+      preview: {
+        select: {
+          title: 'metadata.name',
+        },
+      },
     },
   ]),
 })
