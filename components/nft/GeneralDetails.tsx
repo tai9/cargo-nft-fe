@@ -3,6 +3,7 @@ import { MdRefresh } from 'react-icons/md'
 import { RiShareBoxLine } from 'react-icons/ri'
 import { FiMoreVertical } from 'react-icons/fi'
 import { GiShare } from 'react-icons/gi'
+import { Skeleton } from '@mui/material'
 
 const style = {
   wrapper: `flex`,
@@ -30,7 +31,9 @@ const GeneralDetails = ({ collectionName, NFTName, ownedBy }: Props) => {
     <div className={style.wrapper}>
       <div className={style.infoContainer}>
         <div className={style.accent}>{collectionName || ''}</div>
-        <div className={style.nftTitle}>{NFTName || ''}</div>
+        <div className={style.nftTitle}>
+          {NFTName || <Skeleton animation="wave" />}
+        </div>
         <div className={style.otherInfo}>
           <div className={style.ownedBy}>
             Owned by <span className={style.accent}>{ownedBy}</span>

@@ -4,7 +4,7 @@ import { ethers } from 'ethers'
 import { NFTMetadataOwner } from '@thirdweb-dev/sdk'
 
 const style = {
-  wrapper: `bg-[#303339] flex-auto my-10 mx-5 rounded-2xl overflow-hidden cursor-pointer border border-darkLine`,
+  wrapper: `bg-[#303339] flex-auto my-6 mx-5 rounded-2xl overflow-hidden cursor-pointer border border-darkLine`,
   imgContainer: `h-2/3 w-full overflow-hidden flex justify-center items-center`,
   nftImg: `w-full object-cover`,
   details: `p-3 h-1/3`,
@@ -55,7 +55,7 @@ const NFTCard = ({ nftItem, title, listings, collectionId }: Props) => {
       >
         <div className={style.imgContainer}>
           <img
-            src={nftItem.metadata.image}
+            src={nftItem.metadata.image || ''}
             alt={nftItem.metadata.name}
             className={style.nftImg}
           />

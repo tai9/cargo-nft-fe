@@ -1,32 +1,41 @@
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Checkbox,
+  Divider,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  Grid,
+  IconButton,
+  MenuItem,
+  Radio,
+  RadioGroup,
+  Select,
+  Stack,
+  Tab,
+  Tabs,
+  Typography,
+} from '@mui/material'
 import { useMarketplace, useNFTCollection } from '@thirdweb-dev/react'
+import { CollapseOutline } from 'components/common'
 import { MainLayout } from 'components/layout'
+import NFTCard from 'components/NFTCard'
+import { client } from 'lib/sanityClient'
 import { Collection, NextPageWithLayout } from 'models'
 import { useRouter } from 'next/router'
 import React, { useCallback, useEffect, useState } from 'react'
 import {
   AiOutlineInstagram,
-  AiOutlineTwitter,
   AiOutlineSearch,
+  AiOutlineTwitter,
 } from 'react-icons/ai'
-import { CgWebsite } from 'react-icons/cg'
-import { HiDotsVertical } from 'react-icons/hi'
 import { BiFilter } from 'react-icons/bi'
-import { RiLayoutGridLine } from 'react-icons/ri'
+import { CgWebsite } from 'react-icons/cg'
 import { GrGrid } from 'react-icons/gr'
-import NFTCard from 'components/NFTCard'
-import { client } from 'lib/sanityClient'
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  FormControl,
-  IconButton,
-  MenuItem,
-  Select,
-  Tab,
-  Tabs,
-  Typography,
-} from '@mui/material'
+import { HiDotsVertical } from 'react-icons/hi'
+import { RiLayoutGridLine } from 'react-icons/ri'
 
 const style = {
   bannerImageContainer: `h-[20vh] w-screen overflow-hidden flex justify-center items-center`,
@@ -94,6 +103,7 @@ const Collection: NextPageWithLayout = () => {
   const [nfts, setNfts] = useState<any>([])
   const [listings, setListings] = useState<any>([])
   const [tabValue, setTabValue] = useState<TabType>('items')
+  const [isLoadingNFTs, setIsLoadingNFTs] = useState(false)
 
   const marketplace = useMarketplace(
     process.env.NEXT_PUBLIC_MARKETPLACE_CONTRACT_ADDRESS
@@ -119,10 +129,13 @@ const Collection: NextPageWithLayout = () => {
   const getNFTCollection = async () => {
     if (!nftCollection) return
     try {
+      setIsLoadingNFTs(true)
       const nfts = await nftCollection.getAll()
       setNfts(nfts)
+      setIsLoadingNFTs(false)
     } catch (err) {
       console.error(err)
+      setIsLoadingNFTs(false)
       alert('Error fetching nfts')
     }
   }
@@ -328,17 +341,139 @@ const Collection: NextPageWithLayout = () => {
               </Button>
             </ButtonGroup>
           </div>
-          <div className="flex flex-wrap">
-            {nfts.map((nftItem: any, id: number) => (
-              <NFTCard
-                key={id}
-                nftItem={nftItem}
-                title={collection?.title || ''}
-                listings={listings}
-                collectionId={collectionId as string}
+
+          <Grid container spacing={4}>
+            <Grid
+              item
+              xs={2}
+              sx={{
+                marginTop: 3,
+              }}
+            >
+              <CollapseOutline title="Status">
+                <Stack>
+                  <FormControl variant="standard" fullWidth>
+                    <FormGroup>
+                      <FormControlLabel
+                        sx={{
+                          justifyContent: 'space-between',
+                          ml: 0,
+                        }}
+                        control={<Checkbox name="buynow" />}
+                        label="Buy now"
+                        labelPlacement="start"
+                      />
+                      <FormControlLabel
+                        sx={{
+                          justifyContent: 'space-between',
+                          ml: 0,
+                        }}
+                        control={<Checkbox name="auction" />}
+                        label="On Auction"
+                        labelPlacement="start"
+                      />
+                      <FormControlLabel
+                        sx={{
+                          justifyContent: 'space-between',
+                          ml: 0,
+                        }}
+                        control={<Checkbox name="buyWithCard" />}
+                        label="Buy with Card"
+                        labelPlacement="start"
+                      />
+                    </FormGroup>
+                  </FormControl>
+                </Stack>
+              </CollapseOutline>
+
+              <Divider
+                sx={{
+                  marginY: 2,
+                  background: 'grey',
+                }}
               />
-            ))}
-          </div>
+
+              <CollapseOutline title="Item quantity">
+                <Stack>
+                  <FormControl variant="standard" fullWidth>
+                    <RadioGroup defaultValue="singleItems">
+                      <FormControlLabel
+                        sx={{
+                          justifyContent: 'space-between',
+                          ml: 0,
+                        }}
+                        control={<Radio name="buynow" />}
+                        label="All items"
+                        labelPlacement="start"
+                        value="allItems"
+                      />
+                      <FormControlLabel
+                        sx={{
+                          justifyContent: 'space-between',
+                          ml: 0,
+                        }}
+                        control={<Radio name="auction" />}
+                        label="Single items"
+                        labelPlacement="start"
+                        value="singleItems"
+                      />
+                      <FormControlLabel
+                        sx={{
+                          justifyContent: 'space-between',
+                          ml: 0,
+                        }}
+                        control={<Radio name="buyWithCard" />}
+                        label="Bundles"
+                        labelPlacement="start"
+                        value="bundles"
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                </Stack>
+              </CollapseOutline>
+
+              <Divider
+                sx={{
+                  marginY: 2,
+                  background: 'grey',
+                }}
+              />
+
+              <CollapseOutline title="On sale in">
+                <Stack>
+                  <FormControl variant="standard" fullWidth>
+                    <FormGroup>
+                      <FormControlLabel
+                        sx={{
+                          justifyContent: 'space-between',
+                          ml: 0,
+                        }}
+                        control={<Checkbox name="sale" defaultChecked />}
+                        label="ETH"
+                        labelPlacement="start"
+                      />
+                    </FormGroup>
+                  </FormControl>
+                </Stack>
+              </CollapseOutline>
+            </Grid>
+
+            <Grid item>
+              <div className="flex flex-wrap">
+                {isLoadingNFTs
+                  ? [1, 2].map((x) => <NFTCardSkeleton key={x} />)
+                  : nfts.map((nftItem: any, id: number) => (
+                      <NFTCard
+                        key={id}
+                        nftItem={nftItem}
+                        title={collection?.title || ''}
+                        listings={listings}
+                        collectionId={collectionId as string}
+                      />
+                    ))}
+              </div>
+            </Grid>
+          </Grid>
         </TabPanel>
         <TabPanel value={tabValue} index="activity">
           No item to display
@@ -347,6 +482,18 @@ const Collection: NextPageWithLayout = () => {
     </div>
   )
 }
+
+const NFTCardSkeleton = () => (
+  <div className="border border-slate-600 shadow rounded-md w-[318px] h-[428px] mx-5 my-6">
+    <div className="animate-pulse flex space-x-4">
+      <div className="flex-1 space-y-3">
+        <div className="h-72 bg-slate-700 rounded"></div>
+        <div className="h-4 bg-slate-700 rounded"></div>
+        <div className="h-5 bg-slate-700 rounded"></div>
+      </div>
+    </div>
+  </div>
+)
 
 Collection.Layout = MainLayout
 
