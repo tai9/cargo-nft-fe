@@ -61,7 +61,9 @@ export const Header = () => {
           </Link>
           <div className={style.headerItem}> Stats </div>
           <div className={style.headerItem}> Resources </div>
-          <div className={style.headerItem}> Create </div>
+          <Link href="/assets/create">
+            <a className={style.headerItem}> Create </a>
+          </Link>
           <button className={style.headerIcon} onClick={handleOpenMenu}>
             <CgProfile />
           </button>

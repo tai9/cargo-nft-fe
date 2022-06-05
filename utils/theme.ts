@@ -57,6 +57,13 @@ export let theme = createTheme({
         },
       },
     },
+    MuiDivider: {
+      styleOverrides: {
+        root: {
+          background: 'grey',
+        },
+      },
+    },
   },
   typography: {
     fontFamily: 'Poppins, Roboto',
