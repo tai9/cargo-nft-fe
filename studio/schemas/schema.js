@@ -130,7 +130,7 @@ export default createSchema({
             {
               name: 'image',
               title: 'Image',
-              type: 'string',
+              type: 'image',
             },
             {
               name: 'uri',

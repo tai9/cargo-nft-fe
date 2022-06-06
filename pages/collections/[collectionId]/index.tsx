@@ -18,7 +18,11 @@ import {
   Tabs,
   Typography,
 } from '@mui/material'
-import { useMarketplace, useNFTCollection } from '@thirdweb-dev/react'
+import {
+  useAddress,
+  useMarketplace,
+  useNFTCollection,
+} from '@thirdweb-dev/react'
 import { CollapseOutline } from 'components/common'
 import { MainLayout } from 'components/layout'
 import NFTCard from 'components/NFTCard'
@@ -97,6 +101,7 @@ type TabType = 'items' | 'activity'
 
 const Collection: NextPageWithLayout = () => {
   const router = useRouter()
+  const address = useAddress()
 
   const { collectionId } = router.query
   const [collection, setCollection] = useState<Collection>()
@@ -157,6 +162,20 @@ const Collection: NextPageWithLayout = () => {
       try {
         const collectionData: Collection[] = await sanityClient.fetch(query)
         setCollection(collectionData[0])
+
+        const userDoc = {
+          _type: 'marketItems',
+          _id: collectionData[0].contractAddress,
+          title: 'Invs',
+          contractAddress: collectionData[0].contractAddress,
+          createdBy: {
+            _type: 'reference',
+            _ref: address,
+          },
+        }
+
+        const result = await client.createIfNotExists(userDoc)
+        console.log(result, '🔫')
       } catch (error) {
         console.log(error)
       }

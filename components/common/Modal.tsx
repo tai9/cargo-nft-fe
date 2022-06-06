@@ -14,14 +14,16 @@ const Backdrop = ({ children }: BackdropProps) => {
 }
 
 type ModalProps = {
+  className?: string
   title: string
-  submitText: string
+  submitText?: string
   open: boolean
   children?: ReactNode
   handleClose?: () => void
   handleSubmit?: () => void
 }
 export const Modal = ({
+  className,
   title,
   submitText,
   open,
@@ -35,7 +37,9 @@ export const Modal = ({
         className="h-screen w-screen grid grid-cols-1 items-center"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="bg-[#303338] max-w-2xl mx-auto w-full rounded-md text-white border border-darkLine">
+        <div
+          className={`bg-[#303338] max-w-2xl mx-auto w-full rounded-md text-white border border-darkLine ${className}`}
+        >
           <div className="p-4 text-center relative">
             <div className="font-bold text-xl">{title}</div>
             <IoCloseSharp
@@ -47,15 +51,19 @@ export const Modal = ({
           </div>
           <div className="border-t-[1px] border-darkLine"></div>
           <div className="p-8">{children}</div>
-          <div className="border-t-[1px] border-darkLine"></div>
-          <div className="p-4 text-center">
-            <button
-              className={`py-3 px-4 rounded-lg bg-[#2081e2] hover:bg-[#42a0ff]`}
-              onClick={handleSubmit}
-            >
-              <div className="ml-2 font-semibold">{submitText}</div>
-            </button>
-          </div>
+          {handleSubmit && (
+            <>
+              <div className="border-t-[1px] border-darkLine"></div>
+              <div className="p-4 text-center">
+                <button
+                  className={`py-3 px-4 rounded-lg bg-[#2081e2] hover:bg-[#42a0ff]`}
+                  onClick={handleSubmit}
+                >
+                  <div className="ml-2 font-semibold">{submitText}</div>
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </Backdrop>

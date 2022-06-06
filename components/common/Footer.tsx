@@ -7,6 +7,7 @@ import {
   FaRedditAlien,
   FaTwitter,
 } from 'react-icons/fa'
+import { IconBox } from './IconBox'
 
 const style = {
   searchBar: `flex flex-1 w-max-[520px] items-center bg-darkGrey rounded-lg hover:bg-lightGrey`,
@@ -37,27 +38,27 @@ export const Footer = () => {
         <div>
           <div className="font-bold mb-4 text-lg">Join the community</div>
           <div className="flex gap-3">
-            <Box>
+            <IconBox>
               <FaTwitter fontSize={22} />
-            </Box>
-            <Box>
+            </IconBox>
+            <IconBox>
               <FaInstagram fontSize={22} />
-            </Box>
-            <Box>
+            </IconBox>
+            <IconBox>
               <FaFacebookSquare fontSize={22} />
-            </Box>
-            <Box>
+            </IconBox>
+            <IconBox>
               <FaDiscord fontSize={22} />
-            </Box>
-            <Box>
+            </IconBox>
+            <IconBox>
               <FaYoutube fontSize={22} />
-            </Box>
-            <Box>
+            </IconBox>
+            <IconBox>
               <FaTiktok fontSize={22} />
-            </Box>
-            <Box>
+            </IconBox>
+            <IconBox>
               <FaRedditAlien fontSize={22} />
-            </Box>
+            </IconBox>
           </div>
         </div>
       </div>
@@ -71,9 +72,3 @@ export const Footer = () => {
     </div>
   )
 }
-
-const Box = ({ children }: any) => (
-  <div className="p-3 bg-lightGrey w-fit cursor-pointer rounded-lg  duration-100 hover:bg-primary hover:scale-105">
-    {children}
-  </div>
-)

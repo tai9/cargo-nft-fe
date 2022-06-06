@@ -21,7 +21,7 @@ import {
 } from '@mui/material'
 import { useAddress } from '@thirdweb-dev/react'
 import CoverImg from 'assets/cover.jpeg'
-import { MainLayout } from 'components/layout'
+import { NormalLayout } from 'components/layout'
 import { client } from 'lib/sanityClient'
 import { Collection, NextPageWithLayout, User } from 'models'
 import Image from 'next/image'
@@ -35,7 +35,6 @@ import { GrGrid } from 'react-icons/gr'
 import { RiLayoutGridLine } from 'react-icons/ri'
 import { AiOutlineSearch } from 'react-icons/ai'
 import { CollapseOutline } from 'components/common'
-import NFTCard from 'components/NFTCard'
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -378,6 +377,6 @@ const NFTCardSkeleton = () => (
   </div>
 )
 
-AccountPage.Layout = MainLayout
+AccountPage.Layout = NormalLayout
 
 export default AccountPage

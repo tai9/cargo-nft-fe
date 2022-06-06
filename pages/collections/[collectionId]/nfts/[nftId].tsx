@@ -86,7 +86,10 @@ const Nft: NextPageWithLayout = () => {
         "creator": createdBy->userName,
         title, floorPrice,
         "allOwners": owners[]->,
-        description
+        description,
+        _id,
+        _createdAt,
+        _updatedAt
       }`
 
       try {
@@ -121,7 +124,6 @@ const Nft: NextPageWithLayout = () => {
       if (nftId) {
         const nft = await nftCollection?.get(+nftId)
         setSelectedNft(nft)
-        console.log(nft, '🔫')
 
         if (isListed === 'true') {
           const data: Listing[] | undefined =

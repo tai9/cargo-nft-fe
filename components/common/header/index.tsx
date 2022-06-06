@@ -1,4 +1,4 @@
-import { useDisconnect } from '@thirdweb-dev/react'
+import { useAddress, useDisconnect, useMetamask } from '@thirdweb-dev/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
@@ -8,6 +8,7 @@ import { MdOutlineAccountBalanceWallet } from 'react-icons/md'
 import openseaLogo from 'assets/opensea.png'
 import { Menu, MenuItem } from '@mui/material'
 import { toast } from 'react-toastify'
+import { useRouter } from 'next/router'
 
 const style = {
   wrapper: `bg-darkBlue w-screen px-[1.2rem] py-[0.8rem] flex `,
@@ -22,7 +23,11 @@ const style = {
 }
 
 export const Header = () => {
+  const connectWithMetamask = useMetamask()
   const disconnect = useDisconnect()
+  const addressConnected = useAddress()
+  const router = useRouter()
+
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
   const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -35,6 +40,21 @@ export const Header = () => {
   const handleDisconnectWallet = () => {
     disconnect()
     toast.success('Logout successfully!')
+  }
+
+  const handleNavigateCreateNft = async () => {
+    if (addressConnected) {
+      router.push('/assets/create')
+      return
+    }
+
+    const data = await connectWithMetamask()
+    if (data.error) {
+      toast.error('Cannot connect to your wallet.')
+      return
+    }
+
+    router.push('/assets/create')
   }
 
   return (
@@ -61,9 +81,9 @@ export const Header = () => {
           </Link>
           <div className={style.headerItem}> Stats </div>
           <div className={style.headerItem}> Resources </div>
-          <Link href="/assets/create">
-            <a className={style.headerItem}> Create </a>
-          </Link>
+          <div className={style.headerItem} onClick={handleNavigateCreateNft}>
+            Create
+          </div>
           <button className={style.headerIcon} onClick={handleOpenMenu}>
             <CgProfile />
           </button>

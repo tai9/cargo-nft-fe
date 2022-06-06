@@ -24,10 +24,10 @@ export const Dropzone = ({ onChange }: Props) => {
     },
   })
 
-  const thumbs = files.map((file: any) => (
+  const thumbs = files.map((file: any, idx) => (
     <img
       className="object-cover w-full h-full"
-      key={file.name}
+      key={idx}
       src={file.preview}
       // Revoke data uri after image is loaded
       onLoad={() => {
