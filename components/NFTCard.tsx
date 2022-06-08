@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import Router from 'next/router'
 import { ethers } from 'ethers'
 import { NFTMetadataOwner } from '@thirdweb-dev/sdk'
+import { NFTItem } from 'models'
 
 const style = {
   wrapper: `bg-[#303339] flex-auto my-6 mx-5 rounded-2xl overflow-hidden cursor-pointer border border-darkLine`,
@@ -19,9 +20,9 @@ const style = {
 }
 
 type Props = {
-  nftItem: NFTMetadataOwner
+  nftItem: NFTItem
   title: string
-  listings: any
+  listings?: any
   collectionId?: string
 }
 
@@ -30,6 +31,8 @@ const NFTCard = ({ nftItem, title, listings, collectionId }: Props) => {
   const [price, setPrice] = useState(0)
 
   useEffect(() => {
+    if (!listings) return
+
     const listing = listings.find(
       (listing: any) =>
         ethers.utils.formatEther(listing.asset.id) ===
@@ -45,7 +48,7 @@ const NFTCard = ({ nftItem, title, listings, collectionId }: Props) => {
   return (
     <>
       <div
-        className={`${style.wrapper} max-w-xs`}
+        className={`${style.wrapper} max-w-xs min-h-[450px] `}
         onClick={() => {
           Router.push({
             pathname: `/collections/${collectionId}/nfts/${nftItem.metadata.id}`,

@@ -14,3 +14,18 @@ export type Collection = {
   _createdAt: string
   _updatedAt: string
 }
+
+export const getAllcollectionQuery = `*[_type == "marketItems"] {
+  _id,
+  _createdAt,
+  _updatedAt,
+  "imageUrl": profileImage.asset->url,
+  "bannerImageUrl": bannerImage.asset->url,
+  volumeTraded,
+  createdBy,
+  contractAddress,
+  "creator": createdBy->userName,
+  title, floorPrice,
+  "allOwners": owners[]->,
+  description
+}`

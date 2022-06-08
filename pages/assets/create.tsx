@@ -9,7 +9,7 @@ import {
 } from '@mui/material'
 import { Dropzone, IconBox, Input, Modal } from 'components/common'
 import { NormalLayout } from 'components/layout'
-import { Collection, NextPageWithLayout } from 'models'
+import { Collection, getAllcollectionQuery, NextPageWithLayout } from 'models'
 import React, {
   FormEvent,
   SyntheticEvent,
@@ -62,21 +62,11 @@ const CreatePage: NextPageWithLayout = () => {
   }, [address, router])
 
   const fetchCollectionData = useCallback(async (sanityClient = client) => {
-    const query = `*[_type == "marketItems"] {
-      "imageUrl": profileImage.asset->url,
-      "bannerImageUrl": bannerImage.asset->url,
-      volumeTraded,
-      createdBy,
-      contractAddress,
-      "creator": createdBy->userName,
-      title, floorPrice,
-      "allOwners": owners[]->,
-      description
-    }`
-
     try {
       setLoadingCollection(true)
-      const collectionData: Collection[] = await sanityClient.fetch(query)
+      const collectionData: Collection[] = await sanityClient.fetch(
+        getAllcollectionQuery
+      )
       setLoadingCollection(false)
       setCollections(collectionData)
     } catch (error) {
@@ -106,45 +96,43 @@ const CreatePage: NextPageWithLayout = () => {
   const handleCreateNft = async (event: SyntheticEvent) => {
     event.preventDefault()
     console.log(nftData, address, '🔫')
-    handleConfetti(true)
     // if (!marketplace) return
 
-    // try {
-    //   const imageAsset = await client.assets.upload('image', nftData.image)
-    //   console.log(imageAsset)
-    //   setNftData({
-    //     ...nftData,
-    //     preview: imageAsset.url,
-    //   })
-    //   const userDoc = {
-    //     _type: 'nfts',
-    //     owner: {
-    //       _type: 'reference',
-    //       _ref: address,
-    //     },
-    //     // collection: {
-    //     //   _type: 'reference',
-    //     //   _ref: '0x4f98e821CcE773AE69439B0ED0F4a55e63F7bDaC',
-    //     // },
-    //     metadata: {
-    //       name: nftData.name,
-    //       description: nftData.description,
-    //       image: {
-    //         _type: 'image',
-    //         asset: {
-    //           _type: 'reference',
-    //           _ref: imageAsset._id,
-    //         },
-    //       },
-    //     },
-    //   }
+    try {
+      const imageAsset = await client.assets.upload('image', nftData.image)
+      setNftData({
+        ...nftData,
+        preview: imageAsset.url,
+      })
+      const userDoc = {
+        _type: 'nfts',
+        owner: {
+          _type: 'reference',
+          _ref: address,
+        },
+        collection: {
+          _type: 'reference',
+          _ref: nftData.collectionId,
+        },
+        metadata: {
+          name: nftData.name,
+          description: nftData.description,
+          image: {
+            _type: 'image',
+            asset: {
+              _type: 'reference',
+              _ref: imageAsset._id,
+            },
+          },
+        },
+      }
 
-    //   const result = await client.create(userDoc)
-    //   console.log(result)
-    setOpenModal(true)
-    // } catch (error) {
-    //   console.log(error)
-    // }
+      const result = await client.create(userDoc)
+      handleConfetti(true)
+      setOpenModal(true)
+    } catch (error) {
+      console.log(error)
+    }
 
     // const signature = await marketplace.signature.generate({
     //   metadata: {
@@ -253,7 +241,7 @@ const CreatePage: NextPageWithLayout = () => {
                 onChange={handleColectionChange}
               >
                 {collections.map((collection, idx) => (
-                  <MenuItem key={idx} value={collection.contractAddress}>
+                  <MenuItem key={idx} value={collection._id}>
                     <div className="flex gap-2 items-center">
                       <img
                         className="rounded-full"
