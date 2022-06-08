@@ -14,6 +14,7 @@ import React, {
   FormEvent,
   SyntheticEvent,
   useCallback,
+  useContext,
   useEffect,
   useState,
 } from 'react'
@@ -26,6 +27,7 @@ import { IoLinkSharp } from 'react-icons/io5'
 import Image from 'next/image'
 import { createReadStream } from 'fs'
 import { useRouter } from 'next/router'
+import { CargoContext, CargoContextType } from 'context/cargoContext'
 
 type NFTCreate = {
   name: string
@@ -39,6 +41,8 @@ type NFTCreate = {
 
 const CreatePage: NextPageWithLayout = () => {
   const router = useRouter()
+
+  const { handleConfetti } = useContext(CargoContext) as CargoContextType
 
   const [collections, setCollections] = useState<Collection[]>([])
   const [loadingCollection, setLoadingCollection] = useState(false)
@@ -102,6 +106,7 @@ const CreatePage: NextPageWithLayout = () => {
   const handleCreateNft = async (event: SyntheticEvent) => {
     event.preventDefault()
     console.log(nftData, address, '🔫')
+    handleConfetti(true)
     // if (!marketplace) return
 
     // try {
@@ -136,7 +141,7 @@ const CreatePage: NextPageWithLayout = () => {
 
     //   const result = await client.create(userDoc)
     //   console.log(result)
-    //   setOpenModal(true)
+    setOpenModal(true)
     // } catch (error) {
     //   console.log(error)
     // }

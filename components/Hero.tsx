@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 const style = {
   wrapper: `relative`,
   container: `before:content-[''] before:bg-red-500 before:absolute before:top-0 before:left-0 before:right-0 before:bottom-0 before:bg-[url('https://lh3.googleusercontent.com/ujepnqpnL0nDQIHsWxlCXzyw4pf01yjz1Jmb4kAQHumJAPrSEj0-e3ABMZlZ1HEpJoqwOcY_kgnuJGzfXbd2Tijri66GXUtfN2MXQA=s250')] before:bg-cover before:bg-center before:opacity-30 before:blur`,
@@ -29,7 +31,9 @@ const Hero = () => {
             </div>
             <div className={style.ctaContainer}>
               <button className={style.accentedButton}>Explore</button>
-              <button className={style.button}>Create</button>
+              <Link passHref href="/assets/create">
+                <button className={style.button}>Create</button>
+              </Link>
             </div>
           </div>
           <div className={style.cardContainer}>

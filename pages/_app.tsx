@@ -9,6 +9,7 @@ import { createEmotionCache, theme } from 'utils'
 import { CacheProvider } from '@emotion/react'
 import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
+import { CargoProvider } from 'context/cargoContext'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -31,9 +32,11 @@ function MyApp({
         <ThemeProvider theme={theme}>
           {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
+          <CargoProvider>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </CargoProvider>
         </ThemeProvider>
         <ToastContainer
           position="bottom-right"
