@@ -18,16 +18,19 @@ import ItemActivity from 'components/nft/ItemActivity'
 import NFTImage from 'components/nft/NFTImage'
 import Purchase from 'components/nft/Purchase'
 import { useMarketplace, useNFTCollection } from '@thirdweb-dev/react'
-import { Collapse, Modal } from 'components/common'
+import { Collapse, Input, Modal } from 'components/common'
 import {
   MdTimeline,
   MdSubject,
   MdVerticalSplit,
   MdBallot,
   MdViewModule,
+  MdAttachMoney,
+  MdTimelapse,
+  MdCalendarToday,
 } from 'react-icons/md'
 import { BsTagFill } from 'react-icons/bs'
-import { AiOutlineBars } from 'react-icons/ai'
+import { AiOutlineBars, AiOutlineInfoCircle } from 'react-icons/ai'
 import { client } from 'lib/sanityClient'
 import {
   AuctionListing,
@@ -36,8 +39,9 @@ import {
 } from '@thirdweb-dev/sdk'
 import NFTCard from 'components/NFTCard'
 import Link from 'next/link'
-import { Divider } from '@mui/material'
+import { Divider, FormControl, Grid, MenuItem, Select } from '@mui/material'
 import { sliceAddress } from 'utils'
+import ListingForm, { ListingData } from 'components/nft/ListingForm'
 
 const style = {
   wrapper: `flex flex-col items-center container-lg text-[#e5e8eb]`,
@@ -58,6 +62,7 @@ const Nft: NextPageWithLayout = () => {
   const [selectedNft, setSelectedNft] = useState<NFTMetadataOwner>()
   const [listings, setListings] = useState<any>([])
   const [openModal, setOpenModal] = useState(false)
+  const [openListingModal, setOpenListingModal] = useState(false)
   const [userData, setUserData] = useState<User[]>([])
   const [nfts, setNfts] = useState<NFTItem[]>([])
   const [nftItem, setNftItem] = useState<NFTItem>()
@@ -203,7 +208,7 @@ const Nft: NextPageWithLayout = () => {
   }
 
   const handleListNFT = () => {
-    setOpenModal(true)
+    setOpenListingModal(true)
   }
 
   const handleConfirmCheckout = async () => {
@@ -217,6 +222,10 @@ const Nft: NextPageWithLayout = () => {
         color: '#fff',
       },
     })
+
+  const handleListingNFT = (data?: ListingData) => {
+    console.log(data)
+  }
 
   return (
     <div>
@@ -441,6 +450,15 @@ const Nft: NextPageWithLayout = () => {
             </div>
           </div>
         </div>
+      </Modal>
+
+      <Modal
+        title={`Listing ${nftItem?.metadata.name}`}
+        submitText="Complete listing"
+        open={openListingModal}
+        handleClose={() => setOpenListingModal(false)}
+      >
+        <ListingForm handleSubmit={handleListingNFT} />
       </Modal>
     </div>
   )

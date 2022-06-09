@@ -15,6 +15,7 @@ module.exports = {
         grey2: '#303339',
         'black-rgba': 'rgba(0, 0, 0, 0.5)',
         darkLine: '#151c22',
+        textGrey: '#8a939b',
       },
     },
   },
