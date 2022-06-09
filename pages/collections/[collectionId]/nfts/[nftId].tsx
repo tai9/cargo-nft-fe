@@ -215,7 +215,7 @@ const Nft: NextPageWithLayout = () => {
                   className="rounded-b-none"
                 >
                   <div className="p-4">
-                    <p>
+                    <p className=" text-[#8a939b]">
                       Created by{' '}
                       <span className={style.hoverPrimaryText}>
                         {nftItem?.owner?.userName}
@@ -348,7 +348,7 @@ const Nft: NextPageWithLayout = () => {
           >
             {nfts.length > 0 ? (
               <div className="text-center">
-                <div className="flex gap-4">
+                <div className="grid grid-cols-4 gap-0">
                   {nfts.map((nftItem, id: number) => (
                     <NFTCard
                       key={id}

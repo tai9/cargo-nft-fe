@@ -38,6 +38,11 @@ export let theme = createTheme({
         root: {
           borderRadius: '0.5rem',
           textTransform: 'capitalize',
+
+          '&.Mui-disabled': {
+            color: 'rgba(255, 255, 255, 0.5)',
+            backgroundColor: '#4c505c',
+          },
         },
       },
     },

@@ -7,9 +7,17 @@ import {
   Select,
   SelectChangeEvent,
 } from '@mui/material'
+import LoadingButton from '@mui/lab/LoadingButton'
+import CreateIcon from '@mui/icons-material/Create'
+
 import { Dropzone, IconBox, Input, Modal } from 'components/common'
 import { NormalLayout } from 'components/layout'
-import { Collection, getAllcollectionQuery, NextPageWithLayout } from 'models'
+import {
+  Collection,
+  ETransactionEvent,
+  getAllcollectionQuery,
+  NextPageWithLayout,
+} from 'models'
 import React, {
   FormEvent,
   SyntheticEvent,
@@ -28,6 +36,8 @@ import Image from 'next/image'
 import { createReadStream } from 'fs'
 import { useRouter } from 'next/router'
 import { CargoContext, CargoContextType } from 'context/cargoContext'
+import { ethers } from 'ethers'
+import { toast } from 'react-toastify'
 
 type NFTCreate = {
   name: string
@@ -45,12 +55,15 @@ const CreatePage: NextPageWithLayout = () => {
   const { handleConfetti } = useContext(CargoContext) as CargoContextType
 
   const [collections, setCollections] = useState<Collection[]>([])
-  const [loadingCollection, setLoadingCollection] = useState(false)
   const [openModal, setOpenModal] = useState(false)
   const [nftData, setNftData] = useState<Partial<NFTCreate>>({
     supply: 1,
     blockchain: 'rinkeby',
   })
+
+  // loading states
+  const [loadingCollection, setLoadingCollection] = useState(false)
+  const [isCreating, setIsCreating] = useState(false)
 
   const address = useAddress()
   const marketplace = useNFTCollection(nftData.collectionId)
@@ -93,73 +106,6 @@ const CreatePage: NextPageWithLayout = () => {
     })
   }
 
-  const handleCreateNft = async (event: SyntheticEvent) => {
-    event.preventDefault()
-    // if (!marketplace) return
-
-    try {
-      const imageAsset = await client.assets.upload('image', nftData.image)
-      setNftData({
-        ...nftData,
-        preview: imageAsset.url,
-      })
-      const userDoc = {
-        _type: 'nfts',
-        owner: {
-          _type: 'reference',
-          _ref: address,
-        },
-        collection: {
-          _type: 'reference',
-          _ref: nftData.collectionId,
-        },
-        metadata: {
-          name: nftData.name,
-          description: nftData.description,
-          image: {
-            _type: 'image',
-            asset: {
-              _type: 'reference',
-              _ref: imageAsset._id,
-            },
-          },
-        },
-      }
-
-      const result = await client.create(userDoc)
-      handleConfetti(true)
-      setOpenModal(true)
-    } catch (error) {
-      console.log(error)
-    }
-
-    // const signature = await marketplace.signature.generate({
-    //   metadata: {
-    //     name: nftData.name || '',
-    //     description: nftData.description || '',
-    //     image: nftData.image,
-    //   },
-    // })
-
-    // const tx = await marketplace.signature.mint(signature)
-
-    // const res = await axios.post('/api/generate', {
-    //   name: nftData.name,
-    //   description: nftData.description,
-    //   contractAddress: nftData.collectionId,
-    //   address: address,
-    //   image:
-    //     'https://lh3.googleusercontent.com/RX40rLZkK_eKK_F3IXkoStHR9tth47Q_3QhKGu_cizzesH0U_ELbJ3X8IoW7iJXPNRnvJVF5B4jLKSm81u38rYfsKLLVz6WSbczsoQ=s168',
-    // })
-
-    // const { signature, tx } = res.data
-    // console.log(signature, tx)
-
-    // const data= await collection.signature.mint(signature)
-
-    // alert('NFT Minted successfully!')
-  }
-
   const handleUploadFile = (files: any) => {
     files?.length > 0 &&
       setNftData({
@@ -168,12 +114,105 @@ const CreatePage: NextPageWithLayout = () => {
       })
   }
 
+  const onSubmit = (event: SyntheticEvent) => {
+    event.preventDefault()
+
+    const handleCreateNft = new Promise(async (resolve, reject) => {
+      if (!marketplace) return
+
+      try {
+        setIsCreating(true)
+
+        // mint an NFT
+        const signatureGenerated = await marketplace.signature.generate({
+          metadata: {
+            name: nftData.name || '',
+            description: nftData.description || '',
+            image: nftData.image,
+          },
+        })
+        const tx = await marketplace.signature.mint(signatureGenerated)
+
+        // create an NFT
+        const imageAsset = await client.assets.upload('image', nftData.image)
+        setNftData({
+          ...nftData,
+          preview: imageAsset.url,
+        })
+        const createDoc = {
+          _type: 'nfts',
+          owner: {
+            _type: 'reference',
+            _ref: address,
+          },
+          collection: {
+            _type: 'reference',
+            _ref: collections.find(
+              (c) => c.contractAddress === nftData.collectionId
+            )?._id,
+          },
+          metadata: {
+            name: nftData.name,
+            description: nftData.description,
+            image: {
+              _type: 'image',
+              asset: {
+                _type: 'reference',
+                _ref: imageAsset._id,
+              },
+            },
+          },
+        }
+        const nftResult = await client.create(createDoc)
+
+        // create a transaction
+        const transDoc = {
+          _type: 'transactions',
+          owner: {
+            _type: 'reference',
+            _ref: address,
+          },
+          nft: {
+            _type: 'reference',
+            _ref: nftResult._id,
+          },
+          id: ethers.utils.formatEther(tx.id),
+          confirmations: tx.receipt.confirmations,
+          contractAddress: tx.receipt.contractAddress || '',
+          from: tx.receipt.from,
+          to: tx.receipt.to,
+          gasUsed: ethers.utils.formatEther(tx.receipt.gasUsed),
+          status: tx.receipt.status,
+          transactionHash: tx.receipt.transactionHash,
+          type: tx.receipt.type,
+          price: 0,
+          eventType: ETransactionEvent.MINTED,
+        }
+        await client.create(transDoc)
+
+        setIsCreating(false)
+        handleConfetti(true)
+        setOpenModal(true)
+        resolve(true)
+      } catch (error) {
+        setIsCreating(false)
+        reject(true)
+        console.log(error)
+      }
+    })
+
+    toast.promise(handleCreateNft, {
+      pending: 'Creating your NFT.',
+      error: 'Cannot create your NFT.',
+    })
+  }
+
   return (
     <>
       <Container maxWidth="md">
         <form
           className="flex flex-col gap-6 text-white my-12"
-          onSubmit={handleCreateNft}
+          onSubmit={onSubmit}
         >
           <div className="text-3xl font-bold">Create New Item</div>
           <div className="text-xs text-grey1">
@@ -240,7 +279,7 @@ const CreatePage: NextPageWithLayout = () => {
                 onChange={handleColectionChange}
               >
                 {collections.map((collection, idx) => (
-                  <MenuItem key={idx} value={collection._id}>
+                  <MenuItem key={idx} value={collection.contractAddress}>
                     <div className="flex gap-2 items-center">
                       <img
                         className="rounded-full"
@@ -351,7 +390,7 @@ const CreatePage: NextPageWithLayout = () => {
             }}
           />
 
-          <Button
+          <LoadingButton
             type="submit"
             sx={{
               width: 'fit-content',
@@ -359,9 +398,13 @@ const CreatePage: NextPageWithLayout = () => {
               my: 2,
             }}
             variant="contained"
+            loading={isCreating}
+            loadingPosition="start"
+            startIcon={<CreateIcon />}
+            size="large"
           >
             Create
-          </Button>
+          </LoadingButton>
         </form>
       </Container>
       <Modal

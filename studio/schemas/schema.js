@@ -11,6 +11,7 @@ export default createSchema({
   // Then proceed to concatenate our document type
   // to the ones provided by any plugins that are installed
   types: schemaTypes.concat([
+    // User
     {
       name: 'users',
       title: 'Users',
@@ -48,6 +49,8 @@ export default createSchema({
         },
       ],
     },
+
+    // Collection
     {
       name: 'marketItems',
       title: 'Market Items',
@@ -102,6 +105,8 @@ export default createSchema({
         },
       ],
     },
+
+    // NFT
     {
       name: 'nfts',
       title: 'NFTs',
@@ -166,6 +171,88 @@ export default createSchema({
       preview: {
         select: {
           title: 'metadata.name',
+        },
+      },
+    },
+
+    // transaction
+    {
+      name: 'transactions',
+      title: 'Transactions',
+      type: 'document',
+      fields: [
+        {
+          name: 'id',
+          title: 'ID',
+          type: 'string',
+        },
+        {
+          name: 'eventType',
+          title: 'Event Type',
+          type: 'string',
+        },
+        {
+          name: 'price',
+          title: 'Price',
+          type: 'number',
+        },
+        {
+          name: 'contractAddress',
+          title: 'Contract Address',
+          type: 'string',
+        },
+        {
+          name: 'from',
+          title: 'From',
+          type: 'string',
+        },
+        {
+          name: 'to',
+          title: 'To',
+          type: 'string',
+        },
+        {
+          name: 'gasUsed',
+          title: 'Gas Used',
+          type: 'string',
+        },
+        {
+          name: 'status',
+          title: 'Status',
+          type: 'number',
+        },
+        {
+          name: 'type',
+          title: 'Type',
+          type: 'number',
+        },
+        {
+          name: 'transactionHash',
+          title: 'Transaction Hash',
+          type: 'string',
+        },
+        {
+          name: 'confirmations',
+          title: 'Confirmations',
+          type: 'number',
+        },
+        {
+          name: 'owner',
+          title: 'Owner',
+          type: 'reference',
+          to: [{ type: 'users' }],
+        },
+        {
+          name: 'nft',
+          title: 'NFT',
+          type: 'reference',
+          to: [{ type: 'nfts' }],
+        },
+      ],
+
+      preview: {
+        select: {
+          title: 'id',
         },
       },
     },
