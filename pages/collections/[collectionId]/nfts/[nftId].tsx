@@ -1,9 +1,16 @@
 import { MainLayout } from 'components/layout'
 import { toast } from 'react-toastify'
 import { ethers } from 'ethers'
-import { Collection, NextPageWithLayout, User } from 'models'
+import {
+  Collection,
+  getCollectinByIdQuery,
+  getNFTsByCollectionIdQuery,
+  NextPageWithLayout,
+  NFTItem,
+  User,
+} from 'models'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import GeneralDetails from 'components/nft/GeneralDetails'
 import ItemActivity from 'components/nft/ItemActivity'
 import NFTImage from 'components/nft/NFTImage'
@@ -50,7 +57,8 @@ const Nft: NextPageWithLayout = () => {
   const [listings, setListings] = useState<any>([])
   const [openModal, setOpenModal] = useState(false)
   const [userData, setUserData] = useState<User[]>([])
-  const [nfts, setNfts] = useState<NFTMetadataOwner[]>([])
+  const [nfts, setNfts] = useState<NFTItem[]>([])
+  const [nftItem, setNftItem] = useState<NFTItem>()
   const [nftListing, setNftListing] = useState<Listing>()
 
   const marketplace = useMarketplace(
@@ -77,23 +85,10 @@ const Nft: NextPageWithLayout = () => {
 
   const fetchDetailCollectionData = useCallback(
     async (sanityClient = client) => {
-      const query = `*[_type == "marketItems" && contractAddress == "${collectionId}" ] {
-        "imageUrl": profileImage.asset->url,
-        "bannerImageUrl": bannerImage.asset->url,
-        volumeTraded,
-        createdBy,
-        contractAddress,
-        "creator": createdBy->userName,
-        title, floorPrice,
-        "allOwners": owners[]->,
-        description,
-        _id,
-        _createdAt,
-        _updatedAt
-      }`
-
       try {
-        const collectionData: Collection[] = await sanityClient.fetch(query)
+        const collectionData: Collection[] = await sanityClient.fetch(
+          getCollectinByIdQuery(collectionId as string)
+        )
         setCollection(collectionData[0])
       } catch (error) {
         console.log(error)
@@ -102,47 +97,66 @@ const Nft: NextPageWithLayout = () => {
     [collectionId]
   )
 
+  const fetchNFTsData = useCallback(
+    async (collectionId: string, nftId: string, sanityClient = client) => {
+      try {
+        const collectionData: NFTItem[] = await sanityClient.fetch(
+          getNFTsByCollectionIdQuery(collectionId)
+        )
+        setNfts(collectionData)
+        setNftItem(collectionData.find((n) => n._id === nftId))
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    []
+  )
+
   const getNFTCollection = useCallback(async () => {
     if (!nftCollection) return
-    try {
-      const nfts = await nftCollection.getAll()
-      setNfts(nfts)
-    } catch (err) {
-      console.error(err)
-      alert('Error fetching nfts')
-    }
+    // try {
+    //   const nfts = await nftCollection.getAll()
+    //   setNfts(nfts)
+    // } catch (err) {
+    //   console.error(err)
+    //   alert('Error fetching nfts')
+    // }
   }, [nftCollection])
 
   useEffect(() => {
-    fetchDetailCollectionData()
-    fetchUserData()
-    getNFTCollection()
-  }, [fetchDetailCollectionData, fetchUserData, getNFTCollection])
+    fetchNFTsData(collectionId as string, nftId as string)
+  }, [collectionId, nftId, fetchNFTsData])
 
   useEffect(() => {
-    ;(async () => {
-      if (nftId) {
-        const nft = await nftCollection?.get(+nftId)
-        setSelectedNft(nft)
+    // fetchDetailCollectionData()
+    // fetchUserData()
+    // getNFTCollection()
+  }, [fetchDetailCollectionData, fetchUserData, getNFTCollection])
 
-        if (isListed === 'true') {
-          const data: Listing[] | undefined =
-            await marketplace?.getActiveListings()
+  // useEffect(() => {
+  //   ;(async () => {
+  //     if (nftId) {
+  //       const nft = await nftCollection?.get(+nftId)
+  //       setSelectedNft(nft)
 
-          setListings(data)
+  //       if (isListed === 'true') {
+  //         const data: Listing[] | undefined =
+  //           await marketplace?.getActiveListings()
 
-          if (data && nft) {
-            const listing = data?.find(
-              (x) =>
-                +ethers.utils.formatEther(x.tokenId) ===
-                +ethers.utils.formatEther(nft?.metadata.id)
-            )
-            setNftListing(listing)
-          }
-        }
-      }
-    })()
-  }, [marketplace, nftCollection, isListed, nftId, fetchUserData])
+  //         setListings(data)
+
+  //         if (data && nft) {
+  //           const listing = data?.find(
+  //             (x) =>
+  //               +ethers.utils.formatEther(x.tokenId) ===
+  //               +ethers.utils.formatEther(nft?.metadata.id)
+  //           )
+  //           setNftListing(listing)
+  //         }
+  //       }
+  //     }
+  //   })()
+  // }, [marketplace, nftCollection, isListed, nftId, fetchUserData])
 
   const handleBuyNFT = async (
     listingId: ethers.BigNumberish,
@@ -192,7 +206,7 @@ const Nft: NextPageWithLayout = () => {
         <div className={style.container}>
           <div className={style.topContent}>
             <div className={style.nftImgContainer}>
-              <NFTImage selectedNft={selectedNft} />
+              <NFTImage nftItem={nftItem} />
               <div className="flex flex-col mt-6">
                 <Collapse
                   isToggled={false}
@@ -204,17 +218,11 @@ const Nft: NextPageWithLayout = () => {
                     <p>
                       Created by{' '}
                       <span className={style.hoverPrimaryText}>
-                        {selectedNft
-                          ? userData.find(
-                              (u) => u.walletAddress === selectedNft?.owner
-                            )?.userName
-                          : ''}
+                        {nftItem?.owner?.userName}
                       </span>
                     </p>
-                    {selectedNft?.metadata.description ? (
-                      <p className="mt-1">
-                        {selectedNft?.metadata.description}
-                      </p>
+                    {nftItem?.metadata.description ? (
+                      <p className="mt-1">{nftItem?.metadata.description}</p>
                     ) : (
                       <div className="opacity-50 text-center space-y-1">
                         <img
@@ -229,13 +237,13 @@ const Nft: NextPageWithLayout = () => {
                 </Collapse>
                 <Collapse
                   icon={<MdVerticalSplit />}
-                  title={`About ${collection?.title}`}
+                  title={`About ${nftItem?.collection?.title}`}
                   className="rounded-none border-y-0"
                   defaultOpen={false}
                 >
                   <div className="p-4">
-                    {collection ? (
-                      <p>{collection.description}</p>
+                    {nftItem?.collection ? (
+                      <p>{nftItem?.collection.description}</p>
                     ) : (
                       <div className="opacity-50 text-center space-y-1">
                         <img
@@ -290,17 +298,7 @@ const Nft: NextPageWithLayout = () => {
               </div>
             </div>
             <div className={style.detailsContainer}>
-              <GeneralDetails
-                collectionName={collection?.title}
-                NFTName={selectedNft?.metadata.name}
-                ownedBy={
-                  selectedNft
-                    ? userData.find(
-                        (u) => u.walletAddress === selectedNft?.owner
-                      )?.userName || ''
-                    : ''
-                }
-              />
+              <GeneralDetails nftItem={nftItem} />
               <Purchase
                 isListed={isListed}
                 selectedNft={selectedNft}

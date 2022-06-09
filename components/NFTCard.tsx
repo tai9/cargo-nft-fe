@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import Router from 'next/router'
 import { ethers } from 'ethers'
-import { NFTMetadataOwner } from '@thirdweb-dev/sdk'
 import { NFTItem } from 'models'
 
 const style = {
@@ -51,7 +50,7 @@ const NFTCard = ({ nftItem, title, listings, collectionId }: Props) => {
         className={`${style.wrapper} max-w-xs min-h-[450px] `}
         onClick={() => {
           Router.push({
-            pathname: `/collections/${collectionId}/nfts/${nftItem.metadata.id}`,
+            pathname: `/collections/${collectionId}/nfts/${nftItem._id}`,
             query: { isListed: isListed },
           })
         }}

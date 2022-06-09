@@ -4,6 +4,7 @@ import { RiShareBoxLine } from 'react-icons/ri'
 import { FiMoreVertical } from 'react-icons/fi'
 import { GiShare } from 'react-icons/gi'
 import { Skeleton } from '@mui/material'
+import { NFTItem } from 'models'
 
 const style = {
   wrapper: `flex`,
@@ -21,22 +22,21 @@ const style = {
 }
 
 type Props = {
-  ownedBy: string
-  NFTName?: string
-  collectionName?: string
+  nftItem?: NFTItem
 }
 
-const GeneralDetails = ({ collectionName, NFTName, ownedBy }: Props) => {
+const GeneralDetails = ({ nftItem }: Props) => {
   return (
     <div className={style.wrapper}>
       <div className={style.infoContainer}>
-        <div className={style.accent}>{collectionName || ''}</div>
+        <div className={style.accent}>{nftItem?.collection?.title}</div>
         <div className={style.nftTitle}>
-          {NFTName || <Skeleton animation="wave" />}
+          {nftItem?.metadata.name || <Skeleton animation="wave" />}
         </div>
         <div className={style.otherInfo}>
           <div className={style.ownedBy}>
-            Owned by <span className={style.accent}>{ownedBy}</span>
+            Owned by{' '}
+            <span className={style.accent}>{nftItem?.owner?.userName}</span>
           </div>
           <div className={style.likes}>
             <AiFillHeart className={style.likeIcon} /> 2.3K favorites

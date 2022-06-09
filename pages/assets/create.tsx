@@ -95,7 +95,6 @@ const CreatePage: NextPageWithLayout = () => {
 
   const handleCreateNft = async (event: SyntheticEvent) => {
     event.preventDefault()
-    console.log(nftData, address, '🔫')
     // if (!marketplace) return
 
     try {

@@ -162,20 +162,6 @@ const Collection: NextPageWithLayout = () => {
       try {
         const collectionData: Collection[] = await sanityClient.fetch(query)
         setCollection(collectionData[0])
-
-        const userDoc = {
-          _type: 'marketItems',
-          _id: collectionData[0].contractAddress,
-          title: 'Invs',
-          contractAddress: collectionData[0].contractAddress,
-          createdBy: {
-            _type: 'reference',
-            _ref: address,
-          },
-        }
-
-        const result = await client.createIfNotExists(userDoc)
-        console.log(result, '🔫')
       } catch (error) {
         console.log(error)
       }

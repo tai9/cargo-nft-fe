@@ -1,6 +1,7 @@
 import { IoMdSnow } from 'react-icons/io'
 import { AiOutlineHeart } from 'react-icons/ai'
 import { Skeleton } from '@mui/material'
+import { NFTItem } from 'models'
 
 const style = {
   topBar: `bg-[#303339] p-2 rounded-t-lg border-darkLine border`,
@@ -8,7 +9,11 @@ const style = {
   likesCounter: `flex-1 flex items-center justify-end gap-1 text-sm text-grey1`,
 }
 
-const NFTImage = ({ selectedNft }: any) => {
+type Props = {
+  nftItem?: NFTItem
+}
+
+const NFTImage = ({ nftItem }: Props) => {
   return (
     <div>
       <div className={style.topBar}>
@@ -20,10 +25,10 @@ const NFTImage = ({ selectedNft }: any) => {
         </div>
       </div>
       <div>
-        {selectedNft?.metadata.image ? (
+        {nftItem?.metadata.image ? (
           <img
             className="object-cover w-full"
-            src={selectedNft?.metadata.image}
+            src={nftItem?.metadata.image}
             alt=""
           />
         ) : (

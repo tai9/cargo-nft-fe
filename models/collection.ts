@@ -29,3 +29,20 @@ export const getAllcollectionQuery = `*[_type == "marketItems"] {
   "allOwners": owners[]->,
   description
 }`
+
+export const getCollectinByIdQuery = (
+  contractAddress: string
+) => `*[_type == "marketItems" && contractAddress == "${contractAddress}" ] {
+  "imageUrl": profileImage.asset->url,
+  "bannerImageUrl": bannerImage.asset->url,
+  volumeTraded,
+  createdBy,
+  contractAddress,
+  "creator": createdBy->userName,
+  title, floorPrice,
+  "allOwners": owners[]->,
+  description,
+  _id,
+  _createdAt,
+  _updatedAt
+}`
