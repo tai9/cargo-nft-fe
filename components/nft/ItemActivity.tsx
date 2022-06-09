@@ -3,6 +3,7 @@ import { BiChevronDown, BiChevronUp } from 'react-icons/bi'
 import { useState } from 'react'
 import { dummyEvents } from '../../static/dummyEvents'
 import EventItem from './itemActivity/EventItem'
+import { Transaction } from 'models'
 
 const style = {
   wrapper: `w-full mt-8 border border-[#151b22] rounded-xl bg-[#303339] overflow-hidden`,
@@ -21,7 +22,11 @@ const style = {
   tableHeaderElement: ``,
 }
 
-const ItemActivity = () => {
+type Props = {
+  transactions?: Transaction[]
+}
+
+const ItemActivity = ({ transactions = [] }: Props) => {
   const [toggle, setToggle] = useState(true)
   return (
     <div className={style.wrapper}>
@@ -56,9 +61,20 @@ const ItemActivity = () => {
             <div className={`${style.tableHeaderElement} flex-[3]`}>To</div>
             <div className={`${style.tableHeaderElement} flex-[2]`}>Date</div>
           </div>
-          {dummyEvents.map((event: any, id: number) => (
-            <EventItem key={id} event={event} />
-          ))}
+          {transactions.length > 0 ? (
+            transactions.map((event) => (
+              <EventItem key={event._id} event={event} />
+            ))
+          ) : (
+            <div className="opacity-50 text-center space-y-1 my-4">
+              <img
+                className="m-auto"
+                src="https://opensea.io/static/images/empty-asks.svg"
+                alt=""
+              />
+              <div>No transactions yet</div>
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -6,7 +6,7 @@ import { NFTItem } from 'models'
 const style = {
   wrapper: `bg-[#303339] flex-auto my-6 mx-5 rounded-2xl overflow-hidden cursor-pointer border border-darkLine`,
   imgContainer: `h-2/3 w-full overflow-hidden flex justify-center items-center`,
-  nftImg: `w-full object-cover`,
+  nftImg: `w-full h-full object-cover`,
   details: `p-3 h-1/3`,
   info: `flex justify-between text-[#e4e8eb] drop-shadow-xl`,
   infoLeft: `flex-0.6 flex-wrap`,
@@ -47,7 +47,7 @@ const NFTCard = ({ nftItem, title, listings, collectionId }: Props) => {
   return (
     <>
       <div
-        className={`${style.wrapper} max-w-xs min-h-[450px] `}
+        className={`${style.wrapper} max-w-[280px] min-h-[450px] `}
         onClick={() => {
           Router.push({
             pathname: `/collections/${collectionId}/nfts/${nftItem._id}`,

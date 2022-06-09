@@ -5,12 +5,14 @@ import {
   Collection,
   getCollectinByIdQuery,
   getNFTsByCollectionIdQuery,
+  getTransactionQuery,
   NextPageWithLayout,
   NFTItem,
+  Transaction,
   User,
 } from 'models'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import GeneralDetails from 'components/nft/GeneralDetails'
 import ItemActivity from 'components/nft/ItemActivity'
 import NFTImage from 'components/nft/NFTImage'
@@ -60,6 +62,7 @@ const Nft: NextPageWithLayout = () => {
   const [nfts, setNfts] = useState<NFTItem[]>([])
   const [nftItem, setNftItem] = useState<NFTItem>()
   const [nftListing, setNftListing] = useState<Listing>()
+  const [transactions, setTransactions] = useState<any>()
 
   const marketplace = useMarketplace(
     process.env.NEXT_PUBLIC_MARKETPLACE_CONTRACT_ADDRESS
@@ -112,6 +115,20 @@ const Nft: NextPageWithLayout = () => {
     []
   )
 
+  const fetchTransactionsData = useCallback(
+    async (nftId: string, sanityClient = client) => {
+      try {
+        const transactionData: Transaction[] = await sanityClient.fetch(
+          getTransactionQuery(nftId)
+        )
+        setTransactions(transactionData)
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    []
+  )
+
   const getNFTCollection = useCallback(async () => {
     if (!nftCollection) return
     // try {
@@ -125,7 +142,8 @@ const Nft: NextPageWithLayout = () => {
 
   useEffect(() => {
     fetchNFTsData(collectionId as string, nftId as string)
-  }, [collectionId, nftId, fetchNFTsData])
+    fetchTransactionsData(nftId as string)
+  }, [collectionId, nftId, fetchNFTsData, fetchTransactionsData])
 
   useEffect(() => {
     // fetchDetailCollectionData()
@@ -221,18 +239,7 @@ const Nft: NextPageWithLayout = () => {
                         {nftItem?.owner?.userName}
                       </span>
                     </p>
-                    {nftItem?.metadata.description ? (
-                      <p className="mt-1">{nftItem?.metadata.description}</p>
-                    ) : (
-                      <div className="opacity-50 text-center space-y-1">
-                        <img
-                          className="m-auto"
-                          src="https://opensea.io/static/images/empty-asks.svg"
-                          alt=""
-                        />
-                        <div>No listings yet</div>
-                      </div>
-                    )}
+                    <p className="mt-1">{nftItem?.metadata.description}</p>
                   </div>
                 </Collapse>
                 <Collapse
@@ -340,7 +347,7 @@ const Nft: NextPageWithLayout = () => {
               </div>
             </div>
           </div>
-          <ItemActivity />
+          <ItemActivity transactions={transactions} />
           <Collapse
             icon={<MdViewModule />}
             title="More From This Collection"
@@ -349,15 +356,18 @@ const Nft: NextPageWithLayout = () => {
             {nfts.length > 0 ? (
               <div className="text-center">
                 <div className="grid grid-cols-4 gap-0">
-                  {nfts.map((nftItem, id: number) => (
-                    <NFTCard
-                      key={id}
-                      nftItem={nftItem}
-                      title={collection?.title || ''}
-                      listings={listings}
-                      collectionId={collectionId as string}
-                    />
-                  ))}
+                  {nfts.map(
+                    (nftItem, index: number) =>
+                      index < 4 && (
+                        <NFTCard
+                          key={index}
+                          nftItem={nftItem}
+                          title={collection?.title || ''}
+                          listings={listings}
+                          collectionId={collectionId as string}
+                        />
+                      )
+                  )}
                 </div>
                 <Divider sx={{ mb: 3 }} />
                 <Link passHref href={`/collections/${collectionId}`}>

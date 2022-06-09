@@ -16,7 +16,6 @@ import {
   Stack,
   Tab,
   Tabs,
-  Typography,
 } from '@mui/material'
 import {
   useAddress,
@@ -84,7 +83,7 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Typography>{children}</Typography>}
+      {value === index && <div>{children}</div>}
     </div>
   )
 }
@@ -464,7 +463,7 @@ const Collection: NextPageWithLayout = () => {
             </Grid>
 
             <Grid item>
-              <div className="flex flex-wrap">
+              <div className="grid grid-cols-4">
                 {isLoadingNFTs
                   ? [1, 2].map((x) => <NFTCardSkeleton key={x} />)
                   : nfts.map((nftItem: any, id: number) => (

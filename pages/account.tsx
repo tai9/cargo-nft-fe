@@ -17,7 +17,6 @@ import {
   Tab,
   Tabs,
   Tooltip,
-  Typography,
 } from '@mui/material'
 import { useAddress } from '@thirdweb-dev/react'
 import CoverImg from 'assets/cover.jpeg'
@@ -60,7 +59,7 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Typography>{children}</Typography>}
+      {value === index && <div>{children}</div>}
     </div>
   )
 }
@@ -366,9 +365,9 @@ const AccountPage: NextPageWithLayout = () => {
               </Grid>
 
               <Grid item>
-                <div className="grid grid-cols-3">
+                <div className="grid grid-cols-4">
                   {isLoadingNFTs
-                    ? [1, 2, 3].map((x) => <NFTCardSkeleton key={x} />)
+                    ? [1, 2, 3, 4].map((x) => <NFTCardSkeleton key={x} />)
                     : nfts.map((nftItem, id: number) => (
                         <NFTCard
                           key={id}
@@ -392,7 +391,7 @@ const AccountPage: NextPageWithLayout = () => {
 }
 
 const NFTCardSkeleton = () => (
-  <div className="border border-slate-600 shadow rounded-md w-[320px] h-[450px] mx-5 my-6">
+  <div className="border border-slate-600 shadow rounded-md w-[280px] h-[450px] mx-5 my-6">
     <div className="animate-pulse flex space-x-4">
       <div className="flex-1 space-y-3">
         <div className="h-72 bg-slate-700 rounded"></div>
