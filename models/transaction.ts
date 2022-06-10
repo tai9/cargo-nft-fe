@@ -5,6 +5,7 @@ export enum ETransactionEvent {
   MINTED = 'Minted',
   LIST = 'List',
   TRANSAFER = 'Transfer',
+  OFFER = 'Offer',
 }
 
 export type Transaction = {

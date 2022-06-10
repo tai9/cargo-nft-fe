@@ -132,6 +132,7 @@ const CreatePage: NextPageWithLayout = () => {
           },
         })
         const tx = await marketplace.signature.mint(signatureGenerated)
+        console.log(tx)
 
         // create an NFT
         const imageAsset = await client.assets.upload('image', nftData.image)
@@ -152,6 +153,7 @@ const CreatePage: NextPageWithLayout = () => {
             )?._id,
           },
           metadata: {
+            id: tx.id.toString(),
             name: nftData.name,
             description: nftData.description,
             image: {
@@ -176,12 +178,12 @@ const CreatePage: NextPageWithLayout = () => {
             _type: 'reference',
             _ref: nftResult._id,
           },
-          id: ethers.utils.formatEther(tx.id),
+          id: tx.id.toString(),
           confirmations: tx.receipt.confirmations,
           contractAddress: tx.receipt.contractAddress || '',
           from: tx.receipt.from,
           to: tx.receipt.to,
-          gasUsed: ethers.utils.formatEther(tx.receipt.gasUsed),
+          gasUsed: tx.receipt.gasUsed.toString(),
           status: tx.receipt.status,
           transactionHash: tx.receipt.transactionHash,
           type: tx.receipt.type,
@@ -234,6 +236,7 @@ const CreatePage: NextPageWithLayout = () => {
               Name<span className="text-red-500"> *</span>
             </div>
             <Input
+              className="h-10"
               name="name"
               onChange={handleInputChange}
               placeholder="Item name"
@@ -248,6 +251,7 @@ const CreatePage: NextPageWithLayout = () => {
               underneath its image. Markdown syntax is supported.
             </div>
             <Input
+              className="h-10"
               name="description"
               onChange={handleInputChange}
               placeholder="Provide a detailed description of your item."
@@ -301,7 +305,7 @@ const CreatePage: NextPageWithLayout = () => {
             <div className="text-xs text-grey1">
               The number of items that can be minted. No gas cost to you!
             </div>
-            <Input value={1} disabled />
+            <Input className="h-10" value={1} disabled />
           </div>
 
           <div className="space-y-2">
@@ -379,6 +383,7 @@ const CreatePage: NextPageWithLayout = () => {
               storage.
             </div>
             <Input
+              className="h-10"
               value="To freeze your metadata, you must create your item first."
               disabled
             />

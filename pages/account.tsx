@@ -16,6 +16,7 @@ import {
   Stack,
   Tab,
   Tabs,
+  TextField,
   Tooltip,
 } from '@mui/material'
 import { useAddress } from '@thirdweb-dev/react'
@@ -30,7 +31,7 @@ import {
   User,
 } from 'models'
 import Image from 'next/image'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { BsFillShareFill } from 'react-icons/bs'
 import { FiMoreHorizontal } from 'react-icons/fi'
 import { sliceAddress } from 'utils'
@@ -38,7 +39,7 @@ import moment from 'moment'
 import { BiFilter } from 'react-icons/bi'
 import { GrGrid } from 'react-icons/gr'
 import { RiLayoutGridLine } from 'react-icons/ri'
-import { AiOutlineSearch } from 'react-icons/ai'
+import { AiOutlineSearch, AiTwotoneEdit, AiOutlineCheck } from 'react-icons/ai'
 import { CollapseOutline } from 'components/common'
 import NFTCard from 'components/NFTCard'
 
@@ -82,6 +83,12 @@ const AccountPage: NextPageWithLayout = () => {
   const [isLoadingNFTs, setIsLoadingNFTs] = useState(false)
   const [collection, setCollection] = useState<Collection>()
   const [nfts, setNfts] = useState<NFTItem[]>([])
+  const [editingUsername, setEditingUsername] = useState(false)
+  const [newUsername, setNewUsername] = useState('')
+
+  const onUsernameChange = (e: any) => {
+    setNewUsername(e.target.value)
+  }
 
   const fetchUserData = useCallback(
     async (address: string, sanityClient = client) => {
@@ -98,6 +105,7 @@ const AccountPage: NextPageWithLayout = () => {
         setIsLoadingInfo(true)
         const data: User[] = await sanityClient.fetch(query)
         setUserInfo(data[0])
+        setNewUsername(data[0].userName)
         setIsLoadingInfo(false)
       } catch (error) {
         setIsLoadingInfo(false)
@@ -134,6 +142,10 @@ const AccountPage: NextPageWithLayout = () => {
     setTabValue(newValue)
   }
 
+  const handleUpdateUsername = async () => {
+    setEditingUsername(!editingUsername)
+  }
+
   return (
     <div>
       <Image
@@ -155,7 +167,27 @@ const AccountPage: NextPageWithLayout = () => {
       </div>
       <div className="mx-16 my-[2rem] text-white space-y-1">
         <div className="flex justify-between items-center">
-          <div className="text-2xl font-bold">{userInfo?.userName}</div>
+          <div className="flex items-center gap-3">
+            <div className="cursor-pointer">
+              {editingUsername ? (
+                <AiOutlineCheck fontSize={24} onClick={handleUpdateUsername} />
+              ) : (
+                <AiTwotoneEdit
+                  fontSize={24}
+                  onClick={() => setEditingUsername(!editingUsername)}
+                />
+              )}
+            </div>
+            {editingUsername ? (
+              <input
+                className="bg-transparent font-bold text-2xl w-fit outline-none"
+                value={newUsername || ''}
+                onChange={onUsernameChange}
+              />
+            ) : (
+              <div className="text-2xl font-bold">{newUsername}</div>
+            )}
+          </div>
           <div className="flex gap-4">
             <div>
               <BsFillShareFill />

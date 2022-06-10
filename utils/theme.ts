@@ -69,6 +69,13 @@ export let theme = createTheme({
         },
       },
     },
+    MuiInputBase: {
+      styleOverrides: {
+        root: {
+          color: 'white',
+        },
+      },
+    },
   },
   typography: {
     fontFamily: 'Poppins, Roboto',

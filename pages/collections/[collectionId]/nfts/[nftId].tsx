@@ -3,6 +3,7 @@ import { toast } from 'react-toastify'
 import { ethers } from 'ethers'
 import {
   Collection,
+  ETransactionEvent,
   getCollectinByIdQuery,
   getNFTsByCollectionIdQuery,
   getTransactionQuery,
@@ -12,13 +13,19 @@ import {
   User,
 } from 'models'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import GeneralDetails from 'components/nft/GeneralDetails'
 import ItemActivity from 'components/nft/ItemActivity'
 import NFTImage from 'components/nft/NFTImage'
 import Purchase from 'components/nft/Purchase'
-import { useMarketplace, useNFTCollection } from '@thirdweb-dev/react'
-import { Collapse, Input, Modal } from 'components/common'
+import {
+  useAddress,
+  useMarketplace,
+  useNetwork,
+  useNetworkMismatch,
+  useNFTCollection,
+} from '@thirdweb-dev/react'
+import { Collapse, IconBox, Input, Modal } from 'components/common'
 import {
   MdTimeline,
   MdSubject,
@@ -35,6 +42,7 @@ import { client } from 'lib/sanityClient'
 import {
   AuctionListing,
   DirectListing,
+  NATIVE_TOKEN_ADDRESS,
   NFTMetadataOwner,
 } from '@thirdweb-dev/sdk'
 import NFTCard from 'components/NFTCard'
@@ -42,6 +50,7 @@ import Link from 'next/link'
 import { Divider, FormControl, Grid, MenuItem, Select } from '@mui/material'
 import { sliceAddress } from 'utils'
 import ListingForm, { ListingData } from 'components/nft/ListingForm'
+import { CargoContext, CargoContextType } from 'context/cargoContext'
 
 const style = {
   wrapper: `flex flex-col items-center container-lg text-[#e5e8eb]`,
@@ -56,22 +65,29 @@ type Listing = AuctionListing | DirectListing
 
 const Nft: NextPageWithLayout = () => {
   const router = useRouter()
+  const address = useAddress()
   const { collectionId, nftId, isListed } = router.query
+
+  const { handleConfetti } = useContext(CargoContext) as CargoContextType
 
   const [collection, setCollection] = useState<Partial<Collection>>({})
   const [selectedNft, setSelectedNft] = useState<NFTMetadataOwner>()
   const [listings, setListings] = useState<any>([])
-  const [openModal, setOpenModal] = useState(false)
-  const [openListingModal, setOpenListingModal] = useState(false)
   const [userData, setUserData] = useState<User[]>([])
   const [nfts, setNfts] = useState<NFTItem[]>([])
   const [nftItem, setNftItem] = useState<NFTItem>()
   const [nftListing, setNftListing] = useState<Listing>()
   const [transactions, setTransactions] = useState<any>()
+  const [isListing, setIsListing] = useState(false)
+
+  // modal states
+  const [openModal, setOpenModal] = useState(false)
+  const [openListingModal, setOpenListingModal] = useState(false)
 
   const marketplace = useMarketplace(
     process.env.NEXT_PUBLIC_MARKETPLACE_CONTRACT_ADDRESS
   )
+
   const nftCollection = useNFTCollection(collectionId as string)
 
   const fetchUserData = useCallback(async (sanityClient = client) => {
@@ -156,30 +172,30 @@ const Nft: NextPageWithLayout = () => {
     // getNFTCollection()
   }, [fetchDetailCollectionData, fetchUserData, getNFTCollection])
 
-  // useEffect(() => {
-  //   ;(async () => {
-  //     if (nftId) {
-  //       const nft = await nftCollection?.get(+nftId)
-  //       setSelectedNft(nft)
+  useEffect(() => {
+    ;(async () => {
+      // if (nftId) {
+      const nfts = await nftCollection?.getAll()
+      console.log(nfts, '🔫')
 
-  //       if (isListed === 'true') {
-  //         const data: Listing[] | undefined =
-  //           await marketplace?.getActiveListings()
+      // if (isListed === 'true') {
+      //   const data: Listing[] | undefined =
+      //     await marketplace?.getActiveListings()
 
-  //         setListings(data)
+      //   setListings(data)
 
-  //         if (data && nft) {
-  //           const listing = data?.find(
-  //             (x) =>
-  //               +ethers.utils.formatEther(x.tokenId) ===
-  //               +ethers.utils.formatEther(nft?.metadata.id)
-  //           )
-  //           setNftListing(listing)
-  //         }
-  //       }
-  //     }
-  //   })()
-  // }, [marketplace, nftCollection, isListed, nftId, fetchUserData])
+      //   if (data && nft) {
+      //     const listing = data?.find(
+      //       (x) =>
+      //         +ethers.utils.formatEther(x.tokenId) ===
+      //         +ethers.utils.formatEther(nft?.metadata.id)
+      //     )
+      //     setNftListing(listing)
+      //   }
+      // }
+      // }
+    })()
+  }, [marketplace, nftCollection])
 
   const handleBuyNFT = async (
     listingId: ethers.BigNumberish,
@@ -223,8 +239,90 @@ const Nft: NextPageWithLayout = () => {
       },
     })
 
-  const handleListingNFT = (data?: ListingData) => {
-    console.log(data)
+  const handleListingNFT = async (data?: ListingData) => {
+    if (!marketplace || !address) return
+
+    try {
+      setIsListing(true)
+
+      const listing = {
+        assetContractAddress: nftItem?.collection?.contractAddress || '',
+        tokenId: nftItem?.metadata.id.toString() || '',
+        startTimestamp: new Date(),
+        listingDurationInSeconds: 86400 * (data?.duration || 30),
+        quantity: 1,
+        currencyContractAddress: NATIVE_TOKEN_ADDRESS || '',
+        buyoutPricePerToken: data?.amount?.toString() || '',
+      }
+      console.log({ data, listing })
+
+      const tx = await marketplace.direct.createListing(listing)
+
+      const listingId = tx.id.toString() // the id of the newly created listing
+
+      // create a listing
+      const listingDoc = {
+        _type: 'listings',
+        owner: {
+          _type: 'reference',
+          _ref: address,
+        },
+        nft: {
+          _type: 'reference',
+          _ref: nftItem?._id,
+        },
+        listingId: listingId,
+        startTimestamp: new Date().toISOString(),
+        listingDurationInSeconds: 86400 * (data?.duration || 30),
+        quantity: 1,
+        currencyContractAddress: NATIVE_TOKEN_ADDRESS || '',
+        buyoutPricePerToken: data?.amount?.toString() || '',
+        assetContractAddress: nftItem?.collection?.contractAddress || '',
+      }
+      await client.create(listingDoc)
+
+      // create a transaction
+      const transDoc = {
+        _type: 'transactions',
+        owner: {
+          _type: 'reference',
+          _ref: address,
+        },
+        nft: {
+          _type: 'reference',
+          _ref: nftItem?._id,
+        },
+        id: tx.id.toString(),
+        confirmations: tx.receipt.confirmations,
+        contractAddress: tx.receipt.contractAddress || '',
+        from: tx.receipt.from,
+        to: tx.receipt.to,
+        gasUsed: tx.receipt.gasUsed.toString(),
+        status: tx.receipt.status,
+        transactionHash: tx.receipt.transactionHash,
+        type: tx.receipt.type,
+        price: 0,
+        eventType: ETransactionEvent.LIST,
+      }
+      await client.create(transDoc)
+
+      // And on the buyers side:
+      // Quantity of the asset you want to buy
+      const quantityDesired = 1
+      // const result = await marketplace.direct.buyoutListing(
+      //   listingId,
+      //   quantityDesired
+      // )
+      // console.log({ tx, result })
+      setIsListing(false)
+      handleConfetti(true)
+      setOpenListingModal(false)
+      toast.success(`Listed ${nftItem?.metadata.name} successfully`)
+    } catch (err) {
+      setIsListing(false)
+      toast.error('Cannot listing this NFT.')
+      console.log(err)
+    }
   }
 
   return (
@@ -458,7 +556,7 @@ const Nft: NextPageWithLayout = () => {
         open={openListingModal}
         handleClose={() => setOpenListingModal(false)}
       >
-        <ListingForm handleSubmit={handleListingNFT} />
+        <ListingForm loading={isListing} handleSubmit={handleListingNFT} />
       </Modal>
     </div>
   )

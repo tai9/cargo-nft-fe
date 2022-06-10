@@ -5,6 +5,8 @@ import {
   Select,
   SelectChangeEvent,
 } from '@mui/material'
+import LoadingButton from '@mui/lab/LoadingButton'
+import CreateIcon from '@mui/icons-material/Create'
 import { Input } from 'components/common'
 import { ETH_TOKEN_PRICE } from 'constants/token'
 import React, { FormEvent, SyntheticEvent, useState } from 'react'
@@ -13,6 +15,7 @@ import { MdAttachMoney, MdCalendarToday, MdTimelapse } from 'react-icons/md'
 import { numberFormatter } from 'utils'
 
 type Props = {
+  loading?: boolean
   handleSubmit?: (data?: ListingData) => void
 }
 
@@ -21,7 +24,7 @@ export type ListingData = {
   duration?: number
 }
 
-const ListingForm = ({ handleSubmit }: Props) => {
+const ListingForm = ({ loading, handleSubmit }: Props) => {
   const [data, setData] = useState<ListingData>({
     amount: 0,
     duration: 30,
@@ -198,11 +201,18 @@ const ListingForm = ({ handleSubmit }: Props) => {
 
       <div className="border-t-[1px] border-darkLine"></div>
       <div className="mt-4 text-center">
-        <button
-          className={`py-3 px-4 rounded-lg bg-[#2081e2] hover:bg-[#42a0ff]`}
+        <LoadingButton
+          type="submit"
+          sx={{
+            width: 'fit-content',
+            fontWeight: 'bold',
+          }}
+          variant="contained"
+          loading={loading}
+          size="large"
         >
-          <div className="ml-2 font-semibold">Complete listing</div>
-        </button>
+          Complete listing
+        </LoadingButton>
       </div>
     </form>
   )

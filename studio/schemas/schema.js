@@ -123,13 +123,13 @@ export default createSchema({
               type: 'string',
             },
             {
-              name: 'description',
-              title: 'Description',
+              name: 'name',
+              title: 'Name',
               type: 'string',
             },
             {
-              name: 'name',
-              title: 'Name',
+              name: 'description',
+              title: 'Description',
               type: 'string',
             },
             {
@@ -175,7 +175,7 @@ export default createSchema({
       },
     },
 
-    // transaction
+    // Transaction
     {
       name: 'transactions',
       title: 'Transactions',
@@ -234,6 +234,73 @@ export default createSchema({
         {
           name: 'confirmations',
           title: 'Confirmations',
+          type: 'number',
+        },
+        {
+          name: 'owner',
+          title: 'Owner',
+          type: 'reference',
+          to: [{ type: 'users' }],
+        },
+        {
+          name: 'nft',
+          title: 'NFT',
+          type: 'reference',
+          to: [{ type: 'nfts' }],
+        },
+      ],
+
+      preview: {
+        select: {
+          title: 'id',
+        },
+      },
+    },
+
+    // Listing
+    {
+      name: 'listings',
+      title: 'Listings',
+      type: 'document',
+      fields: [
+        {
+          name: 'listingId',
+          title: 'Listing ID',
+          type: 'string',
+        },
+        {
+          name: 'startTimestamp',
+          title: 'Start Time',
+          type: 'string',
+        },
+        {
+          name: 'listingDurationInSeconds',
+          title: 'duration',
+          type: 'number',
+        },
+        {
+          name: 'quantity',
+          title: 'Quantity',
+          type: 'number',
+        },
+        {
+          name: 'currencyContractAddress',
+          title: 'Currency Contract Address',
+          type: 'string',
+        },
+        {
+          name: 'assetContractAddress',
+          title: 'Asset Contract Address',
+          type: 'string',
+        },
+        {
+          name: 'buyoutPricePerToken',
+          title: 'Buyout Price Per Token',
+          type: 'string',
+        },
+        {
+          name: 'status',
+          title: 'Status',
           type: 'number',
         },
         {
