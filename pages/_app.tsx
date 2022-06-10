@@ -34,15 +34,15 @@ function MyApp({
           {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
           <CargoProvider>
+            <NextNprogress
+              options={{ showSpinner: false }}
+              color="#2181e2"
+              startPosition={0.3}
+              stopDelayMs={200}
+              height={3}
+              showOnShallow={true}
+            />
             <Layout>
-              <NextNprogress
-                options={{ showSpinner: false }}
-                color="#2181e2"
-                startPosition={0.3}
-                stopDelayMs={200}
-                height={3}
-                showOnShallow={true}
-              />
               <Component {...pageProps} />
             </Layout>
           </CargoProvider>

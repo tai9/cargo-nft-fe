@@ -2,6 +2,7 @@ import { AiFillHeart } from 'react-icons/ai'
 import { MdRefresh, MdSend } from 'react-icons/md'
 import { FiMoreVertical } from 'react-icons/fi'
 import { GiShare } from 'react-icons/gi'
+import { RiShareBoxFill } from 'react-icons/ri'
 import { Skeleton } from '@mui/material'
 import { NFTItem } from 'models'
 import { BootstrapTooltip } from 'components/common'
@@ -25,11 +26,10 @@ const style = {
 
 type Props = {
   nftItem?: NFTItem
+  isTransfered?: boolean
 }
 
-const GeneralDetails = ({ nftItem }: Props) => {
-  console.log(Router.asPath)
-
+const GeneralDetails = ({ nftItem, isTransfered }: Props) => {
   return (
     <div className={style.wrapper}>
       <div className={style.infoContainer}>
@@ -55,13 +55,26 @@ const GeneralDetails = ({ nftItem }: Props) => {
             </div>
           </BootstrapTooltip>
           <div className={style.divider} />
-          <BootstrapTooltip title="Transfer" placement="top">
-            <Link passHref href={`${Router.asPath}/transfer`}>
-              <a className={style.actionButton}>
+          {isTransfered ? (
+            <BootstrapTooltip title="Transfer" placement="top">
+              <div
+                className={style.actionButton}
+                onClick={() => Router.push(`${Router.asPath}/transfer`)}
+              >
                 <MdSend />
-              </a>
-            </Link>
-          </BootstrapTooltip>
+              </div>
+            </BootstrapTooltip>
+          ) : (
+            <BootstrapTooltip
+              title={`View on ${nftItem?.metadata.name}`}
+              placement="top"
+            >
+              <div className={style.actionButton}>
+                <RiShareBoxFill />
+              </div>
+            </BootstrapTooltip>
+          )}
+
           <div className={style.divider} />
           <BootstrapTooltip title="Share" placement="top">
             <div className={style.actionButton}>

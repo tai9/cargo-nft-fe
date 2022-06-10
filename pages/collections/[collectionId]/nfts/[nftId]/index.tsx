@@ -373,7 +373,10 @@ const Nft: NextPageWithLayout = () => {
               </div>
             </div>
             <div className={style.detailsContainer}>
-              <GeneralDetails nftItem={nftItem} />
+              <GeneralDetails
+                nftItem={nftItem}
+                isTransfered={address === nftItem?.owner?.walletAddress}
+              />
               <Purchase
                 address={address}
                 nftListing={nftListing}
