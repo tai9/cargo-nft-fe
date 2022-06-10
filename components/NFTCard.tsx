@@ -1,7 +1,5 @@
-import { useEffect, useState } from 'react'
+import { Listing, NFTItem } from 'models'
 import Router from 'next/router'
-import { ethers } from 'ethers'
-import { NFTItem } from 'models'
 
 const style = {
   wrapper: `bg-[#303339] flex-auto my-6 mx-5 rounded-2xl overflow-hidden cursor-pointer border border-darkLine`,
@@ -9,40 +7,24 @@ const style = {
   nftImg: `w-full h-full object-cover`,
   details: `p-3 h-1/3`,
   info: `flex justify-between text-[#e4e8eb] drop-shadow-xl`,
-  infoLeft: `flex-0.6 flex-wrap`,
+  infoLeft: `flex-0.5 flex-wrap`,
   collectionName: `font-semibold text-sm text-[#8a939b]`,
-  assetName: `font-bold text-lg mt-2`,
-  infoRight: `flex-0.4 text-right`,
+  assetName: `font-bold text-base mt-2`,
+  infoRight: `flex-0.5 text-right`,
   priceTag: `font-semibold text-sm text-[#8a939b]`,
-  priceValue: `flex items-center text-xl font-bold mt-2`,
+  priceValue: `flex items-center text-base font-bold mt-2`,
   ethLogo: `h-5 mr-2`,
 }
 
 type Props = {
   nftItem: NFTItem
   title: string
-  listings?: any
+  listing?: Listing
   collectionId?: string
 }
 
-const NFTCard = ({ nftItem, title, listings, collectionId }: Props) => {
-  const [isListed, setIsListed] = useState(false)
-  const [price, setPrice] = useState(0)
-
-  useEffect(() => {
-    if (!listings) return
-
-    const listing = listings.find(
-      (listing: any) =>
-        ethers.utils.formatEther(listing.asset.id) ===
-        ethers.utils.formatEther(nftItem.metadata.id)
-    )
-
-    if (Boolean(listing)) {
-      setIsListed(true)
-      setPrice(listing.buyoutCurrencyValuePerToken.displayValue)
-    }
-  }, [listings, nftItem])
+const NFTCard = ({ nftItem, title, listing, collectionId }: Props) => {
+  console.log(listing)
 
   return (
     <>
@@ -51,7 +33,6 @@ const NFTCard = ({ nftItem, title, listings, collectionId }: Props) => {
         onClick={() => {
           Router.push({
             pathname: `/collections/${collectionId}/nfts/${nftItem._id}`,
-            query: { isListed: isListed },
           })
         }}
       >
@@ -68,7 +49,7 @@ const NFTCard = ({ nftItem, title, listings, collectionId }: Props) => {
               <div className={style.collectionName}>{title}</div>
               <div className={style.assetName}>{nftItem.metadata.name}</div>
             </div>
-            {isListed && (
+            {listing && (
               <div className={style.infoRight}>
                 <div className={style.priceTag}>Price</div>
                 <div className={style.priceValue}>
@@ -77,7 +58,7 @@ const NFTCard = ({ nftItem, title, listings, collectionId }: Props) => {
                     alt="eth"
                     className={style.ethLogo}
                   />
-                  {price}
+                  {listing.buyoutPricePerToken}
                 </div>
               </div>
             )}

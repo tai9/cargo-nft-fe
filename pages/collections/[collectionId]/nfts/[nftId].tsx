@@ -72,14 +72,17 @@ const Nft: NextPageWithLayout = () => {
   const { handleConfetti } = useContext(CargoContext) as CargoContextType
 
   const [collection, setCollection] = useState<Partial<Collection>>({})
-  const [selectedNft, setSelectedNft] = useState<NFTMetadataOwner>()
-  const [listings, setListings] = useState<any>([])
   const [userData, setUserData] = useState<User[]>([])
+  const [transactions, setTransactions] = useState<any>()
+
+  // NFT states
   const [nfts, setNfts] = useState<NFTItem[]>([])
   const [nftItem, setNftItem] = useState<NFTItem>()
-  const [nftListing, setNftListing] = useState<Listing>()
-  const [transactions, setTransactions] = useState<any>()
+
+  // listing states
   const [isListing, setIsListing] = useState(false)
+  const [listings, setListings] = useState<Listing[]>([])
+  const [nftListing, setNftListing] = useState<Listing>()
 
   // modal states
   const [openModal, setOpenModal] = useState(false)
@@ -142,14 +145,10 @@ const Nft: NextPageWithLayout = () => {
     async (nftId: string, sanityClient = client) => {
       try {
         const listingData: Listing[] = await sanityClient.fetch(
-          getListingQuery(nftId)
+          getListingQuery()
         )
-        console.log(listingData[0])
-        setNftListing(listingData[0])
-
-        // setNfts(nftData)
-        // setNftItem(nftData.find((n) => n._id === nftId))
-        // console.log(nftData.find((n) => n._id === nftId))
+        setListings(listingData)
+        setNftListing(listingData.find((n) => n.nft?._id === nftId))
       } catch (error) {
         console.log(error)
       }
@@ -427,7 +426,7 @@ const Nft: NextPageWithLayout = () => {
                     <div className="flex justify-between">
                       <div>Token ID</div>
                       <div className={style.hoverPrimaryText}>
-                        {nftItem?.metadata.id.toString()}
+                        {nftItem?.metadata.id?.toString()}
                       </div>
                     </div>
                     <div className="flex justify-between">
@@ -496,15 +495,15 @@ const Nft: NextPageWithLayout = () => {
           >
             {nfts.length > 0 ? (
               <div className="text-center">
-                <div className="grid grid-cols-4 gap-0">
+                <div className="grid grid-cols-4 gap-0 text-left">
                   {nfts.map(
-                    (nftItem, index: number) =>
+                    (nft, index: number) =>
                       index < 4 && (
                         <NFTCard
                           key={index}
-                          nftItem={nftItem}
+                          nftItem={nft}
                           title={collection?.title || ''}
-                          listings={listings}
+                          listing={listings.find((l) => l.nft?._id === nft._id)}
                           collectionId={collectionId as string}
                         />
                       )
@@ -547,12 +546,12 @@ const Nft: NextPageWithLayout = () => {
             <div className="flex gap-3">
               <img
                 className="object-cover w-20 rounded-md"
-                src={selectedNft?.metadata.image || ''}
+                src={nftItem?.metadata.image || ''}
                 alt=""
               />
               <div className="flex flex-col">
                 <div className="text-primary font-normal">Collection</div>
-                <div className="">{selectedNft?.metadata.name}</div>
+                <div className="">{nftItem?.metadata.name}</div>
               </div>
             </div>
             <div className="space-y-1">

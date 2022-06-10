@@ -15,11 +15,11 @@ export const CargoProvider: React.FC<Props> = ({ children }) => {
   const [confetti, setConfetti] = useState(false)
 
   const handleConfetti = (value: boolean) => {
-    window.scroll({
-      top: 0,
-      left: 0,
-      behavior: 'smooth',
-    })
+    // window.scroll({
+    //   top: 0,
+    //   left: 0,
+    //   behavior: 'smooth',
+    // })
     setConfetti(value)
   }
 

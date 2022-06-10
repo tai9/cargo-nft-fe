@@ -26,7 +26,14 @@ import { CollapseOutline } from 'components/common'
 import { MainLayout } from 'components/layout'
 import NFTCard from 'components/NFTCard'
 import { client } from 'lib/sanityClient'
-import { Collection, NextPageWithLayout } from 'models'
+import {
+  Collection,
+  getListingQuery,
+  getNFTsByCollectionIdQuery,
+  Listing,
+  NextPageWithLayout,
+  NFTItem,
+} from 'models'
 import { useRouter } from 'next/router'
 import React, { useCallback, useEffect, useState } from 'react'
 import {
@@ -104,8 +111,8 @@ const Collection: NextPageWithLayout = () => {
 
   const { collectionId } = router.query
   const [collection, setCollection] = useState<Collection>()
-  const [nfts, setNfts] = useState<any>([])
-  const [listings, setListings] = useState<any>([])
+  const [nfts, setNfts] = useState<NFTItem[]>([])
+  const [listings, setListings] = useState<Listing[]>([])
   const [tabValue, setTabValue] = useState<TabType>('items')
   const [isLoadingNFTs, setIsLoadingNFTs] = useState(false)
 
@@ -114,35 +121,30 @@ const Collection: NextPageWithLayout = () => {
   )
   const nftCollection = useNFTCollection(collectionId as string)
 
-  useEffect(() => {
-    getListings()
-    getNFTCollection()
-  }, [])
-
-  const getListings = async () => {
-    if (!marketplace) return
+  const fetchListingsData = useCallback(async () => {
     try {
-      const list = await marketplace.getActiveListings()
-      setListings(list)
+      const listingData = await client.fetch(getListingQuery())
+      setListings(listingData)
     } catch (err) {
       console.error(err)
       alert('Error fetching listings')
     }
-  }
+  }, [])
 
-  const getNFTCollection = async () => {
-    if (!nftCollection) return
+  const fetchNFTsData = useCallback(async (collectionId: string) => {
     try {
       setIsLoadingNFTs(true)
-      const nfts = await nftCollection.getAll()
-      setNfts(nfts)
+      const nftData = await client.fetch(
+        getNFTsByCollectionIdQuery(collectionId)
+      )
+      setNfts(nftData)
       setIsLoadingNFTs(false)
     } catch (err) {
       console.error(err)
       setIsLoadingNFTs(false)
       alert('Error fetching nfts')
     }
-  }
+  }, [])
 
   const fetchCollectionData = useCallback(
     async (collectionId: string, sanityClient = client) => {
@@ -170,7 +172,9 @@ const Collection: NextPageWithLayout = () => {
 
   useEffect(() => {
     fetchCollectionData(collectionId as string)
-  }, [collectionId, fetchCollectionData])
+    fetchNFTsData(collectionId as string)
+    fetchListingsData()
+  }, [collectionId, fetchCollectionData, fetchNFTsData, fetchListingsData])
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: TabType) => {
     setTabValue(newValue)
@@ -463,18 +467,20 @@ const Collection: NextPageWithLayout = () => {
             </Grid>
 
             <Grid item>
-              <div className="grid grid-cols-4">
+              <div className="grid lg:grid-cols-3 md:grid-cols-2 xl:grid-cols-4">
                 {isLoadingNFTs
-                  ? [1, 2].map((x) => <NFTCardSkeleton key={x} />)
-                  : nfts.map((nftItem: any, id: number) => (
-                      <NFTCard
-                        key={id}
-                        nftItem={nftItem}
-                        title={collection?.title || ''}
-                        listings={listings}
-                        collectionId={collectionId as string}
-                      />
-                    ))}
+                  ? [1, 2, 3, 4].map((x) => <NFTCardSkeleton key={x} />)
+                  : nfts.map((nft) => {
+                      return (
+                        <NFTCard
+                          key={nft._id}
+                          nftItem={nft}
+                          title={collection?.title || ''}
+                          listing={listings.find((l) => l.nft?._id === nft._id)}
+                          collectionId={collectionId as string}
+                        />
+                      )
+                    })}
               </div>
             </Grid>
           </Grid>
@@ -488,7 +494,7 @@ const Collection: NextPageWithLayout = () => {
 }
 
 const NFTCardSkeleton = () => (
-  <div className="border border-slate-600 shadow rounded-md w-[318px] h-[428px] mx-5 my-6">
+  <div className="border border-slate-600 shadow rounded-md w-[280px] h-[450px] mx-5 my-6">
     <div className="animate-pulse flex space-x-4">
       <div className="flex-1 space-y-3">
         <div className="h-72 bg-slate-700 rounded"></div>
