@@ -58,7 +58,7 @@ const Nft: NextPageWithLayout = () => {
 
   const { handleConfetti } = useContext(CargoContext) as CargoContextType
 
-  const [transactions, setTransactions] = useState<any>()
+  const [transactions, setTransactions] = useState<Transaction[]>()
 
   // NFT states
   const [nfts, setNfts] = useState<NFTItem[]>([])

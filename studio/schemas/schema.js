@@ -258,7 +258,16 @@ export default createSchema({
 
       preview: {
         select: {
-          title: 'id',
+          eventType: 'eventType',
+          subtitle: 'owner.userName',
+          nftName: 'nft.metadata.name',
+        },
+        prepare(selection) {
+          const { eventType, subtitle, nftName } = selection
+          return {
+            title: `${eventType} - ${nftName}`,
+            subtitle: subtitle,
+          }
         },
       },
     },
@@ -330,7 +339,8 @@ export default createSchema({
 
       preview: {
         select: {
-          title: 'listingId',
+          title: 'nft.metadata.name',
+          subtitle: 'buyoutPricePerToken',
         },
       },
     },
