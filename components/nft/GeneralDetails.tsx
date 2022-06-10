@@ -1,10 +1,10 @@
 import { AiFillHeart } from 'react-icons/ai'
-import { MdRefresh } from 'react-icons/md'
-import { RiShareBoxLine } from 'react-icons/ri'
+import { MdRefresh, MdSend } from 'react-icons/md'
 import { FiMoreVertical } from 'react-icons/fi'
 import { GiShare } from 'react-icons/gi'
 import { Skeleton } from '@mui/material'
 import { NFTItem } from 'models'
+import { BootstrapTooltip } from 'components/common'
 
 const style = {
   wrapper: `flex`,
@@ -45,21 +45,29 @@ const GeneralDetails = ({ nftItem }: Props) => {
       </div>
       <div className={style.actionButtonsContainer}>
         <div className={style.actionButtons}>
-          <div className={`${style.actionButton} ml-2`}>
-            <MdRefresh />
-          </div>
+          <BootstrapTooltip title="Refresh metadata" placement="top">
+            <div className={`${style.actionButton} ml-2`}>
+              <MdRefresh />
+            </div>
+          </BootstrapTooltip>
           <div className={style.divider} />
-          <div className={style.actionButton}>
-            <RiShareBoxLine />
-          </div>
+          <BootstrapTooltip title="Transfer" placement="top">
+            <div className={style.actionButton}>
+              <MdSend />
+            </div>
+          </BootstrapTooltip>
           <div className={style.divider} />
-          <div className={style.actionButton}>
-            <GiShare />
-          </div>
+          <BootstrapTooltip title="Share" placement="top">
+            <div className={style.actionButton}>
+              <GiShare />
+            </div>
+          </BootstrapTooltip>
           <div className={style.divider} />
-          <div className={`${style.actionButton} mr-2`}>
-            <FiMoreVertical />
-          </div>
+          <BootstrapTooltip title="More" placement="top">
+            <div className={`${style.actionButton} mr-2`}>
+              <FiMoreVertical />
+            </div>
+          </BootstrapTooltip>
         </div>
       </div>
     </div>
