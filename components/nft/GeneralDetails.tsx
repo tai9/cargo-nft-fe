@@ -5,6 +5,8 @@ import { GiShare } from 'react-icons/gi'
 import { Skeleton } from '@mui/material'
 import { NFTItem } from 'models'
 import { BootstrapTooltip } from 'components/common'
+import Link from 'next/link'
+import Router from 'next/router'
 
 const style = {
   wrapper: `flex`,
@@ -26,6 +28,8 @@ type Props = {
 }
 
 const GeneralDetails = ({ nftItem }: Props) => {
+  console.log(Router.asPath)
+
   return (
     <div className={style.wrapper}>
       <div className={style.infoContainer}>
@@ -52,9 +56,11 @@ const GeneralDetails = ({ nftItem }: Props) => {
           </BootstrapTooltip>
           <div className={style.divider} />
           <BootstrapTooltip title="Transfer" placement="top">
-            <div className={style.actionButton}>
-              <MdSend />
-            </div>
+            <Link passHref href={`${Router.asPath}/transfer`}>
+              <a className={style.actionButton}>
+                <MdSend />
+              </a>
+            </Link>
           </BootstrapTooltip>
           <div className={style.divider} />
           <BootstrapTooltip title="Share" placement="top">
