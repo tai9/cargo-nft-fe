@@ -3,6 +3,7 @@ import {
   Button,
   ButtonGroup,
   Checkbox,
+  CircularProgress,
   Divider,
   FormControl,
   FormControlLabel,
@@ -26,6 +27,7 @@ import { client } from 'lib/sanityClient'
 import {
   Collection,
   getOwnNFTsQuery,
+  getUserQuery,
   NextPageWithLayout,
   NFTItem,
   User,
@@ -42,6 +44,7 @@ import { RiLayoutGridLine } from 'react-icons/ri'
 import { AiOutlineSearch, AiTwotoneEdit, AiOutlineCheck } from 'react-icons/ai'
 import { CollapseOutline } from 'components/common'
 import NFTCard from 'components/NFTCard'
+import { toast } from 'react-toastify'
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -85,6 +88,7 @@ const AccountPage: NextPageWithLayout = () => {
   const [nfts, setNfts] = useState<NFTItem[]>([])
   const [editingUsername, setEditingUsername] = useState(false)
   const [newUsername, setNewUsername] = useState('')
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false)
 
   const onUsernameChange = (e: any) => {
     setNewUsername(e.target.value)
@@ -92,14 +96,7 @@ const AccountPage: NextPageWithLayout = () => {
 
   const fetchUserData = useCallback(
     async (address: string, sanityClient = client) => {
-      const query = `*[_type == "users" && walletAddress == "${address}"] {
-        userName,
-        walletAddress,
-        profileImage,
-        bannerImage,
-        igHandle,
-        createdAt
-    }`
+      const query = getUserQuery(address)
 
       try {
         setIsLoadingInfo(true)
@@ -143,7 +140,22 @@ const AccountPage: NextPageWithLayout = () => {
   }
 
   const handleUpdateUsername = async () => {
-    setEditingUsername(!editingUsername)
+    if (!address) return
+    setIsUpdatingProfile(true)
+    client
+      .patch(address || '')
+      .set({ userName: newUsername })
+      .commit()
+      .then(() => {
+        toast.success('Update your profile successful!')
+        setIsUpdatingProfile(false)
+        setEditingUsername(!editingUsername)
+      })
+      .catch((err) => {
+        console.log(err)
+        toast.error('Something went wrong')
+        setIsUpdatingProfile(false)
+      })
   }
 
   return (
@@ -169,7 +181,9 @@ const AccountPage: NextPageWithLayout = () => {
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="cursor-pointer">
-              {editingUsername ? (
+              {isUpdatingProfile ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : editingUsername ? (
                 <AiOutlineCheck fontSize={24} onClick={handleUpdateUsername} />
               ) : (
                 <AiTwotoneEdit
@@ -397,7 +411,7 @@ const AccountPage: NextPageWithLayout = () => {
               </Grid>
 
               <Grid item>
-                <div className="grid grid-cols-4">
+                <div className="grid lg:grid-cols-3 md:grid-cols-2 xl:grid-cols-4">
                   {isLoadingNFTs
                     ? [1, 2, 3, 4].map((x) => <NFTCardSkeleton key={x} />)
                     : nfts.map((nftItem, id: number) => (

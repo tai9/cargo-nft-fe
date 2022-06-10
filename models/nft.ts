@@ -9,6 +9,7 @@ export type NFTItem = {
   metadata: NFTMetadata
   collection?: Collection
   owner?: User
+  createdBy?: string
 }
 
 export const getOwnNFTsQuery = (
@@ -17,6 +18,7 @@ export const getOwnNFTsQuery = (
     _id,
    _createdAt,
    _updatedAt,
+   "createdBy":createdBy->userName,
    "metadata":metadata{
         description,
         name,
@@ -46,7 +48,8 @@ export const getNFTsByCollectionIdQuery = (
     _id,
    _createdAt,
    _updatedAt,
-   "metadata":metadata{
+    "createdBy":createdBy->userName,
+    "metadata":metadata{
         description,
         name,
         uri,
@@ -68,12 +71,13 @@ export const getNFTsByCollectionIdQuery = (
         description
     },
     "owner":owner->
- }`
+}`
 
 export const getAllNFTQuery = `*[_type == "nfts" ] {
     _id,
    _createdAt,
    _updatedAt,
+   "createdBy":createdBy->userName,
    "metadata":metadata{
         description,
         name,
