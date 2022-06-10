@@ -1,5 +1,6 @@
 import { ReactNode } from 'react'
 import { IoCloseSharp } from 'react-icons/io5'
+import LoadingButton from '@mui/lab/LoadingButton'
 
 type BackdropProps = {
   children?: ReactNode
@@ -19,6 +20,7 @@ type ModalProps = {
   submitText?: string
   open: boolean
   children?: ReactNode
+  loading?: boolean
   handleClose?: () => void
   handleSubmit?: () => void
 }
@@ -28,6 +30,7 @@ export const Modal = ({
   submitText,
   open,
   children,
+  loading,
   handleClose,
   handleSubmit,
 }: ModalProps) => {
@@ -40,7 +43,7 @@ export const Modal = ({
         <div
           className={`bg-[#303338] max-w-2xl mx-auto w-full rounded-md text-white border border-darkLine ${className}`}
         >
-          <div className="p-4 text-center relative">
+          <div className="p-6 text-center relative">
             <div className="font-bold text-xl">{title}</div>
             <IoCloseSharp
               fontSize={24}
@@ -54,13 +57,20 @@ export const Modal = ({
           {handleSubmit && (
             <>
               <div className="border-t-[1px] border-darkLine"></div>
-              <div className="p-4 text-center">
-                <button
-                  className={`py-3 px-4 rounded-lg bg-[#2081e2] hover:bg-[#42a0ff]`}
+              <div className="p-6 text-center">
+                <LoadingButton
+                  type="submit"
+                  sx={{
+                    width: 'fit-content',
+                    fontWeight: 'bold',
+                  }}
+                  variant="contained"
+                  loading={loading}
+                  size="large"
                   onClick={handleSubmit}
                 >
-                  <div className="ml-2 font-semibold">{submitText}</div>
-                </button>
+                  {submitText}
+                </LoadingButton>
               </div>
             </>
           )}

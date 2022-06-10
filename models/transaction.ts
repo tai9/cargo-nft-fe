@@ -6,6 +6,8 @@ export enum ETransactionEvent {
   LIST = 'List',
   TRANSAFER = 'Transfer',
   OFFER = 'Offer',
+  SALE = 'Sale',
+  CANCEL = 'Cancel',
 }
 
 export type Transaction = {

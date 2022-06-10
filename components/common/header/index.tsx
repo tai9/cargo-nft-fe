@@ -39,7 +39,7 @@ export const Header = () => {
 
   const handleDisconnectWallet = () => {
     disconnect()
-    toast.success('Logout successfully!')
+    toast.success('Logout successful!')
   }
 
   const handleNavigateCreateNft = async () => {

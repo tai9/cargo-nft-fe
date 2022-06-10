@@ -1,13 +1,11 @@
-import { useEffect, useState } from 'react'
+import Button from '@mui/material/Button'
+import { ETH_TOKEN_PRICE } from 'constants/token'
+import { Listing } from 'models'
+import moment from 'moment'
+import { AiOutlineClockCircle } from 'react-icons/ai'
 import { HiTag } from 'react-icons/hi'
 import { IoMdWallet } from 'react-icons/io'
-import { AiOutlineClockCircle } from 'react-icons/ai'
-import { ethers } from 'ethers'
-import Button from '@mui/material/Button'
-import { Listing, NFTItem } from 'models'
-import moment from 'moment'
 import { numberFormatter } from 'utils'
-import { ETH_TOKEN_PRICE } from 'constants/token'
 
 const style = {
   button: `flex items-center py-2 px-12 rounded-lg cursor-pointer`,
@@ -75,7 +73,7 @@ const Purchase = ({
                 <IoMdWallet className={style.buttonIcon} />
                 <div className={style.buttonText}>Buy Now</div>
               </Button>
-              {address === nftListing.owner?.walletAddress && (
+              {address !== nftListing.owner?.walletAddress && (
                 <button
                   className={`${style.button} border border-darkLine  bg-darkGrey hover:bg-lightGrey disabled:cursor-default disabled:hover:bg-darkGrey`}
                 >
@@ -87,13 +85,17 @@ const Purchase = ({
           </div>
         </div>
       ) : (
-        <button
-          className={`${style.button} bg-[#2081e2] hover:bg-[#42a0ff]`}
+        <Button
+          disableRipple
+          variant="contained"
+          sx={{
+            paddingX: '3rem',
+          }}
           onClick={handleListNFT}
         >
           <IoMdWallet className={style.buttonIcon} />
           <div className={style.buttonText}>List Item</div>
-        </button>
+        </Button>
       )}
     </div>
   )

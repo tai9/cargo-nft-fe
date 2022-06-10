@@ -49,7 +49,7 @@ function MyApp({
           draggable
           pauseOnHover
           theme="dark"
-          style={{
+          toastStyle={{
             background: '#04111d',
             color: '#fff',
           }}

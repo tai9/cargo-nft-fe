@@ -24,8 +24,6 @@ type Props = {
 }
 
 const NFTCard = ({ nftItem, title, listing, collectionId }: Props) => {
-  console.log(listing)
-
   return (
     <>
       <div

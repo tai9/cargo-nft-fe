@@ -161,6 +161,12 @@ export default createSchema({
           to: [{ type: 'users' }],
         },
         {
+          name: 'createdBy',
+          title: 'Created by',
+          type: 'reference',
+          to: [{ type: 'users' }],
+        },
+        {
           name: 'collection',
           title: 'Collection',
           type: 'reference',
@@ -267,6 +273,11 @@ export default createSchema({
           name: 'listingId',
           title: 'Listing ID',
           type: 'string',
+        },
+        {
+          name: 'active',
+          title: 'Active',
+          type: 'boolean',
         },
         {
           name: 'startTimestamp',

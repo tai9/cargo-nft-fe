@@ -132,7 +132,6 @@ const CreatePage: NextPageWithLayout = () => {
           },
         })
         const tx = await marketplace.signature.mint(signatureGenerated)
-        console.log(tx)
 
         // create an NFT
         const imageAsset = await client.assets.upload('image', nftData.image)
