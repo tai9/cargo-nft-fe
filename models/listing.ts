@@ -20,7 +20,7 @@ export const getListingQuery = (
   nftId?: string
 ) => `*[_type == "listings" && active == true ${
   nftId ? `&& nft._ref == "${nftId}"` : ''
-} ] {
+} ] | order(_updatedAt desc) {
   _createdAt,
   _id,
   _updatedAt,

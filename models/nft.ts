@@ -44,7 +44,7 @@ export const getOwnNFTsQuery = (
 
 export const getNFTsByCollectionIdQuery = (
   contractAddress: string
-) => `*[_type == "nfts" && collection->contractAddress == "${contractAddress}" ] {
+) => `*[_type == "nfts" && collection->contractAddress == "${contractAddress}" ] | order(_updatedAt desc) {
     _id,
    _createdAt,
    _updatedAt,
@@ -73,7 +73,7 @@ export const getNFTsByCollectionIdQuery = (
     "owner":owner->
 }`
 
-export const getAllNFTQuery = `*[_type == "nfts" ] {
+export const getAllNFTQuery = `*[_type == "nfts" ] | order(_updatedAt desc) {
     _id,
    _createdAt,
    _updatedAt,

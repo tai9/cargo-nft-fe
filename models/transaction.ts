@@ -30,7 +30,9 @@ export type Transaction = {
 
 export const getTransactionQuery = (
   nftId?: string
-) => `*[_type == "transactions" ${nftId ? `&& nft._ref == "${nftId}"` : ''} ] {
+) => `*[_type == "transactions" ${
+  nftId ? `&& nft._ref == "${nftId}"` : ''
+} ] | order(_createdAt desc) {
   _createdAt,
   _id,
   _updatedAt,
