@@ -44,6 +44,11 @@ export let theme = createTheme({
             backgroundColor: '#4c505c',
           },
         },
+        outlined: {
+          color: 'white',
+          borderColor: 'white',
+          backgroundColor: '#202225',
+        },
       },
     },
     MuiTab: {
@@ -58,7 +63,7 @@ export let theme = createTheme({
     MuiButtonBase: {
       styleOverrides: {
         root: {
-          borderColor: '#151c22 !important',
+          borderColor: '#151c22',
         },
       },
     },

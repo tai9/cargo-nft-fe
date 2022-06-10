@@ -1,4 +1,4 @@
-import { Divider } from '@mui/material'
+import { Button, Divider } from '@mui/material'
 import { useAddress, useMarketplace } from '@thirdweb-dev/react'
 import { NATIVE_TOKEN_ADDRESS } from '@thirdweb-dev/sdk'
 import { Collapse, Modal } from 'components/common'
@@ -37,6 +37,7 @@ import {
 } from 'react-icons/md'
 import { toast } from 'react-toastify'
 import { numberFormatter, sliceAddress } from 'utils'
+import LoadingButton from '@mui/lab/LoadingButton'
 
 const style = {
   wrapper: `flex flex-col items-center container-lg text-[#e5e8eb]`,
@@ -51,6 +52,7 @@ const Nft: NextPageWithLayout = () => {
   const marketplace = useMarketplace(
     process.env.NEXT_PUBLIC_MARKETPLACE_CONTRACT_ADDRESS
   )
+
   const address = useAddress()
 
   const router = useRouter()
@@ -71,10 +73,12 @@ const Nft: NextPageWithLayout = () => {
   // modal states
   const [openModal, setOpenModal] = useState(false)
   const [openListingModal, setOpenListingModal] = useState(false)
+  const [openConfirmModal, setOpenConfirmModal] = useState(false)
 
   // loading states
   const [isListing, setIsListing] = useState(false)
   const [isPurchasing, setIsPurchasing] = useState(false)
+  const [isCancelling, setIsCancelling] = useState(false)
 
   const fetchNFTsData = useCallback(
     async (collectionId: string, nftId: string, sanityClient = client) => {
@@ -286,6 +290,30 @@ const Nft: NextPageWithLayout = () => {
     }
   }
 
+  const handleCancelListing = async () => {
+    setIsCancelling(true)
+    // update listing status
+    client
+      .patch(nftListing?._id || '')
+      .set({
+        active: false,
+      })
+      .commit()
+      .then(async () => {
+        await fetchListingData(nftId as string)
+        setIsCancelling(false)
+        toast.success(`Cancel listing successful`)
+        handleCloseConfirmModal()
+      })
+      .catch((error) => {
+        setIsCancelling(false)
+        toast.error('Cannot cancel listing.')
+        console.log(error)
+      })
+  }
+
+  const handleCloseConfirmModal = () => setOpenConfirmModal(false)
+
   return (
     <div>
       <div className={style.wrapper}>
@@ -382,6 +410,7 @@ const Nft: NextPageWithLayout = () => {
                 nftListing={nftListing}
                 handleBuyNFT={handleBuyNFT}
                 handleListNFT={handleListNFT}
+                handleCancelListing={handleCancelListing}
               />
               <div className="flex flex-col gap-6 mt-6">
                 <Collapse icon={<MdTimeline />} title="Price History">
@@ -534,6 +563,45 @@ const Nft: NextPageWithLayout = () => {
         handleClose={() => setOpenListingModal(false)}
       >
         <ListingForm loading={isListing} handleSubmit={handleListingNFT} />
+      </Modal>
+
+      <Modal open={openConfirmModal} handleClose={handleCloseConfirmModal}>
+        <div className="text-center space-y-12">
+          <div className="text-xl font-bold">
+            Are you sure you want to cancel your listing?
+          </div>
+          <div className="text-left">
+            Canceling your listing will unpublish this sale from Cargo and
+            requires a transaction to make sure it will never be fulfillable.
+          </div>
+          <div className="space-x-4">
+            <Button
+              type="submit"
+              sx={{
+                width: 'fit-content',
+                fontWeight: 'bold',
+              }}
+              variant="outlined"
+              size="large"
+              onClick={handleCloseConfirmModal}
+            >
+              Cancel listing
+            </Button>
+            <LoadingButton
+              type="submit"
+              sx={{
+                width: 'fit-content',
+                fontWeight: 'bold',
+              }}
+              variant="contained"
+              loading={isCancelling}
+              size="large"
+              onClick={handleCancelListing}
+            >
+              Cancel listing
+            </LoadingButton>
+          </div>
+        </div>
       </Modal>
     </div>
   )

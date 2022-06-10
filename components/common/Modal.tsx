@@ -16,7 +16,7 @@ const Backdrop = ({ children }: BackdropProps) => {
 
 type ModalProps = {
   className?: string
-  title: string
+  title?: string
   submitText?: string
   open: boolean
   children?: ReactNode
@@ -41,17 +41,19 @@ export const Modal = ({
         onClick={(e) => e.stopPropagation()}
       >
         <div
-          className={`bg-[#303338] max-w-2xl mx-auto w-full rounded-md text-white border border-darkLine ${className}`}
+          className={`bg-[#303338] relative max-w-2xl mx-auto w-full rounded-md text-white border border-darkLine ${className}`}
         >
-          <div className="p-6 text-center relative">
-            <div className="font-bold text-xl">{title}</div>
-            <IoCloseSharp
-              fontSize={24}
-              color="grey"
-              className="cursor-pointer absolute top-4 right-4"
-              onClick={handleClose}
-            />
-          </div>
+          {title && (
+            <div className="p-6 text-center relative">
+              <div className="font-bold text-xl">{title}</div>
+            </div>
+          )}
+          <IoCloseSharp
+            fontSize={24}
+            color="grey"
+            className="cursor-pointer absolute top-4 right-4"
+            onClick={handleClose}
+          />
           <div className="border-t-[1px] border-darkLine"></div>
           <div className="p-8">{children}</div>
           {handleSubmit && (
