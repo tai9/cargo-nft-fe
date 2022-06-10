@@ -1,5 +1,10 @@
 import { MainLayout } from 'components/layout'
-import { getSingleNFTQuery, NextPageWithLayout, NFTItem } from 'models'
+import {
+  ETransactionEvent,
+  getSingleNFTQuery,
+  NextPageWithLayout,
+  NFTItem,
+} from 'models'
 import { SyntheticEvent, useCallback, useEffect, useState } from 'react'
 import { client } from 'lib/sanityClient'
 import { useRouter } from 'next/router'
@@ -8,6 +13,7 @@ import { MdWarningAmber } from 'react-icons/md'
 import LoadingButton from '@mui/lab/LoadingButton'
 import { ethers } from 'ethers'
 import { toast } from 'react-toastify'
+import { useAddress, useNFTCollection } from '@thirdweb-dev/react'
 
 const TransferPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -17,6 +23,9 @@ const TransferPage: NextPageWithLayout = () => {
   const [transferAddress, setTransferAddress] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [isTransfering, setIsTransfering] = useState(false)
+
+  const address = useAddress()
+  const nftContract = useNFTCollection(nftItem?.collection?.contractAddress)
 
   const fetchNFTsData = useCallback(async (nftId: string) => {
     try {
@@ -44,12 +53,73 @@ const TransferPage: NextPageWithLayout = () => {
     }
   }, [transferAddress, nftItem])
 
-  const handleTransfer = (event: SyntheticEvent) => {
+  const handleTransfer = async (event: SyntheticEvent) => {
     event.preventDefault()
+    if (
+      !address ||
+      !nftContract ||
+      !nftItem ||
+      !transferAddress ||
+      errorMessage
+    )
+      return
+
     try {
       setIsTransfering(true)
+
+      const tx = await nftContract.transfer(
+        transferAddress,
+        nftItem?.metadata.id
+      )
+
+      // create user if not exists
+      const userDoc = {
+        _type: 'users',
+        _id: transferAddress,
+        userName: 'Unnamed',
+        walletAddress: address,
+      }
+      await client.createIfNotExists(userDoc)
+
+      // update NFT owner
+      client
+        .patch(nftItem?._id || '')
+        .set({
+          owner: {
+            _ref: transferAddress,
+          },
+        })
+        .commit()
+
+      // create a transaction
+      const transDoc = {
+        _type: 'transactions',
+        owner: {
+          _type: 'reference',
+          _ref: address,
+        },
+        nft: {
+          _type: 'reference',
+          _ref: nftItem._id,
+        },
+        confirmations: tx.receipt.confirmations,
+        contractAddress: tx.receipt.contractAddress || '',
+        from: tx.receipt.from,
+        to: tx.receipt.to,
+        gasUsed: tx.receipt.gasUsed.toString(),
+        status: tx.receipt.status,
+        transactionHash: tx.receipt.transactionHash,
+        type: tx.receipt.type,
+        price: 0,
+        eventType: ETransactionEvent.TRANSAFER,
+      }
+      await client.create(transDoc)
+
       toast.success(`Transfer ${nftItem?.metadata.name} successful!`)
       setIsTransfering(false)
+      setTimeout(() => {
+        router.back()
+      }, 1000)
     } catch (error) {
       toast.error('Something went wrong')
       setIsTransfering(false)
