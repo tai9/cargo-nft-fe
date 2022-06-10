@@ -275,7 +275,7 @@ export default createSchema({
         },
         {
           name: 'listingDurationInSeconds',
-          title: 'duration',
+          title: 'Duration timestamp',
           type: 'number',
         },
         {
@@ -319,7 +319,7 @@ export default createSchema({
 
       preview: {
         select: {
-          title: 'id',
+          title: 'listingId',
         },
       },
     },

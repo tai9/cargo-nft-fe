@@ -4,6 +4,10 @@ import { IoMdWallet } from 'react-icons/io'
 import { AiOutlineClockCircle } from 'react-icons/ai'
 import { ethers } from 'ethers'
 import Button from '@mui/material/Button'
+import { Listing, NFTItem } from 'models'
+import moment from 'moment'
+import { numberFormatter } from 'utils'
+import { ETH_TOKEN_PRICE } from 'constants/token'
 
 const style = {
   button: `flex items-center py-2 px-12 rounded-lg cursor-pointer`,
@@ -11,53 +15,51 @@ const style = {
   buttonText: `ml-2 text-lg font-semibold`,
 }
 
+type Props = {
+  address?: string
+  nftListing?: Listing
+  handleBuyNFT: (listingId: string, quantityDesired: number) => void
+  handleListNFT?: () => void
+}
+
 const Purchase = ({
-  isListed,
-  selectedNft,
-  listings,
+  address,
+  nftListing,
   handleBuyNFT,
   handleListNFT,
-}: any) => {
-  const [selectedMarketNft, setSelectedMarketNft] = useState<any>()
-  const [enableButton, setEnableButton] = useState(true)
-
-  useEffect(() => {
-    if (!listings || isListed === 'false') return
-    ;(async () => {
-      setSelectedMarketNft(
-        listings.find(
-          (marketNft: any) =>
-            ethers.utils.formatEther(marketNft.asset.id) ===
-            ethers.utils.formatEther(selectedNft.metadata.id)
-        )
-      )
-    })()
-  }, [selectedNft, listings, isListed])
-
-  useEffect(() => {
-    if (!selectedMarketNft || !selectedNft) return
-    setEnableButton(true)
-  }, [selectedMarketNft, selectedNft])
-
+}: Props) => {
   return (
     <div className="w-full items-center rounded-lg border border-darkLine bg-[#303339] p-4">
-      {isListed === 'true' ? (
+      {nftListing ? (
         <div className="">
           <div className="bg-[#262b2f] flex gap-2 items-center px-4 py-3 text-grey1 rounded-t-lg">
             <AiOutlineClockCircle className={style.buttonIcon} />
-            <div>Sale ends June 26, 2022 at 2:26pm GMT+7</div>
+            <span>Sale ends</span>
+            <div>
+              {moment(nftListing.listingDurationInSeconds).format(
+                'MMMM Do YYYY, h:mm:ss a'
+              )}
+            </div>
           </div>
           <div className="flex flex-col px-4 py-4 gap-3">
             <div className="space-y-1">
               <p className="text-sm text-grey1">Current price:</p>
               <div className="flex gap-2 items-center">
-                <span>
-                  {selectedMarketNft?.buyoutCurrencyValuePerToken?.symbol}
-                </span>
+                <img
+                  src="https://openseauserdata.com/files/6f8e2979d428180222796ff4a33ab929.svg"
+                  alt=""
+                  width={16}
+                />
                 <span className="text-3xl font-bold">
-                  {selectedMarketNft?.buyoutCurrencyValuePerToken?.displayValue}
+                  {nftListing.buyoutPricePerToken}
                 </span>
-                <span className="text-sm text-grey1">($137.95)</span>
+                <span className="text-sm text-grey1">
+                  (
+                  {numberFormatter.format(
+                    ETH_TOKEN_PRICE * +nftListing.buyoutPricePerToken
+                  )}
+                  )
+                </span>
               </div>
             </div>
             <div className="flex gap-2">
@@ -67,20 +69,20 @@ const Purchase = ({
                 sx={{
                   paddingX: '3rem',
                 }}
-                onClick={() => {
-                  enableButton ? handleBuyNFT(selectedMarketNft?.id, 1) : null
-                }}
+                onClick={() => handleBuyNFT(nftListing.listingId, 1)}
+                disabled={address === nftListing.owner?.walletAddress}
               >
                 <IoMdWallet className={style.buttonIcon} />
                 <div className={style.buttonText}>Buy Now</div>
               </Button>
-
-              <div
-                className={`${style.button} border border-darkLine  bg-darkGrey hover:bg-lightGrey`}
-              >
-                <HiTag className={style.buttonIcon} />
-                <div className={style.buttonText}>Make Offer</div>
-              </div>
+              {address === nftListing.owner?.walletAddress && (
+                <button
+                  className={`${style.button} border border-darkLine  bg-darkGrey hover:bg-lightGrey disabled:cursor-default disabled:hover:bg-darkGrey`}
+                >
+                  <HiTag className={style.buttonIcon} />
+                  <div className={style.buttonText}>Make Offer</div>
+                </button>
+              )}
             </div>
           </div>
         </div>

@@ -49,6 +49,10 @@ function MyApp({
           draggable
           pauseOnHover
           theme="dark"
+          style={{
+            background: '#04111d',
+            color: '#fff',
+          }}
         />
       </ThirdwebProvider>
     </CacheProvider>

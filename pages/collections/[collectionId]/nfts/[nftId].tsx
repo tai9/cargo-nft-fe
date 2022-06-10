@@ -5,8 +5,10 @@ import {
   Collection,
   ETransactionEvent,
   getCollectinByIdQuery,
+  getListingQuery,
   getNFTsByCollectionIdQuery,
   getTransactionQuery,
+  Listing,
   NextPageWithLayout,
   NFTItem,
   Transaction,
@@ -51,6 +53,7 @@ import { Divider, FormControl, Grid, MenuItem, Select } from '@mui/material'
 import { sliceAddress } from 'utils'
 import ListingForm, { ListingData } from 'components/nft/ListingForm'
 import { CargoContext, CargoContextType } from 'context/cargoContext'
+import moment from 'moment'
 
 const style = {
   wrapper: `flex flex-col items-center container-lg text-[#e5e8eb]`,
@@ -60,8 +63,6 @@ const style = {
   detailsContainer: `flex-[2] ml-4`,
   hoverPrimaryText: `text-primary cursor-pointer hover:text-greyBlue`,
 }
-
-type Listing = AuctionListing | DirectListing
 
 const Nft: NextPageWithLayout = () => {
   const router = useRouter()
@@ -124,11 +125,31 @@ const Nft: NextPageWithLayout = () => {
   const fetchNFTsData = useCallback(
     async (collectionId: string, nftId: string, sanityClient = client) => {
       try {
-        const collectionData: NFTItem[] = await sanityClient.fetch(
+        const nftData: NFTItem[] = await sanityClient.fetch(
           getNFTsByCollectionIdQuery(collectionId)
         )
-        setNfts(collectionData)
-        setNftItem(collectionData.find((n) => n._id === nftId))
+        setNfts(nftData)
+        setNftItem(nftData.find((n) => n._id === nftId))
+        console.log(nftData.find((n) => n._id === nftId))
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    []
+  )
+
+  const fetchListingData = useCallback(
+    async (nftId: string, sanityClient = client) => {
+      try {
+        const listingData: Listing[] = await sanityClient.fetch(
+          getListingQuery(nftId)
+        )
+        console.log(listingData[0])
+        setNftListing(listingData[0])
+
+        // setNfts(nftData)
+        // setNftItem(nftData.find((n) => n._id === nftId))
+        // console.log(nftData.find((n) => n._id === nftId))
       } catch (error) {
         console.log(error)
       }
@@ -164,7 +185,14 @@ const Nft: NextPageWithLayout = () => {
   useEffect(() => {
     fetchNFTsData(collectionId as string, nftId as string)
     fetchTransactionsData(nftId as string)
-  }, [collectionId, nftId, fetchNFTsData, fetchTransactionsData])
+    fetchListingData(nftId as string)
+  }, [
+    collectionId,
+    nftId,
+    fetchNFTsData,
+    fetchTransactionsData,
+    fetchListingData,
+  ])
 
   useEffect(() => {
     // fetchDetailCollectionData()
@@ -175,12 +203,19 @@ const Nft: NextPageWithLayout = () => {
   useEffect(() => {
     ;(async () => {
       // if (nftId) {
-      const nfts = await nftCollection?.getAll()
-      console.log(nfts, '🔫')
+      // const nfts = await nftCollection?.getAll()
 
       // if (isListed === 'true') {
-      //   const data: Listing[] | undefined =
-      //     await marketplace?.getActiveListings()
+      const data = await marketplace?.getActiveListings()
+      const s = data as DirectListing[]
+
+      console.log(
+        data,
+        s[0].startTimeInSeconds.toString(),
+        s[0].secondsUntilEnd.toString(),
+        s[0].buyoutPrice.toString(),
+        '🔫'
+      )
 
       //   setListings(data)
 
@@ -197,11 +232,8 @@ const Nft: NextPageWithLayout = () => {
     })()
   }, [marketplace, nftCollection])
 
-  const handleBuyNFT = async (
-    listingId: ethers.BigNumberish,
-    quantityDesired = 1
-  ) => {
-    if (!marketplace) return
+  const handleBuyNFT = async (listingId: string, quantityDesired: number) => {
+    if (!marketplace || !address) return
     try {
       // toast.promise(
       //   marketplace.buyoutListing(listingId, quantityDesired),
@@ -273,7 +305,10 @@ const Nft: NextPageWithLayout = () => {
         },
         listingId: listingId,
         startTimestamp: new Date().toISOString(),
-        listingDurationInSeconds: 86400 * (data?.duration || 30),
+        listingDurationInSeconds: moment()
+          .add(data?.duration || 30, 'days')
+          .toDate()
+          .getTime(),
         quantity: 1,
         currencyContractAddress: NATIVE_TOKEN_ADDRESS || '',
         buyoutPricePerToken: data?.amount?.toString() || '',
@@ -386,13 +421,13 @@ const Nft: NextPageWithLayout = () => {
                         target="_blank"
                         rel="noreferrer"
                       >
-                        {sliceAddress(nftListing?.assetContractAddress)}
+                        {sliceAddress(nftItem?.collection?.contractAddress)}
                       </a>
                     </div>
                     <div className="flex justify-between">
                       <div>Token ID</div>
                       <div className={style.hoverPrimaryText}>
-                        {nftListing?.id}
+                        {nftItem?.metadata.id.toString()}
                       </div>
                     </div>
                     <div className="flex justify-between">
@@ -414,9 +449,8 @@ const Nft: NextPageWithLayout = () => {
             <div className={style.detailsContainer}>
               <GeneralDetails nftItem={nftItem} />
               <Purchase
-                isListed={isListed}
-                selectedNft={selectedNft}
-                listings={listings}
+                address={address}
+                nftListing={nftListing}
                 handleBuyNFT={handleBuyNFT}
                 handleListNFT={handleListNFT}
               />
