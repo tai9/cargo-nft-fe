@@ -10,6 +10,7 @@ import { CacheProvider } from '@emotion/react'
 import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import { CargoProvider } from 'context/cargoContext'
+import NextNprogress from 'nextjs-progressbar'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -34,6 +35,14 @@ function MyApp({
           <CssBaseline />
           <CargoProvider>
             <Layout>
+              <NextNprogress
+                options={{ showSpinner: false }}
+                color="#2181e2"
+                startPosition={0.3}
+                stopDelayMs={200}
+                height={3}
+                showOnShallow={true}
+              />
               <Component {...pageProps} />
             </Layout>
           </CargoProvider>
