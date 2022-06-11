@@ -38,6 +38,7 @@ import {
 import { toast } from 'react-toastify'
 import { numberFormatter, sliceAddress } from 'utils'
 import LoadingButton from '@mui/lab/LoadingButton'
+import OfferForm from 'components/nft/OfferForm'
 
 const style = {
   wrapper: `flex flex-col items-center container-lg text-[#e5e8eb]`,
@@ -74,11 +75,13 @@ const Nft: NextPageWithLayout = () => {
   const [openModal, setOpenModal] = useState(false)
   const [openListingModal, setOpenListingModal] = useState(false)
   const [openConfirmModal, setOpenConfirmModal] = useState(false)
+  const [openOfferModal, setOpenOfferModal] = useState(false)
 
   // loading states
   const [isListing, setIsListing] = useState(false)
   const [isPurchasing, setIsPurchasing] = useState(false)
   const [isCancelling, setIsCancelling] = useState(false)
+  const [isOffering, setIsOffering] = useState(false)
 
   const fetchNFTsData = useCallback(
     async (collectionId: string, nftId: string, sanityClient = client) => {
@@ -139,6 +142,11 @@ const Nft: NextPageWithLayout = () => {
   const handleBuyNFT = () => {
     if (!marketplace || !address || !listings) return
     setOpenModal(true)
+  }
+
+  const handleMakeOffer = () => {
+    if (!marketplace || !address) return
+    setOpenOfferModal(true)
   }
 
   const handleListNFT = () => {
@@ -312,6 +320,10 @@ const Nft: NextPageWithLayout = () => {
       })
   }
 
+  const handleMakeOfferNFT = async (data?: ListingData) => {
+    console.log(data)
+  }
+
   const handleCloseConfirmModal = () => setOpenConfirmModal(false)
 
   return (
@@ -411,6 +423,7 @@ const Nft: NextPageWithLayout = () => {
                 handleBuyNFT={handleBuyNFT}
                 handleListNFT={handleListNFT}
                 handleCancelListing={handleCancelListing}
+                handleMakeOffer={handleMakeOffer}
               />
               <div className="flex flex-col gap-6 mt-6">
                 <Collapse icon={<MdTimeline />} title="Price History">
@@ -556,6 +569,7 @@ const Nft: NextPageWithLayout = () => {
         </div>
       </Modal>
 
+      {/* Listing */}
       <Modal
         title={`Listing ${nftItem?.metadata.name}`}
         submitText="Complete listing"
@@ -565,6 +579,16 @@ const Nft: NextPageWithLayout = () => {
         <ListingForm loading={isListing} handleSubmit={handleListingNFT} />
       </Modal>
 
+      {/* Make offer */}
+      <Modal
+        title="Make an offer"
+        open={openOfferModal}
+        handleClose={() => setOpenOfferModal(false)}
+      >
+        <OfferForm loading={isOffering} handleSubmit={handleMakeOfferNFT} />
+      </Modal>
+
+      {/* Cancel listing */}
       <Modal open={openConfirmModal} handleClose={handleCloseConfirmModal}>
         <div className="text-center space-y-12">
           <div className="text-xl font-bold">

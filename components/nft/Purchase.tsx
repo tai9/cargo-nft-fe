@@ -20,6 +20,7 @@ type Props = {
   handleBuyNFT: (listingId: string, quantityDesired: number) => void
   handleListNFT?: () => void
   handleCancelListing?: () => void
+  handleMakeOffer?: () => void
 }
 
 const Purchase = ({
@@ -28,6 +29,7 @@ const Purchase = ({
   handleBuyNFT,
   handleListNFT,
   handleCancelListing,
+  handleMakeOffer,
 }: Props) => {
   return (
     <>
@@ -80,6 +82,7 @@ const Purchase = ({
                 {address !== nftListing.owner?.walletAddress && (
                   <button
                     className={`${style.button} border border-darkLine  bg-darkGrey hover:bg-lightGrey disabled:cursor-default disabled:hover:bg-darkGrey`}
+                    onClick={handleMakeOffer}
                   >
                     <HiTag className={style.buttonIcon} />
                     <div className={style.buttonText}>Make Offer</div>
