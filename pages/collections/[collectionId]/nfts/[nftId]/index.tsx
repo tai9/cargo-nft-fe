@@ -366,7 +366,7 @@ const Nft: NextPageWithLayout = () => {
                           src="https://opensea.io/static/images/empty-asks.svg"
                           alt=""
                         />
-                        <div>No listings yet</div>
+                        <div>No description yet</div>
                       </div>
                     )}
                   </div>
@@ -433,7 +433,7 @@ const Nft: NextPageWithLayout = () => {
                       src="https://opensea.io/static/images/empty-asks.svg"
                       alt=""
                     />
-                    <div>No listings yet</div>
+                    <div>No activity yet</div>
                   </div>
                 </Collapse>
                 <Collapse icon={<BsTagFill />} title="Listings">
@@ -453,7 +453,7 @@ const Nft: NextPageWithLayout = () => {
                       src="https://opensea.io/static/images/empty-asks.svg"
                       alt=""
                     />
-                    <div>No listings yet</div>
+                    <div>No offers yet</div>
                   </div>
                 </Collapse>
               </div>
