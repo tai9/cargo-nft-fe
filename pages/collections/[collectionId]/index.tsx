@@ -28,12 +28,15 @@ import NFTCard from 'components/NFTCard'
 import { client } from 'lib/sanityClient'
 import {
   Collection,
+  getAllcollectionQuery,
+  getCollectinByIdQuery,
   getListingQuery,
   getNFTsByCollectionIdQuery,
   Listing,
   NextPageWithLayout,
   NFTItem,
 } from 'models'
+import { GetStaticProps, GetStaticPropsContext } from 'next'
 import { useRouter } from 'next/router'
 import React, { useCallback, useEffect, useState } from 'react'
 import {
@@ -105,12 +108,10 @@ function a11yProps(index: TabType) {
 
 type TabType = 'items' | 'activity'
 
-const Collection: NextPageWithLayout = () => {
+const Collection: NextPageWithLayout = ({ collection }: any) => {
   const router = useRouter()
-  const address = useAddress()
 
   const { collectionId } = router.query
-  const [collection, setCollection] = useState<Collection>()
   const [nfts, setNfts] = useState<NFTItem[]>([])
   const [listings, setListings] = useState<Listing[]>([])
   const [tabValue, setTabValue] = useState<TabType>('items')
@@ -139,35 +140,10 @@ const Collection: NextPageWithLayout = () => {
     }
   }, [])
 
-  const fetchCollectionData = useCallback(
-    async (collectionId: string, sanityClient = client) => {
-      const query = `*[_type == "marketItems" && contractAddress == "${collectionId}" ] {
-      "imageUrl": profileImage.asset->url,
-      "bannerImageUrl": bannerImage.asset->url,
-      volumeTraded,
-      createdBy,
-      contractAddress,
-      "creator": createdBy->userName,
-      title, floorPrice,
-      "allOwners": owners[]->,
-      description
-    }`
-
-      try {
-        const collectionData: Collection[] = await sanityClient.fetch(query)
-        setCollection(collectionData[0])
-      } catch (error) {
-        console.log(error)
-      }
-    },
-    []
-  )
-
   useEffect(() => {
-    fetchCollectionData(collectionId as string)
     fetchNFTsData(collectionId as string)
     fetchListingsData()
-  }, [collectionId, fetchCollectionData, fetchNFTsData, fetchListingsData])
+  }, [collectionId, fetchNFTsData, fetchListingsData])
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: TabType) => {
     setTabValue(newValue)
@@ -497,6 +473,42 @@ const NFTCardSkeleton = () => (
     </div>
   </div>
 )
+
+export async function getStaticPaths() {
+  const collectionData: Collection[] = await client.fetch(getAllcollectionQuery)
+  const paths = collectionData.map((col) => ({
+    params: { collectionId: col._id },
+  }))
+  return {
+    paths,
+    fallback: true,
+  }
+}
+
+export const getStaticProps: GetStaticProps<any> = async (
+  context: GetStaticPropsContext
+) => {
+  const collectionId = context.params?.collectionId as string
+  if (!collectionId) {
+    return {
+      notFound: true,
+    }
+  }
+
+  const query = getCollectinByIdQuery(collectionId)
+  const collectionData: Collection[] = await client.fetch(query)
+  if (collectionData.length === 0) {
+    return {
+      notFound: true,
+    }
+  }
+
+  return {
+    props: {
+      collection: collectionData[0],
+    },
+  }
+}
 
 Collection.Layout = MainLayout
 
