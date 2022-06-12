@@ -84,7 +84,6 @@ const AccountPage: NextPageWithLayout = ({ user }: any) => {
   const router = useRouter()
   const { walletAddress } = router.query
 
-  const address = useAddress()
   const [tabValue, setTabValue] = useState<TabType>('items')
   const [isLoadingNFTs, setIsLoadingNFTs] = useState(false)
   const [editingUsername, setEditingUsername] = useState(false)
@@ -131,8 +130,8 @@ const AccountPage: NextPageWithLayout = ({ user }: any) => {
   }, [])
 
   const fetchOwnNFTs = useCallback(
-    async (address: string, sanityClient = client) => {
-      const query = getOwnNFTsQuery(address)
+    async (walletAddress: string, sanityClient = client) => {
+      const query = getOwnNFTsQuery(walletAddress)
 
       try {
         setIsLoadingNFTs(true)
@@ -217,7 +216,7 @@ const AccountPage: NextPageWithLayout = ({ user }: any) => {
                   alt="eth"
                   className="h-5 mr-2"
                 />
-                {sliceAddress(address)}
+                {sliceAddress(walletAddress as string)}
               </div>
             </Tooltip>
             <div className="text-grey1">

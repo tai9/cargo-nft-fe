@@ -31,7 +31,15 @@ export const Header = () => {
   const [search, setSearch] = useState('')
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
-  const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleOpenMenu = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    if (!addressConnected) {
+      const res: any = await connectWithMetamask()
+      if (res.data) {
+        router.push(`/${res.data.account}`)
+        return
+      }
+      return
+    }
     setAnchorEl(event.currentTarget)
   }
   const handleClose = () => {
@@ -40,6 +48,7 @@ export const Header = () => {
 
   const handleDisconnectWallet = () => {
     disconnect()
+    handleClose()
     toast.success('Logout successful!')
   }
 
