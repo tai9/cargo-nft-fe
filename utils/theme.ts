@@ -32,6 +32,15 @@ const colors = {
 
 export let theme = createTheme({
   palette: colors,
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 900,
+      lg: 1320,
+      xl: 1536,
+    },
+  },
   components: {
     MuiButton: {
       styleOverrides: {

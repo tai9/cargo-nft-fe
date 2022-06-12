@@ -22,7 +22,7 @@ export const MainLayout = ({ children }: LayoutProps) => {
       {confetti && <Confetti run={confetti} />}
       <Header />
 
-      <main className="grow mb-12">{children}</main>
+      <main className="grow">{children}</main>
 
       <Footer />
     </div>
