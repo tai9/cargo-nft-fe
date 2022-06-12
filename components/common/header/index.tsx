@@ -1,7 +1,7 @@
 import { useAddress, useDisconnect, useMetamask } from '@thirdweb-dev/react'
 import Image from 'next/image'
 import Link from 'next/link'
-import React from 'react'
+import React, { useState } from 'react'
 import { AiOutlineSearch } from 'react-icons/ai'
 import { CgProfile } from 'react-icons/cg'
 import { MdOutlineAccountBalanceWallet } from 'react-icons/md'
@@ -28,7 +28,8 @@ export const Header = () => {
   const addressConnected = useAddress()
   const router = useRouter()
 
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
+  const [search, setSearch] = useState('')
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
   const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
@@ -73,6 +74,12 @@ export const Header = () => {
           <input
             className={style.searchInput}
             placeholder="Search items, collections, and accounts"
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                router.push(search)
+              }
+            }}
           />
         </div>
         <div className={style.headerItems}>
@@ -97,7 +104,7 @@ export const Header = () => {
             }}
           >
             <MenuItem onClick={handleClose}>
-              <Link href="/account">
+              <Link href={`/${addressConnected}`}>
                 <a>Profile</a>
               </Link>
             </MenuItem>
