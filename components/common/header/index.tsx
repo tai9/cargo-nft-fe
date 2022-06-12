@@ -77,7 +77,7 @@ export const Header = () => {
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
-                router.push(search)
+                router.push(`/${search}`)
               }
             }}
           />

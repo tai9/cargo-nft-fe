@@ -17,42 +17,36 @@ import {
   Stack,
   Tab,
   Tabs,
-  TextField,
   Tooltip,
 } from '@mui/material'
 import { useAddress } from '@thirdweb-dev/react'
 import CoverImg from 'assets/cover.jpeg'
+import { CollapseOutline } from 'components/common'
 import { NormalLayout } from 'components/layout'
+import NFTCard from 'components/NFTCard'
 import { client } from 'lib/sanityClient'
 import {
-  Collection,
+  getListingQuery,
   getOwnNFTsQuery,
   getUserQuery,
+  Listing,
   NextPageWithLayout,
   NFTItem,
   User,
 } from 'models'
+import moment from 'moment'
+import { GetServerSidePropsContext } from 'next'
 import Image from 'next/image'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/router'
+import { useCallback, useEffect, useState } from 'react'
+import { AiOutlineCheck, AiOutlineSearch, AiTwotoneEdit } from 'react-icons/ai'
+import { BiFilter } from 'react-icons/bi'
 import { BsFillShareFill } from 'react-icons/bs'
 import { FiMoreHorizontal } from 'react-icons/fi'
-import { sliceAddress } from 'utils'
-import moment from 'moment'
-import { BiFilter } from 'react-icons/bi'
 import { GrGrid } from 'react-icons/gr'
 import { RiLayoutGridLine } from 'react-icons/ri'
-import { AiOutlineSearch, AiTwotoneEdit, AiOutlineCheck } from 'react-icons/ai'
-import { CollapseOutline } from 'components/common'
-import NFTCard from 'components/NFTCard'
 import { toast } from 'react-toastify'
-import { useRouter } from 'next/router'
-import {
-  GetServerSideProps,
-  GetServerSidePropsContext,
-  GetStaticPaths,
-  GetStaticProps,
-  GetStaticPropsContext,
-} from 'next'
+import { sliceAddress } from 'utils'
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -86,7 +80,7 @@ function a11yProps(index: TabType) {
 
 type TabType = 'items' | 'activity'
 
-const AccountPage: NextPageWithLayout = ({ user, nfts }: any) => {
+const AccountPage: NextPageWithLayout = ({ user }: any) => {
   const router = useRouter()
   const { walletAddress } = router.query
 
@@ -96,6 +90,9 @@ const AccountPage: NextPageWithLayout = ({ user, nfts }: any) => {
   const [editingUsername, setEditingUsername] = useState(false)
   const [newUsername, setNewUsername] = useState((user as User).userName)
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false)
+
+  const [nfts, setNfts] = useState<NFTItem[]>([])
+  const [listings, setListings] = useState<Listing[]>([])
 
   const onUsernameChange = (e: any) => {
     setNewUsername(e.target.value)
@@ -124,7 +121,36 @@ const AccountPage: NextPageWithLayout = ({ user, nfts }: any) => {
       })
   }
 
-  // if (typeof window === 'undefined') return <div>wtf bro</div>
+  const fetchListingsData = useCallback(async () => {
+    try {
+      const listingData = await client.fetch(getListingQuery())
+      setListings(listingData)
+    } catch (err) {
+      console.error(err)
+    }
+  }, [])
+
+  const fetchOwnNFTs = useCallback(
+    async (address: string, sanityClient = client) => {
+      const query = getOwnNFTsQuery(address)
+
+      try {
+        setIsLoadingNFTs(true)
+        const data: NFTItem[] = await sanityClient.fetch(query)
+        setNfts(data)
+        setIsLoadingNFTs(false)
+      } catch (error) {
+        setIsLoadingNFTs(false)
+        console.log(error)
+      }
+    },
+    []
+  )
+
+  useEffect(() => {
+    fetchListingsData()
+    fetchOwnNFTs(walletAddress as string)
+  }, [fetchListingsData, fetchOwnNFTs, walletAddress])
 
   return (
     <div>
@@ -395,7 +421,9 @@ const AccountPage: NextPageWithLayout = ({ user, nfts }: any) => {
                             key={id}
                             nftItem={nftItem}
                             title={nftItem.collection?.title || ''}
-                            // listings={listings}
+                            listing={listings.find(
+                              (l) => l.nft?._id === nftItem._id
+                            )}
                             collectionId={nftItem.collection?.contractAddress}
                           />
                         ))}
@@ -409,7 +437,6 @@ const AccountPage: NextPageWithLayout = ({ user, nfts }: any) => {
           </div>
         </div>
       </div>
-      {/* <NotFound /> */}
     </div>
   )
 }
@@ -443,13 +470,9 @@ export const getServerSideProps = async (
     }
   }
 
-  const nftQuery = getOwnNFTsQuery(address)
-  const nfts: NFTItem[] = await client.fetch(nftQuery)
-
   return {
     props: {
       user: users[0],
-      nfts,
     },
   }
 }

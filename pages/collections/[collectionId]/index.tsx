@@ -116,18 +116,12 @@ const Collection: NextPageWithLayout = () => {
   const [tabValue, setTabValue] = useState<TabType>('items')
   const [isLoadingNFTs, setIsLoadingNFTs] = useState(false)
 
-  const marketplace = useMarketplace(
-    process.env.NEXT_PUBLIC_MARKETPLACE_CONTRACT_ADDRESS
-  )
-  const nftCollection = useNFTCollection(collectionId as string)
-
   const fetchListingsData = useCallback(async () => {
     try {
       const listingData = await client.fetch(getListingQuery())
       setListings(listingData)
     } catch (err) {
       console.error(err)
-      alert('Error fetching listings')
     }
   }, [])
 
@@ -142,7 +136,6 @@ const Collection: NextPageWithLayout = () => {
     } catch (err) {
       console.error(err)
       setIsLoadingNFTs(false)
-      alert('Error fetching nfts')
     }
   }, [])
 

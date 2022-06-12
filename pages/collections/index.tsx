@@ -42,7 +42,6 @@ const Collections: NextPageWithLayout = () => {
       const nfts = await nftCollection.getAll()
     } catch (err) {
       console.error(err)
-      alert('Error fetching nfts')
     }
   }
 
