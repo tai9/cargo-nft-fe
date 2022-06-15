@@ -128,7 +128,7 @@ const TransferPage: NextPageWithLayout = () => {
   }
 
   return (
-    <form className="flex flex-col gap-14 text-white items-center justify-center h-full w-full max-w-2xl mx-auto mt-20">
+    <form className="flex flex-col gap-14 text-white items-center justify-center h-full w-full max-w-2xl mx-auto mt-20 pb-12">
       <div className="font-bold text-6xl">Transfer</div>
       <div className="border border-darkLine p-4 rounded-lg">
         {nftItem?.metadata.image ? (

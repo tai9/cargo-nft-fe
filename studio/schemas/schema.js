@@ -78,8 +78,8 @@ export default createSchema({
           to: [{ type: 'users' }],
         },
         {
-          name: 'volumeTraded',
-          title: 'Volume Traded',
+          name: 'totalVolume',
+          title: 'Total Volume',
           type: 'number',
         },
         {

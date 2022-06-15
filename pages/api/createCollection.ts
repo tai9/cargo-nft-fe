@@ -12,7 +12,7 @@ export default async function handler(
     return res.status(400).json({ message: 'Invalid request method' })
 
   const {
-    body: { name, description, image, contractAddress },
+    body: { name, description, walletAddress },
   } = req
 
   const sdk = new ThirdwebSDK(
@@ -24,17 +24,11 @@ export default async function handler(
     )
   )
 
-  const collection = await sdk.getNFTCollection(contractAddress)
-
-  const signature = await collection.signature.generate({
-    metadata: {
-      name,
-      description,
-      image,
-    },
+  const contractAddress = await sdk.deployer.deployNFTCollection({
+    name,
+    description,
+    primary_sale_recipient: walletAddress,
   })
 
-  const tx = await collection.signature.mint(signature)
-
-  res.json({ message: 'Signature generated successfully', signature, tx })
+  res.json({ message: 'Deploy NFT collection successfully', contractAddress })
 }

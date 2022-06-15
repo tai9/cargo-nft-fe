@@ -1,14 +1,21 @@
+import {
+  Divider,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+} from '@mui/material'
 import { useAddress, useDisconnect, useMetamask } from '@thirdweb-dev/react'
+import openseaLogo from 'assets/opensea.png'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import { AiOutlineSearch } from 'react-icons/ai'
+import { BsGrid3X3 } from 'react-icons/bs'
 import { CgProfile } from 'react-icons/cg'
-import { MdOutlineAccountBalanceWallet } from 'react-icons/md'
-import openseaLogo from 'assets/opensea.png'
-import { Menu, MenuItem } from '@mui/material'
+import { MdLogout, MdOutlineAccountBalanceWallet } from 'react-icons/md'
 import { toast } from 'react-toastify'
-import { useRouter } from 'next/router'
 
 const style = {
   wrapper: `bg-darkBlue w-screen px-[1.2rem] py-[0.8rem] flex `,
@@ -95,8 +102,15 @@ export const Header = () => {
           <Link href="/collections" passHref>
             <div className={style.headerItem}> Collections </div>
           </Link>
-          <div className={style.headerItem}> Stats </div>
-          <div className={style.headerItem}> Resources </div>
+          <div className={style.headerItem}> Activity </div>
+          <a
+            href="https://support.opensea.io/hc/en-us"
+            target="_blank"
+            rel="noreferrer"
+            className={style.headerItem}
+          >
+            Resources
+          </a>
           <div className={style.headerItem} onClick={handleNavigateCreateNft}>
             Create
           </div>
@@ -113,11 +127,32 @@ export const Header = () => {
             }}
           >
             <MenuItem onClick={handleClose}>
-              <Link href={`/${addressConnected}`}>
-                <a>Profile</a>
-              </Link>
+              <ListItemIcon>
+                <CgProfile fontSize={20} />
+              </ListItemIcon>
+              <ListItemText>
+                <Link href={`/${addressConnected}`}>
+                  <a>Profile</a>
+                </Link>
+              </ListItemText>
             </MenuItem>
-            <MenuItem onClick={handleDisconnectWallet}>Logout</MenuItem>
+            <MenuItem onClick={handleClose}>
+              <ListItemIcon>
+                <BsGrid3X3 fontSize={20} />
+              </ListItemIcon>
+              <ListItemText>
+                <Link href="/my-collections">
+                  <a>My Collections</a>
+                </Link>
+              </ListItemText>
+            </MenuItem>
+            <Divider />
+            <MenuItem onClick={handleDisconnectWallet}>
+              <ListItemIcon>
+                <MdLogout fontSize={20} />
+              </ListItemIcon>
+              <ListItemText>Logout</ListItemText>
+            </MenuItem>
           </Menu>
           <div className={style.headerIcon}>
             <MdOutlineAccountBalanceWallet />

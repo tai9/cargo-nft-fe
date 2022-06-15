@@ -1,14 +1,25 @@
-import Link from 'next/link'
+import { Collection } from 'models'
+import Router from 'next/router'
 import React from 'react'
+import { AiOutlineEdit } from 'react-icons/ai'
 
 type Props = {
-  data: any
+  data: Collection
 }
 
 const CollectionCard = ({ data }: Props) => {
   return (
-    <Link href={`/collections/${data.contractAddress}`} passHref>
-      <div className="bg-grey2 flex-auto w-full h-[30rem] rounded-2xl overflow-hidden cursor-pointer">
+    <div className="relative">
+      <div
+        className="text-white absolute right-3 top-3 text-xl bg-grey2 rounded-md p-1 cursor-pointer hover:bg-gray-600"
+        onClick={() => Router.push(`/collections/${data.contractAddress}/edit`)}
+      >
+        <AiOutlineEdit />
+      </div>
+      <div
+        className="bg-grey2 flex-auto w-full h-[30rem] rounded-2xl overflow-hidden cursor-pointer"
+        onClick={() => Router.push(`/collections/${data.contractAddress}`)}
+      >
         <div className="h-2/3 w-full overflow-hidden flex justify-center items-center">
           <img
             src={data.bannerImageUrl}
@@ -38,7 +49,7 @@ const CollectionCard = ({ data }: Props) => {
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   )
 }
 

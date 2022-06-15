@@ -17,11 +17,6 @@ import {
   Tab,
   Tabs,
 } from '@mui/material'
-import {
-  useAddress,
-  useMarketplace,
-  useNFTCollection,
-} from '@thirdweb-dev/react'
 import { CollapseOutline } from 'components/common'
 import { MainLayout } from 'components/layout'
 import NFTCard from 'components/NFTCard'
@@ -37,6 +32,7 @@ import {
   NFTItem,
 } from 'models'
 import { GetStaticProps, GetStaticPropsContext } from 'next'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useCallback, useEffect, useState } from 'react'
 import {
@@ -211,7 +207,9 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
         <div className={style.midRow}>
           <div className={style.createdBy}>
             Created by{' '}
-            <span className="text-[#2081e2]">{collection?.creator}</span>
+            <Link href={`/${collection?.createdBy._ref}`} passHref>
+              <a className="text-[#2081e2]">{collection?.creator}</a>
+            </Link>
           </div>
         </div>
         <div className={style.midRow}>
@@ -221,9 +219,7 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
               <div className={style.statName}>items</div>
             </div>
             <div className={style.collectionStat}>
-              <div className={style.statValue}>
-                {collection?.allOwners ? collection.allOwners.length : ''}
-              </div>
+              <div className={style.statValue}>1</div>
               <div className={style.statName}>owners</div>
             </div>
             <div className={style.collectionStat}>
@@ -246,7 +242,7 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
                 />
                 {collection?.volumeTraded}.5K
               </div>
-              <div className={style.statName}>volume traded</div>
+              <div className={style.statName}>total volume</div>
             </div>
           </div>
         </div>
@@ -437,19 +433,27 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
 
             <Grid item>
               <div className="grid lg:grid-cols-3 md:grid-cols-2 xl:grid-cols-4">
-                {isLoadingNFTs
-                  ? [1, 2, 3, 4].map((x) => <NFTCardSkeleton key={x} />)
-                  : nfts.map((nft) => {
-                      return (
-                        <NFTCard
-                          key={nft._id}
-                          nftItem={nft}
-                          title={collection?.title || ''}
-                          listing={listings.find((l) => l.nft?._id === nft._id)}
-                          collectionId={collectionId as string}
-                        />
-                      )
-                    })}
+                {nfts.length === 0 && (
+                  <div className="text-textGrey text-lg mt-6 ml-8">
+                    No NFTs yet.
+                  </div>
+                )}
+                {nfts.length > 0 &&
+                  (isLoadingNFTs
+                    ? [1, 2, 3, 4].map((x) => <NFTCardSkeleton key={x} />)
+                    : nfts.map((nft) => {
+                        return (
+                          <NFTCard
+                            key={nft._id}
+                            nftItem={nft}
+                            title={collection?.title || ''}
+                            listing={listings.find(
+                              (l) => l.nft?._id === nft._id
+                            )}
+                            collectionId={collectionId as string}
+                          />
+                        )
+                      }))}
               </div>
             </Grid>
           </Grid>
