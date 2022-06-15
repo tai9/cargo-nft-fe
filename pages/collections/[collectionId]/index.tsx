@@ -255,23 +255,40 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
             </div>
             <div className={style.collectionStat}>
               <div className={style.statValue}>
-                <img
-                  src="https://openseauserdata.com/files/6f8e2979d428180222796ff4a33ab929.svg"
-                  alt="eth"
-                  className={style.ethLogo}
-                />
-                {collection?.floorPrice}
+                {listings.length > 0 ? (
+                  <>
+                    <img
+                      src="https://openseauserdata.com/files/6f8e2979d428180222796ff4a33ab929.svg"
+                      alt="eth"
+                      className={style.ethLogo}
+                    />
+                    {Math.min(
+                      ...listings.map((item) => +item.buyoutPricePerToken)
+                    )}
+                  </>
+                ) : (
+                  '-'
+                )}
               </div>
               <div className={style.statName}>floor price</div>
             </div>
             <div className={style.collectionStat}>
               <div className={style.statValue}>
-                <img
-                  src="https://openseauserdata.com/files/6f8e2979d428180222796ff4a33ab929.svg"
-                  alt="eth"
-                  className={style.ethLogo}
-                />
-                {collection?.volumeTraded}.5K
+                {listings.length > 0 ? (
+                  <>
+                    <img
+                      src="https://openseauserdata.com/files/6f8e2979d428180222796ff4a33ab929.svg"
+                      alt="eth"
+                      className={style.ethLogo}
+                    />
+                    {listings.reduce(
+                      (prev, current) => +prev + +current.buyoutPricePerToken,
+                      +listings[0].buyoutPricePerToken
+                    )}
+                  </>
+                ) : (
+                  '-'
+                )}
               </div>
               <div className={style.statName}>total volume</div>
             </div>
