@@ -43,8 +43,15 @@ export const getOwnNFTsQuery = (
  }`
 
 export const getNFTsByCollectionIdQuery = (
-  contractAddress: string
-) => `*[_type == "nfts" && collection->contractAddress == "${contractAddress}" ] | order(_updatedAt desc) {
+  contractAddress?: string,
+  search?: string
+) => `*[_type == "nfts" ${search ? `&& metadata.name match "${search}*"` : ''}
+${
+  contractAddress
+    ? ` && collection->contractAddress == "${contractAddress}"`
+    : ''
+}
+] | order(_updatedAt desc) {
     _id,
    _createdAt,
    _updatedAt,

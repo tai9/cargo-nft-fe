@@ -45,6 +45,7 @@ import { CgWebsite } from 'react-icons/cg'
 import { GrGrid } from 'react-icons/gr'
 import { HiDotsVertical } from 'react-icons/hi'
 import { RiLayoutGridLine } from 'react-icons/ri'
+import { useDebounce } from 'use-debounce'
 
 const style = {
   bannerImageContainer: `h-[20vh] w-screen overflow-hidden flex justify-center items-center`,
@@ -113,6 +114,9 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
   const [tabValue, setTabValue] = useState<TabType>('items')
   const [isLoadingNFTs, setIsLoadingNFTs] = useState(false)
 
+  const [searchValue, setSearchValue] = useState('')
+  const [searchDebounced] = useDebounce(searchValue, 1000)
+
   const fetchListingsData = useCallback(async () => {
     try {
       const listingData = await client.fetch(getListingQuery())
@@ -122,19 +126,22 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
     }
   }, [])
 
-  const fetchNFTsData = useCallback(async (collectionId: string) => {
-    try {
-      setIsLoadingNFTs(true)
-      const nftData = await client.fetch(
-        getNFTsByCollectionIdQuery(collectionId)
-      )
-      setNfts(nftData)
-      setIsLoadingNFTs(false)
-    } catch (err) {
-      console.error(err)
-      setIsLoadingNFTs(false)
-    }
-  }, [])
+  const fetchNFTsData = useCallback(
+    async (collectionId: string) => {
+      try {
+        setIsLoadingNFTs(true)
+        const nftData = await client.fetch(
+          getNFTsByCollectionIdQuery(collectionId, searchDebounced)
+        )
+        setNfts(nftData)
+        setIsLoadingNFTs(false)
+      } catch (err) {
+        console.error(err)
+        setIsLoadingNFTs(false)
+      }
+    },
+    [searchDebounced]
+  )
 
   useEffect(() => {
     fetchNFTsData(collectionId as string)
@@ -143,6 +150,10 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: TabType) => {
     setTabValue(newValue)
+  }
+
+  const handleSearchNfts = (e: any) => {
+    setSearchValue(e.target.value)
   }
 
   return (
@@ -275,6 +286,7 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
               <input
                 className={style.searchInput}
                 placeholder="Search by name"
+                onChange={handleSearchNfts}
               />
             </div>
             <FormControl>
@@ -315,14 +327,8 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
             </ButtonGroup>
           </div>
 
-          <Grid container spacing={4}>
-            <Grid
-              item
-              xs={2}
-              sx={{
-                marginTop: 3,
-              }}
-            >
+          <div className="grid grid-cols-6 gap-6 mt-6">
+            <div className="col-span-1">
               <CollapseOutline title="Status">
                 <Stack>
                   <FormControl variant="standard" fullWidth>
@@ -358,14 +364,12 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
                   </FormControl>
                 </Stack>
               </CollapseOutline>
-
               <Divider
                 sx={{
                   marginY: 2,
                   background: 'grey',
                 }}
               />
-
               <CollapseOutline title="Item quantity">
                 <Stack>
                   <FormControl variant="standard" fullWidth>
@@ -404,14 +408,12 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
                   </FormControl>
                 </Stack>
               </CollapseOutline>
-
               <Divider
                 sx={{
                   marginY: 2,
                   background: 'grey',
                 }}
               />
-
               <CollapseOutline title="On sale in">
                 <Stack>
                   <FormControl variant="standard" fullWidth>
@@ -429,9 +431,8 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
                   </FormControl>
                 </Stack>
               </CollapseOutline>
-            </Grid>
-
-            <Grid item>
+            </div>
+            <div className="col-span-5">
               <div className="grid lg:grid-cols-3 md:grid-cols-2 xl:grid-cols-4">
                 {nfts.length === 0 && (
                   <div className="text-textGrey text-lg mt-6 ml-8">
@@ -455,8 +456,8 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
                         )
                       }))}
               </div>
-            </Grid>
-          </Grid>
+            </div>
+          </div>
         </TabPanel>
         <TabPanel value={tabValue} index="activity">
           No item to display
