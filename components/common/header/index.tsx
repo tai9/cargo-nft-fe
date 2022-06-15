@@ -126,25 +126,27 @@ export const Header = () => {
               'aria-labelledby': 'basic-button',
             }}
           >
-            <MenuItem onClick={handleClose}>
+            <MenuItem
+              onClick={() => {
+                router.push(`/${addressConnected}`)
+                handleClose()
+              }}
+            >
               <ListItemIcon>
                 <CgProfile fontSize={20} />
               </ListItemIcon>
-              <ListItemText>
-                <Link href={`/${addressConnected}`}>
-                  <a>Profile</a>
-                </Link>
-              </ListItemText>
+              <ListItemText>Profile</ListItemText>
             </MenuItem>
-            <MenuItem onClick={handleClose}>
+            <MenuItem
+              onClick={() => {
+                router.push('/my-collections')
+                handleClose()
+              }}
+            >
               <ListItemIcon>
                 <BsGrid3X3 fontSize={20} />
               </ListItemIcon>
-              <ListItemText>
-                <Link href="/my-collections">
-                  <a>My Collections</a>
-                </Link>
-              </ListItemText>
+              <ListItemText>My Collections</ListItemText>
             </MenuItem>
             <Divider />
             <MenuItem onClick={handleDisconnectWallet}>
