@@ -9,43 +9,34 @@ import {
 } from '@mui/material'
 import { useAddress } from '@thirdweb-dev/react'
 import ETHToken from 'assets/ETH.svg'
-import axios from 'axios'
 import { Dropzone, Input } from 'components/common'
 import { NormalLayout } from 'components/layout'
-import { CargoContext, CargoContextType } from 'context/cargoContext'
 import { client } from 'lib/sanityClient'
-import { NextPageWithLayout } from 'models'
+import { Collection, getCollectionByIdQuery, NextPageWithLayout } from 'models'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import React, {
   FormEvent,
   SyntheticEvent,
-  useContext,
+  useCallback,
   useEffect,
   useState,
 } from 'react'
 import { toast } from 'react-toastify'
 
-type CollectionCreate = {
-  name: string
-  profileImage?: any
-  bannerImage?: any
-  description?: string
-  blockchain?: string
-  preview?: string
+type ImageType = {
+  bannerImage: any
+  profileImage: any
 }
 
-const CreateCollectionPage: NextPageWithLayout = () => {
+const EditCollectionPage: NextPageWithLayout = () => {
   const router = useRouter()
 
-  const { handleConfetti } = useContext(CargoContext) as CargoContextType
-
-  const [collection, setCollection] = useState<Partial<CollectionCreate>>({
-    blockchain: 'rinkeby',
-  })
+  const [collection, setCollection] =
+    useState<Partial<Collection & ImageType>>()
 
   // loading states
-  const [isCreating, setIsCreating] = useState(false)
+  const [isUpdating, setIsUpdating] = useState(false)
 
   const address = useAddress()
 
@@ -55,10 +46,77 @@ const CreateCollectionPage: NextPageWithLayout = () => {
     }
   }, [address, router])
 
-  const handleInputChange = (event: FormEvent<HTMLInputElement>) => {
-    setCollection({
-      ...collection,
-      [event.currentTarget.name]: event.currentTarget.value,
+  const fetchCollection = useCallback(async () => {
+    const query = getCollectionByIdQuery(router.query?.collectionId as string)
+    const collectionData: Collection[] = await client.fetch(query)
+    setCollection(collectionData[0])
+  }, [router.query?.collectionId])
+
+  useEffect(() => {
+    fetchCollection()
+  }, [fetchCollection])
+
+  const onSubmit = async (event: SyntheticEvent) => {
+    event.preventDefault()
+    if (!collection) return
+
+    const handleUpdateCollection = new Promise(async (resolve, reject) => {
+      try {
+        setIsUpdating(true)
+
+        let bannerImage: any, profileImage: any
+        if (collection.bannerImage) {
+          bannerImage = await client.assets.upload(
+            'image',
+            collection.bannerImage
+          )
+        }
+        if (collection.profileImage) {
+          profileImage = await client.assets.upload(
+            'image',
+            collection.profileImage
+          )
+        }
+
+        // update listing status
+        await client
+          .patch(collection._id || '')
+          .set({
+            title: collection.title,
+            description: collection.description,
+            profileImage: {
+              _type: 'image',
+              asset: {
+                _type: 'reference',
+                _ref: profileImage
+                  ? profileImage._id
+                  : collection.profileImageId,
+              },
+            },
+            bannerImage: {
+              _type: 'image',
+              asset: {
+                _type: 'reference',
+                _ref: bannerImage ? bannerImage._id : collection.bannerImageId,
+              },
+            },
+          })
+          .commit()
+
+        setIsUpdating(false)
+        router.push('/my-collections')
+        resolve(true)
+      } catch (error) {
+        setIsUpdating(false)
+        reject(true)
+        console.log(error)
+      }
+    })
+
+    toast.promise(handleUpdateCollection, {
+      pending: 'Updating your collection.',
+      error: 'Cannot update your collection.',
+      success: 'Updated your collection successfully.',
     })
   }
 
@@ -67,76 +125,16 @@ const CreateCollectionPage: NextPageWithLayout = () => {
       setCollection({
         ...collection,
         [name]: files[0],
+        imageUrl: name === 'profileImage' ? '' : collection?.imageUrl,
+        bannerImageUrl:
+          name === 'bannerImage' ? '' : collection?.bannerImageUrl,
       })
   }
 
-  const onSubmit = (event: SyntheticEvent) => {
-    event.preventDefault()
-
-    const handleCreateNft = new Promise(async (resolve, reject) => {
-      try {
-        setIsCreating(true)
-
-        // deploy NFT Collection to thirdweb
-        const { data } = await axios.post('/api/createCollection', {
-          name: collection.name || '',
-          description: collection.description || '',
-          walletAddress: address || '',
-        })
-
-        // create a collection to sanity server
-        const profileImage = await client.assets.upload(
-          'image',
-          collection.profileImage
-        )
-        const bannerImage = await client.assets.upload(
-          'image',
-          collection.bannerImage
-        )
-
-        const createDoc = {
-          _type: 'marketItems',
-          createdBy: {
-            _type: 'reference',
-            _ref: address,
-          },
-          title: collection.name,
-          description: collection.description,
-          contractAddress: data?.contractAddress,
-          totalVolume: 0,
-          floorPrice: 0,
-          profileImage: {
-            _type: 'image',
-            asset: {
-              _type: 'reference',
-              _ref: profileImage._id,
-            },
-          },
-          bannerImage: {
-            _type: 'image',
-            asset: {
-              _type: 'reference',
-              _ref: bannerImage._id,
-            },
-          },
-        }
-        await client.create(createDoc)
-
-        setIsCreating(false)
-        handleConfetti(true)
-        router.push('/my-collections')
-        resolve(true)
-      } catch (error) {
-        setIsCreating(false)
-        reject(true)
-        console.log(error)
-      }
-    })
-
-    toast.promise(handleCreateNft, {
-      pending: 'Creating your collection.',
-      error: 'Cannot create your collection.',
-      success: 'Created your collection successfully.',
+  const handleInputChange = (event: FormEvent<HTMLInputElement>) => {
+    setCollection({
+      ...collection,
+      [event.currentTarget.name]: event.currentTarget.value,
     })
   }
 
@@ -160,6 +158,7 @@ const CreateCollectionPage: NextPageWithLayout = () => {
             This image will also be used for navigation. 350 x 350 recommended.
           </div>
           <Dropzone
+            defaultValue={collection?.imageUrl}
             onChange={(file) => handleUploadFile('profileImage', file)}
           />
         </div>
@@ -172,6 +171,7 @@ const CreateCollectionPage: NextPageWithLayout = () => {
             x 400 recommended.
           </div>
           <Dropzone
+            defaultValue={collection?.bannerImageUrl}
             onChange={(file) => handleUploadFile('bannerImage', file)}
           />
         </div>
@@ -182,7 +182,8 @@ const CreateCollectionPage: NextPageWithLayout = () => {
           </div>
           <Input
             className="h-10"
-            name="name"
+            name="title"
+            value={collection?.title || ''}
             onChange={handleInputChange}
             placeholder="Item name"
             required
@@ -198,6 +199,7 @@ const CreateCollectionPage: NextPageWithLayout = () => {
           <Input
             className="h-10"
             name="description"
+            value={collection?.description || ''}
             onChange={handleInputChange}
             placeholder="Provide a detailed description of your item."
           />
@@ -304,18 +306,18 @@ const CreateCollectionPage: NextPageWithLayout = () => {
             my: 2,
           }}
           variant="contained"
-          loading={isCreating}
+          loading={isUpdating}
           loadingPosition="start"
           startIcon={<CreateIcon />}
           size="large"
         >
-          Create
+          Update
         </LoadingButton>
       </form>
     </Container>
   )
 }
 
-CreateCollectionPage.Layout = NormalLayout
+EditCollectionPage.Layout = NormalLayout
 
-export default CreateCollectionPage
+export default EditCollectionPage

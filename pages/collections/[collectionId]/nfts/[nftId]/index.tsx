@@ -166,7 +166,7 @@ const Nft: NextPageWithLayout = () => {
       )
 
       // update NFT owner
-      client
+      await client
         .patch(nftItem?._id || '')
         .set({
           owner: {
@@ -176,7 +176,7 @@ const Nft: NextPageWithLayout = () => {
         .commit()
 
       // update listing status
-      client
+      await client
         .patch(nftListing?._id || '')
         .set({
           active: false,

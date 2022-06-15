@@ -82,7 +82,7 @@ const TransferPage: NextPageWithLayout = () => {
       await client.createIfNotExists(userDoc)
 
       // update NFT owner
-      client
+      await client
         .patch(nftItem?._id || '')
         .set({
           owner: {

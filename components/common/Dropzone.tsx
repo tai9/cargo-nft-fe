@@ -3,10 +3,11 @@ import { useDropzone } from 'react-dropzone'
 import { MdImage } from 'react-icons/md'
 
 type Props = {
+  defaultValue?: string
   onChange?: (files: any) => void
 }
 
-export const Dropzone = ({ onChange }: Props) => {
+export const Dropzone = ({ defaultValue, onChange }: Props) => {
   const [files, setFiles] = useState([])
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: 1,
@@ -48,7 +49,20 @@ export const Dropzone = ({ onChange }: Props) => {
         className="border-dashed border-2 rounded-lg flex items-center justify-center h-full"
       >
         <input {...getInputProps()} className="outline-none" />
-        {files.length > 0 ? thumbs : <MdImage className="m-20" fontSize={72} />}
+        {defaultValue ? (
+          <img
+            className="object-cover w-full h-full"
+            src={defaultValue}
+            // Revoke data uri after image is loaded
+            onLoad={() => {
+              URL.revokeObjectURL(defaultValue)
+            }}
+          />
+        ) : files.length > 0 ? (
+          thumbs
+        ) : (
+          <MdImage className="m-20" fontSize={72} />
+        )}
       </div>
     </section>
   )

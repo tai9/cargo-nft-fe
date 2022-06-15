@@ -1,12 +1,24 @@
 import { Button, Container } from '@mui/material'
 import CollectionCard from 'components/collection/CollectionCard'
+import { SkeletonCard } from 'components/common'
 import { NormalLayout } from 'components/layout'
-import { Collection, getAllcollectionQuery, NextPageWithLayout } from 'models'
-import { GetStaticProps } from 'next'
 import { client } from 'lib/sanityClient'
+import { Collection, getAllcollectionQuery, NextPageWithLayout } from 'models'
 import Router from 'next/router'
+import { useEffect, useState } from 'react'
 
-const MyCollectionPage: NextPageWithLayout = ({ collections }: any) => {
+const MyCollectionPage: NextPageWithLayout = () => {
+  const [collections, setCollections] = useState<Collection[]>([])
+
+  useEffect(() => {
+    ;(async () => {
+      const collections: Collection[] = await client.fetch(
+        getAllcollectionQuery
+      )
+      setCollections(collections)
+    })()
+  }, [])
+
   return (
     <Container>
       <div className="text-white space-y-8 mt-12">
@@ -25,22 +37,21 @@ const MyCollectionPage: NextPageWithLayout = ({ collections }: any) => {
         </Button>
 
         <div className="grid grid-cols-3 gap-4">
-          {collections.map((collection: any, index: number) => (
-            <CollectionCard key={index} data={collection} />
-          ))}
+          {collections.length === 0 ? (
+            <>
+              <SkeletonCard />
+              <SkeletonCard />
+              <SkeletonCard />
+            </>
+          ) : (
+            collections.map((collection: any, index: number) => (
+              <CollectionCard key={index} data={collection} />
+            ))
+          )}
         </div>
       </div>
     </Container>
   )
-}
-
-export const getStaticProps: GetStaticProps<any> = async () => {
-  const collections: Collection[] = await client.fetch(getAllcollectionQuery)
-  return {
-    props: {
-      collections,
-    },
-  }
 }
 
 MyCollectionPage.Layout = NormalLayout

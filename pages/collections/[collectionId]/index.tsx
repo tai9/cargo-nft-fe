@@ -24,7 +24,7 @@ import { client } from 'lib/sanityClient'
 import {
   Collection,
   getAllcollectionQuery,
-  getCollectinByIdQuery,
+  getCollectionByIdQuery,
   getListingQuery,
   getNFTsByCollectionIdQuery,
   Listing,
@@ -499,7 +499,7 @@ export const getStaticProps: GetStaticProps<any> = async (
     }
   }
 
-  const query = getCollectinByIdQuery(collectionId)
+  const query = getCollectionByIdQuery(collectionId)
   const collectionData: Collection[] = await client.fetch(query)
   if (collectionData.length === 0) {
     return {
