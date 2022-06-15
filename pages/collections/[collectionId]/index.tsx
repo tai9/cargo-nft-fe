@@ -7,7 +7,6 @@ import {
   FormControl,
   FormControlLabel,
   FormGroup,
-  Grid,
   IconButton,
   MenuItem,
   Radio,
@@ -20,17 +19,22 @@ import {
 import { CollapseOutline } from 'components/common'
 import { MainLayout } from 'components/layout'
 import NFTCard from 'components/NFTCard'
+import { NULL_ADDRESS } from 'constants/wallet'
 import { client } from 'lib/sanityClient'
 import {
   Collection,
+  ETransactionEvent,
   getAllcollectionQuery,
   getCollectionByIdQuery,
+  getCollectionTransactionQuery,
   getListingQuery,
   getNFTsByCollectionIdQuery,
   Listing,
   NextPageWithLayout,
   NFTItem,
+  Transaction,
 } from 'models'
+import moment from 'moment'
 import { GetStaticProps, GetStaticPropsContext } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -44,8 +48,10 @@ import { BiFilter } from 'react-icons/bi'
 import { CgWebsite } from 'react-icons/cg'
 import { GrGrid } from 'react-icons/gr'
 import { HiDotsVertical } from 'react-icons/hi'
+import { MdOutlineOpenInNew } from 'react-icons/md'
 import { RiLayoutGridLine } from 'react-icons/ri'
 import { useDebounce } from 'use-debounce'
+import { getEventIcon, sliceAddress } from 'utils'
 
 const style = {
   bannerImageContainer: `h-[20vh] w-screen overflow-hidden flex justify-center items-center`,
@@ -111,6 +117,7 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
   const { collectionId } = router.query
   const [nfts, setNfts] = useState<NFTItem[]>([])
   const [listings, setListings] = useState<Listing[]>([])
+  const [transactions, setTransactions] = useState<Transaction[]>([])
   const [tabValue, setTabValue] = useState<TabType>('items')
   const [isLoadingNFTs, setIsLoadingNFTs] = useState(false)
 
@@ -126,10 +133,22 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
     }
   }, [])
 
+  const fetchTransactionData = useCallback(async (collectionId: string) => {
+    try {
+      const transactionData = await client.fetch(
+        getCollectionTransactionQuery(collectionId)
+      )
+      setTransactions(transactionData)
+    } catch (err) {
+      console.error(err)
+    }
+  }, [])
+
   const fetchNFTsData = useCallback(
     async (collectionId: string) => {
       try {
         setIsLoadingNFTs(true)
+
         const nftData = await client.fetch(
           getNFTsByCollectionIdQuery(collectionId, searchDebounced)
         )
@@ -146,7 +165,8 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
   useEffect(() => {
     fetchNFTsData(collectionId as string)
     fetchListingsData()
-  }, [collectionId, fetchNFTsData, fetchListingsData])
+    fetchTransactionData(collectionId as string)
+  }, [collectionId, fetchNFTsData, fetchListingsData, fetchTransactionData])
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: TabType) => {
     setTabValue(newValue)
@@ -261,7 +281,7 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
           <div className={style.description}>{collection?.description}</div>
         </div>
       </div>
-      <div className="px-10">
+      <div className="px-10 pb-10">
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs
             value={tabValue}
@@ -459,8 +479,153 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
             </div>
           </div>
         </TabPanel>
+
         <TabPanel value={tabValue} index="activity">
-          No item to display
+          <div className="flex gap-4 mt-6 justify-between">
+            <IconButton>
+              <BiFilter fontSize={28} color="white" />
+            </IconButton>
+
+            <FormControl>
+              <Select
+                size="small"
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                defaultValue={50}
+                sx={{
+                  background: '#303339',
+                  color: 'white',
+                  fontWeight: 'bold',
+                  height: '100%',
+                  borderColor: '#151c22',
+                }}
+              >
+                <MenuItem value={10}>Last 7 Days</MenuItem>
+                <MenuItem value={20}>Last 14 Days</MenuItem>
+                <MenuItem value={30}>Last 30 Days</MenuItem>
+                <MenuItem value={40}>Last 60 Days</MenuItem>
+                <MenuItem value={50}>Last 90 Days</MenuItem>
+                <MenuItem value={60}>Last Year</MenuItem>
+              </Select>
+            </FormControl>
+          </div>
+
+          <div className="grid grid-cols-6 gap-6 mt-6">
+            <div className="col-span-1">
+              <CollapseOutline title="Event Type">
+                <Stack>
+                  <FormControl variant="standard" fullWidth>
+                    <FormGroup>
+                      <FormControlLabel
+                        sx={{
+                          justifyContent: 'space-between',
+                          ml: 0,
+                        }}
+                        control={<Checkbox name="buynow" />}
+                        label="Sales"
+                        labelPlacement="start"
+                      />
+                      <FormControlLabel
+                        sx={{
+                          justifyContent: 'space-between',
+                          ml: 0,
+                        }}
+                        control={<Checkbox name="auction" />}
+                        label="Listings"
+                        labelPlacement="start"
+                      />
+                      <FormControlLabel
+                        sx={{
+                          justifyContent: 'space-between',
+                          ml: 0,
+                        }}
+                        control={<Checkbox name="buyWithCard" />}
+                        label="Offers"
+                        labelPlacement="start"
+                      />
+                      <FormControlLabel
+                        sx={{
+                          justifyContent: 'space-between',
+                          ml: 0,
+                        }}
+                        control={<Checkbox name="buyWithCard" />}
+                        label="Transfers"
+                        labelPlacement="start"
+                      />
+                    </FormGroup>
+                  </FormControl>
+                </Stack>
+              </CollapseOutline>
+            </div>
+            <div className="col-span-5">
+              <div className="">
+                <table className="table-auto text-white w-full text-center">
+                  <thead className="border-b-[1px] border-grey2 h-[56px]">
+                    <tr>
+                      <th></th>
+                      <th className="text-left">Item</th>
+                      <th>Price</th>
+                      <th>Quantity</th>
+                      <th>From</th>
+                      <th>To</th>
+                      <th>Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {transactions.map((transaction) => (
+                      <>
+                        <tr
+                          key={transaction._id}
+                          className="h-[80px] cursor-pointer hover:bg-grey2 duration-200"
+                          onClick={() =>
+                            router.push(
+                              `/collections/${collection.contractAddress}/nfts/${transaction.nft?._id}`
+                            )
+                          }
+                        >
+                          <td className="font-bold">
+                            <div className="flex items-center gap-2 ml-6">
+                              <div className="mr-2 text-xl">
+                                {getEventIcon(
+                                  transaction.eventType as ETransactionEvent
+                                )}
+                              </div>
+                              <div className="text-lg font-semibold">
+                                {transaction.eventType}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="font-bold text-left">
+                            {transaction.nft?.metadata.name}
+                          </td>
+                          <td className="font-bold">
+                            {transaction.price || '-'}
+                          </td>
+                          <td>1</td>
+                          <td className="text-primary">
+                            {transaction.eventType === ETransactionEvent.MINTED
+                              ? NULL_ADDRESS
+                              : sliceAddress(transaction.from)}
+                          </td>
+                          <td className="text-primary">
+                            {sliceAddress(transaction.to)}
+                          </td>
+                          <td className="text-primary">
+                            <div className="flex items-center gap-2 justify-center">
+                              {moment(transaction._createdAt)
+                                .startOf('second')
+                                .fromNow()}
+                              <MdOutlineOpenInNew fontSize={24} />
+                            </div>
+                          </td>
+                        </tr>
+                      </>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </TabPanel>
       </div>
     </div>

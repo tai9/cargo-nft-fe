@@ -1,16 +1,8 @@
-import { ETransactionEvent, Transaction } from 'models'
-import { BsFillCartFill } from 'react-icons/bs'
-import { BiTransfer } from 'react-icons/bi'
-import {
-  MdOutlineOpenInNew,
-  MdChildFriendly,
-  MdLocalOffer,
-  MdOutlineTextsms,
-  MdOutlineCancel,
-} from 'react-icons/md'
-import moment from 'moment'
-import { sliceAddress } from 'utils'
 import { NULL_ADDRESS } from 'constants/wallet'
+import { ETransactionEvent, Transaction } from 'models'
+import moment from 'moment'
+import { MdOutlineOpenInNew } from 'react-icons/md'
+import { getEventIcon, sliceAddress } from 'utils'
 
 const style = {
   eventItem: `flex px-4 py-5 font-medium`,
@@ -32,12 +24,7 @@ const EventItem = ({ event }: Props) => {
     <div className={style.eventItem}>
       <div className={`${style.event} flex-[2]`}>
         <div className={style.eventIcon}>
-          {event?.eventType === ETransactionEvent.MINTED && <MdChildFriendly />}
-          {event?.eventType === ETransactionEvent.LIST && <MdLocalOffer />}
-          {event?.eventType === ETransactionEvent.TRANSAFER && <BiTransfer />}
-          {event?.eventType === ETransactionEvent.OFFER && <MdOutlineTextsms />}
-          {event?.eventType === ETransactionEvent.SALE && <BsFillCartFill />}
-          {event?.eventType === ETransactionEvent.CANCEL && <MdOutlineCancel />}
+          {getEventIcon(event?.eventType as ETransactionEvent)}
         </div>
         <div className={style.eventName}>{event?.eventType}</div>
       </div>

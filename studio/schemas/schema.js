@@ -254,6 +254,12 @@ export default createSchema({
           type: 'reference',
           to: [{ type: 'nfts' }],
         },
+        {
+          name: 'collection',
+          title: 'Collection',
+          type: 'reference',
+          to: [{ type: 'marketItems' }],
+        },
       ],
 
       preview: {

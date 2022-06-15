@@ -177,6 +177,12 @@ const CreatePage: NextPageWithLayout = () => {
             _type: 'reference',
             _ref: nftResult._id,
           },
+          collection: {
+            _type: 'reference',
+            _ref: collections.find(
+              (c) => c.contractAddress === nftData.collectionId
+            )?._id,
+          },
           id: tx.id.toString(),
           confirmations: tx.receipt.confirmations,
           contractAddress: tx.receipt.contractAddress || '',

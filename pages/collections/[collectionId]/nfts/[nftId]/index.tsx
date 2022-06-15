@@ -194,6 +194,10 @@ const Nft: NextPageWithLayout = () => {
           _type: 'reference',
           _ref: nftItem?._id,
         },
+        collection: {
+          _type: 'reference',
+          _ref: nftItem?.collection?._id,
+        },
         confirmations: tx.receipt.confirmations,
         contractAddress: tx.receipt.contractAddress || '',
         from: tx.receipt.from,
@@ -272,6 +276,10 @@ const Nft: NextPageWithLayout = () => {
         nft: {
           _type: 'reference',
           _ref: nftItem?._id,
+        },
+        collection: {
+          _type: 'reference',
+          _ref: nftItem?.collection?._id,
         },
         id: tx.id.toString(),
         confirmations: tx.receipt.confirmations,

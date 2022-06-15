@@ -102,6 +102,10 @@ const TransferPage: NextPageWithLayout = () => {
           _type: 'reference',
           _ref: nftItem._id,
         },
+        collection: {
+          _type: 'reference',
+          _ref: nftItem?.collection?._id,
+        },
         confirmations: tx.receipt.confirmations,
         contractAddress: tx.receipt.contractAddress || '',
         from: tx.receipt.from,
