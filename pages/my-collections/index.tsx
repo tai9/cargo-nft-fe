@@ -45,7 +45,7 @@ const MyCollectionPage: NextPageWithLayout = () => {
             </>
           ) : (
             collections.map((collection: any, index: number) => (
-              <CollectionCard key={index} data={collection} />
+              <CollectionCard key={index} data={collection} editable />
             ))
           )}
         </div>

@@ -5,17 +5,22 @@ import { AiOutlineEdit } from 'react-icons/ai'
 
 type Props = {
   data: Collection
+  editable?: boolean
 }
 
-const CollectionCard = ({ data }: Props) => {
+const CollectionCard = ({ data, editable }: Props) => {
   return (
     <div className="relative">
-      <div
-        className="text-white absolute right-3 top-3 text-xl bg-grey2 rounded-md p-1 cursor-pointer hover:bg-gray-600"
-        onClick={() => Router.push(`/collections/${data.contractAddress}/edit`)}
-      >
-        <AiOutlineEdit />
-      </div>
+      {editable && (
+        <div
+          className="text-white absolute right-3 top-3 text-xl bg-grey2 rounded-md p-1 cursor-pointer hover:bg-gray-600"
+          onClick={() =>
+            Router.push(`/collections/${data.contractAddress}/edit`)
+          }
+        >
+          <AiOutlineEdit />
+        </div>
+      )}
       <div
         className="bg-grey2 flex-auto w-full h-[30rem] rounded-2xl overflow-hidden cursor-pointer"
         onClick={() => Router.push(`/collections/${data.contractAddress}`)}
