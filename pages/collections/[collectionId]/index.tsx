@@ -16,14 +16,13 @@ import {
   Tab,
   Tabs,
 } from '@mui/material'
+import ActivityTable from 'components/activity/ActivityTable'
 import { CollapseOutline } from 'components/common'
 import { MainLayout } from 'components/layout'
 import NFTCard from 'components/NFTCard'
-import { NULL_ADDRESS } from 'constants/wallet'
 import { client } from 'lib/sanityClient'
 import {
   Collection,
-  ETransactionEvent,
   getAllcollectionQuery,
   getCollectionByIdQuery,
   getCollectionTransactionQuery,
@@ -34,7 +33,6 @@ import {
   NFTItem,
   Transaction,
 } from 'models'
-import moment from 'moment'
 import { GetStaticProps, GetStaticPropsContext } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -48,10 +46,8 @@ import { BiFilter } from 'react-icons/bi'
 import { CgWebsite } from 'react-icons/cg'
 import { GrGrid } from 'react-icons/gr'
 import { HiDotsVertical } from 'react-icons/hi'
-import { MdOutlineOpenInNew } from 'react-icons/md'
 import { RiLayoutGridLine } from 'react-icons/ri'
 import { useDebounce } from 'use-debounce'
-import { getEventIcon, sliceAddress } from 'utils'
 
 const style = {
   bannerImageContainer: `h-[20vh] w-screen overflow-hidden flex justify-center items-center`,
@@ -575,72 +571,7 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
               </CollapseOutline>
             </div>
             <div className="col-span-5">
-              <div className="">
-                <table className="table-auto text-white w-full text-center">
-                  <thead className="border-b-[1px] border-grey2 h-[56px]">
-                    <tr>
-                      <th></th>
-                      <th className="text-left">Item</th>
-                      <th>Price</th>
-                      <th>Quantity</th>
-                      <th>From</th>
-                      <th>To</th>
-                      <th>Time</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {transactions.map((transaction) => (
-                      <>
-                        <tr
-                          key={transaction._id}
-                          className="h-[80px] cursor-pointer hover:bg-grey2 duration-200"
-                          onClick={() =>
-                            router.push(
-                              `/collections/${collection.contractAddress}/nfts/${transaction.nft?._id}`
-                            )
-                          }
-                        >
-                          <td className="font-bold">
-                            <div className="flex items-center gap-2 ml-6">
-                              <div className="mr-2 text-xl">
-                                {getEventIcon(
-                                  transaction.eventType as ETransactionEvent
-                                )}
-                              </div>
-                              <div className="text-lg font-semibold">
-                                {transaction.eventType}
-                              </div>
-                            </div>
-                          </td>
-                          <td className="font-bold text-left">
-                            {transaction.nft?.metadata.name}
-                          </td>
-                          <td className="font-bold">
-                            {transaction.price || '-'}
-                          </td>
-                          <td>1</td>
-                          <td className="text-primary">
-                            {transaction.eventType === ETransactionEvent.MINTED
-                              ? NULL_ADDRESS
-                              : sliceAddress(transaction.from)}
-                          </td>
-                          <td className="text-primary">
-                            {sliceAddress(transaction.to)}
-                          </td>
-                          <td className="text-primary">
-                            <div className="flex items-center gap-2 justify-center">
-                              {moment(transaction._createdAt)
-                                .startOf('second')
-                                .fromNow()}
-                              <MdOutlineOpenInNew fontSize={24} />
-                            </div>
-                          </td>
-                        </tr>
-                      </>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <ActivityTable transactions={transactions} />
             </div>
           </div>
         </TabPanel>

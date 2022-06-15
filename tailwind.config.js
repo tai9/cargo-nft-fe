@@ -18,6 +18,26 @@ module.exports = {
         textGrey: '#8a939b',
       },
     },
+    container: {
+      center: true,
+    },
   },
-  plugins: [],
+  plugins: [require('daisyui')],
+  daisyui: {
+    styled: true,
+    themes: true,
+    base: true,
+    utils: true,
+    logs: true,
+    rtl: false,
+    prefix: '',
+    darkTheme: 'dark',
+    themes: [
+      {
+        dark: {
+          primary: '#2181e2',
+        },
+      },
+    ],
+  },
 }

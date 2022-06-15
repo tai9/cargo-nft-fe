@@ -102,7 +102,9 @@ export const Header = () => {
           <Link href="/collections" passHref>
             <div className={style.headerItem}> Collections </div>
           </Link>
-          <div className={style.headerItem}> Activity </div>
+          <Link href="/activity" passHref>
+            <div className={style.headerItem}> Activity </div>
+          </Link>
           <a
             href="https://support.opensea.io/hc/en-us"
             target="_blank"

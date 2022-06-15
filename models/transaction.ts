@@ -1,3 +1,4 @@
+import { Collection } from './collection'
 import { NFTItem } from './nft'
 import { User } from './user'
 
@@ -26,6 +27,7 @@ export type Transaction = {
   transactionHash: string
   nft?: NFTItem
   owner?: User
+  collection?: Collection
 }
 
 export const getTransactionQuery = (
@@ -121,5 +123,19 @@ export const getCollectionTransactionQuery = (
         description
     },
   },
-  "owner":owner->
+  "owner":owner->,
+  "collection": collection->{
+    _id,
+    _createdAt,
+    _updatedAt,
+    "imageUrl": profileImage.asset->url,
+    "bannerImageUrl": bannerImage.asset->url,
+    volumeTraded,
+    createdBy,
+    contractAddress,
+    "creator": createdBy->userName,
+    title, floorPrice,
+    "allOwners": owners[]->,
+    description
+},
 }`
