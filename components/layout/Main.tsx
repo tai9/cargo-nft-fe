@@ -1,12 +1,14 @@
-import { Footer, Header } from 'components/common'
+import { Footer, Header, WalletDrawer } from 'components/common'
 import { LayoutProps } from 'models'
 
 import Confetti from 'react-confetti'
 import { useContext, useEffect } from 'react'
 import { CargoContext, CargoContextType } from 'context/cargoContext'
+import { useAddress } from '@thirdweb-dev/react'
 
 export const MainLayout = ({ children }: LayoutProps) => {
-  const { confetti, handleConfetti } = useContext(
+  const walletAddress = useAddress()
+  const { confetti, addressBalance, handleConfetti } = useContext(
     CargoContext
   ) as CargoContextType
 
@@ -22,9 +24,17 @@ export const MainLayout = ({ children }: LayoutProps) => {
       {confetti && <Confetti run={confetti} />}
       <Header />
 
-      <main className="grow">{children}</main>
-
-      <Footer />
+      <div className="drawer drawer-end">
+        <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
+        <div className="drawer-content">
+          <main className="grow">{children}</main>
+          <Footer />
+        </div>
+        <WalletDrawer
+          walletAddress={walletAddress}
+          totalBalance={addressBalance}
+        />
+      </div>
     </div>
   )
 }
