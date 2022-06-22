@@ -7,6 +7,8 @@ import { HiTag } from 'react-icons/hi'
 import { IoMdWallet } from 'react-icons/io'
 import { TiCancel } from 'react-icons/ti'
 import { numberFormatter } from 'utils'
+import ETHToken from 'assets/ETH.svg'
+import Image from 'next/image'
 
 const style = {
   button: `flex items-center py-2 px-12 rounded-lg cursor-pointer`,
@@ -49,10 +51,12 @@ const Purchase = ({
               <div className="space-y-1">
                 <p className="text-sm text-grey1">Current price:</p>
                 <div className="flex gap-2 items-center">
-                  <img
-                    src="https://openseauserdata.com/files/6f8e2979d428180222796ff4a33ab929.svg"
-                    alt=""
-                    width={16}
+                  <Image
+                    src={ETHToken}
+                    alt="eth"
+                    layout="fixed"
+                    width={24}
+                    height={24}
                   />
                   <span className="text-3xl font-bold">
                     {nftListing.buyoutPricePerToken}
@@ -102,17 +106,14 @@ const Purchase = ({
             </div>
           </div>
         ) : (
-          <Button
-            disableRipple
-            variant="contained"
-            sx={{
-              paddingX: '3rem',
-            }}
+          <label
             onClick={handleListNFT}
+            htmlFor="listing-modal"
+            className="btn btn-primary modal-button normal-case text-white border-darkBlue px-12"
           >
             <IoMdWallet className={style.buttonIcon} />
             <div className={style.buttonText}>List Item</div>
-          </Button>
+          </label>
         )}
       </div>
     </>

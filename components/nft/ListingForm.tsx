@@ -6,13 +6,14 @@ import {
   SelectChangeEvent,
 } from '@mui/material'
 import LoadingButton from '@mui/lab/LoadingButton'
-import CreateIcon from '@mui/icons-material/Create'
 import { Input } from 'components/common'
 import { ETH_TOKEN_PRICE } from 'constants/token'
 import React, { FormEvent, SyntheticEvent, useState } from 'react'
 import { AiOutlineInfoCircle } from 'react-icons/ai'
 import { MdAttachMoney, MdCalendarToday, MdTimelapse } from 'react-icons/md'
 import { numberFormatter } from 'utils'
+import ETHToken from 'assets/ETH.svg'
+import Image from 'next/image'
 
 type Props = {
   loading?: boolean
@@ -97,10 +98,12 @@ const ListingForm = ({ loading, handleSubmit }: Props) => {
               >
                 <MenuItem value="ETH">
                   <div className="flex gap-2 items-center">
-                    <img
-                      src="https://openseauserdata.com/files/6f8e2979d428180222796ff4a33ab929.svg"
-                      alt=""
-                      width={12}
+                    <Image
+                      src={ETHToken}
+                      alt="eth"
+                      layout="fixed"
+                      width={24}
+                      height={24}
                     />
                     <div>ETH</div>
                   </div>

@@ -511,6 +511,7 @@ const Nft: NextPageWithLayout = () => {
       </div>
 
       <Modal
+        id="checkout-modal"
         title="Complete checkout"
         submitText="Confirm checkout"
         open={openModal}
@@ -579,6 +580,7 @@ const Nft: NextPageWithLayout = () => {
 
       {/* Listing */}
       <Modal
+        id="listing-modal"
         title={`Listing ${nftItem?.metadata.name}`}
         submitText="Complete listing"
         open={openListingModal}
@@ -589,6 +591,7 @@ const Nft: NextPageWithLayout = () => {
 
       {/* Make offer */}
       <Modal
+        id="offer-modal"
         title="Make an offer"
         open={openOfferModal}
         handleClose={() => setOpenOfferModal(false)}
@@ -597,7 +600,11 @@ const Nft: NextPageWithLayout = () => {
       </Modal>
 
       {/* Cancel listing */}
-      <Modal open={openConfirmModal} handleClose={handleCloseConfirmModal}>
+      <Modal
+        id="canncel-listing-modal"
+        open={openConfirmModal}
+        handleClose={handleCloseConfirmModal}
+      >
         <div className="text-center space-y-12">
           <div className="text-xl font-bold">
             Are you sure you want to cancel your listing?
