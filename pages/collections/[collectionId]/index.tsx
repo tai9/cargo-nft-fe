@@ -1,7 +1,5 @@
 import {
   Box,
-  Button,
-  ButtonGroup,
   Checkbox,
   Divider,
   FormControl,
@@ -44,7 +42,7 @@ import {
 } from 'react-icons/ai'
 import { BiFilter } from 'react-icons/bi'
 import { CgWebsite } from 'react-icons/cg'
-import { GrGrid } from 'react-icons/gr'
+import { MdOutlineGridOn } from 'react-icons/md'
 import { HiDotsVertical } from 'react-icons/hi'
 import { RiLayoutGridLine } from 'react-icons/ri'
 import { useDebounce } from 'use-debounce'
@@ -342,22 +340,15 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
                 <MenuItem value={40}>Recently Created</MenuItem>
               </Select>
             </FormControl>
-            <ButtonGroup
-              disableRipple
-              variant="outlined"
-              aria-label="outlined button group"
-              sx={{
-                background: '#303339',
-                borderColor: 'white',
-              }}
-            >
-              <Button>
+
+            <div className="btn-group">
+              <button className="btn border-2">
                 <RiLayoutGridLine fontSize={24} color="white" />
-              </Button>
-              <Button>
-                <GrGrid fontSize={20} color="white" />
-              </Button>
-            </ButtonGroup>
+              </button>
+              <button className="btn border-2 border-l-0 opacity-60">
+                <MdOutlineGridOn fontSize={22} color="white" />
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-6 gap-6 mt-6">

@@ -1,7 +1,5 @@
 import {
   Box,
-  Button,
-  ButtonGroup,
   Checkbox,
   CircularProgress,
   Divider,
@@ -19,7 +17,6 @@ import {
   Tabs,
   Tooltip,
 } from '@mui/material'
-import { useAddress } from '@thirdweb-dev/react'
 import CoverImg from 'assets/cover.jpeg'
 import { CollapseOutline } from 'components/common'
 import { NormalLayout } from 'components/layout'
@@ -43,7 +40,7 @@ import { AiOutlineCheck, AiOutlineSearch, AiTwotoneEdit } from 'react-icons/ai'
 import { BiFilter } from 'react-icons/bi'
 import { BsFillShareFill } from 'react-icons/bs'
 import { FiMoreHorizontal } from 'react-icons/fi'
-import { GrGrid } from 'react-icons/gr'
+import { MdOutlineGridOn } from 'react-icons/md'
 import { RiLayoutGridLine } from 'react-icons/ri'
 import { toast } from 'react-toastify'
 import { sliceAddress } from 'utils'
@@ -268,23 +265,14 @@ const AccountPage: NextPageWithLayout = ({ user }: any) => {
                   <MenuItem value={40}>Recently Created</MenuItem>
                 </Select>
               </FormControl>
-              <ButtonGroup
-                disableRipple
-                variant="outlined"
-                aria-label="outlined button group"
-                sx={{
-                  background: '#303339',
-                  borderColor: 'white',
-                  borderRadius: '0.8rem',
-                }}
-              >
-                <Button>
+              <div className="btn-group">
+                <button className="btn border-2">
                   <RiLayoutGridLine fontSize={24} color="white" />
-                </Button>
-                <Button>
-                  <GrGrid fontSize={20} color="white" />
-                </Button>
-              </ButtonGroup>
+                </button>
+                <button className="btn border-2 border-l-0 opacity-60">
+                  <MdOutlineGridOn fontSize={22} color="white" />
+                </button>
+              </div>
             </div>
 
             <Grid container spacing={4}>
