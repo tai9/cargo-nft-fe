@@ -418,6 +418,7 @@ const CreatePage: NextPageWithLayout = () => {
         </form>
       </Container>
       <Modal
+        id="created-nft-modal"
         className="max-w-lg"
         title={`You created ${nftData.name}!`}
         open={openModal}
