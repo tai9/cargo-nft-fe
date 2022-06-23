@@ -36,7 +36,6 @@ export const Header = () => {
   const disconnect = useDisconnect()
   const addressConnected = useAddress()
   const router = useRouter()
-  let provider: any
 
   const { handleAddressBalance } = useContext(CargoContext) as CargoContextType
 
@@ -79,11 +78,10 @@ export const Header = () => {
 
     router.push('/assets/create')
   }
-  if (typeof window !== 'undefined') {
-    provider = new ethers.providers.Web3Provider(window.ethereum)
-  }
 
   const getBalance = async () => {
+    if (!window.ethereum) return
+    let provider = new ethers.providers.Web3Provider(window.ethereum)
     const addresses = await provider.send('eth_requestAccounts', [])
     const balance = await provider.getBalance(addresses[0])
     handleAddressBalance(+ethers.utils.formatEther(balance))
