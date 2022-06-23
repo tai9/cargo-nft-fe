@@ -144,6 +144,10 @@ const Nft: NextPageWithLayout = () => {
     setOpenModal(true)
   }
 
+  const handleCancelListing = () => {
+    setOpenConfirmModal(true)
+  }
+
   const handleMakeOffer = () => {
     if (!marketplace || !address) return
     setOpenOfferModal(true)
@@ -306,7 +310,7 @@ const Nft: NextPageWithLayout = () => {
     }
   }
 
-  const handleCancelListing = async () => {
+  const handleConfirmCancelListing = async () => {
     setIsCancelling(true)
     // update listing status
     client
@@ -317,6 +321,7 @@ const Nft: NextPageWithLayout = () => {
       .commit()
       .then(async () => {
         await fetchListingData(nftId as string)
+        await fetchNFTsData(collectionId as string, nftId as string)
         setIsCancelling(false)
         toast.success(`Cancel listing successful`)
         handleCloseConfirmModal()
@@ -427,6 +432,7 @@ const Nft: NextPageWithLayout = () => {
               />
               <Purchase
                 address={address}
+                nftItem={nftItem}
                 nftListing={nftListing}
                 handleBuyNFT={handleBuyNFT}
                 handleListNFT={handleListNFT}
@@ -624,7 +630,7 @@ const Nft: NextPageWithLayout = () => {
               size="large"
               onClick={handleCloseConfirmModal}
             >
-              Cancel listing
+              Cancel
             </Button>
             <LoadingButton
               type="submit"
@@ -635,9 +641,9 @@ const Nft: NextPageWithLayout = () => {
               variant="contained"
               loading={isCancelling}
               size="large"
-              onClick={handleCancelListing}
+              onClick={handleConfirmCancelListing}
             >
-              Cancel listing
+              Confirm
             </LoadingButton>
           </div>
         </div>

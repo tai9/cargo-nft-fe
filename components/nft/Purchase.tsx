@@ -1,6 +1,6 @@
 import Button from '@mui/material/Button'
 import { ETH_TOKEN_PRICE } from 'constants/token'
-import { Listing } from 'models'
+import { Listing, NFTItem } from 'models'
 import moment from 'moment'
 import { AiOutlineClockCircle } from 'react-icons/ai'
 import { HiTag } from 'react-icons/hi'
@@ -19,6 +19,7 @@ const style = {
 type Props = {
   address?: string
   nftListing?: Listing
+  nftItem?: NFTItem
   handleBuyNFT: (listingId: string, quantityDesired: number) => void
   handleListNFT?: () => void
   handleCancelListing?: () => void
@@ -28,6 +29,7 @@ type Props = {
 const Purchase = ({
   address,
   nftListing,
+  nftItem,
   handleBuyNFT,
   handleListNFT,
   handleCancelListing,
@@ -80,32 +82,40 @@ const Purchase = ({
                   onClick={() => handleBuyNFT(nftListing.listingId, 1)}
                   disabled={address === nftListing.owner?.walletAddress}
                 >
-                  <IoMdWallet className={style.buttonIcon} />
-                  <div className={style.buttonText}>Buy Now</div>
+                  <label
+                    onClick={() => handleBuyNFT(nftListing.listingId, 1)}
+                    htmlFor="checkout-modal"
+                    className="flex gap-2 items-center py-4 cursor-pointer"
+                  >
+                    <IoMdWallet className={style.buttonIcon} />
+                    <div className={style.buttonText}>Buy Now</div>
+                  </label>
                 </Button>
                 {address !== nftListing.owner?.walletAddress && (
-                  <button
-                    className={`${style.button} border border-darkLine  bg-darkGrey hover:bg-lightGrey disabled:cursor-default disabled:hover:bg-darkGrey`}
+                  <label
+                    className={`${style.button} border border-darkLine py-4 bg-darkGrey hover:bg-lightGrey disabled:cursor-default disabled:hover:bg-darkGrey`}
                     onClick={handleMakeOffer}
+                    htmlFor="offer-modal"
                   >
                     <HiTag className={style.buttonIcon} />
                     <div className={style.buttonText}>Make Offer</div>
-                  </button>
+                  </label>
                 )}
 
                 {address === nftListing.owner?.walletAddress && (
-                  <button
+                  <label
+                    htmlFor="canncel-listing-modal"
                     className={`${style.button} border border-darkLine  bg-darkGrey hover:bg-lightGrey disabled:cursor-default disabled:hover:bg-darkGrey`}
                     onClick={handleCancelListing}
                   >
                     <TiCancel className={style.buttonIcon} />
                     <div className={style.buttonText}>Cancel listing</div>
-                  </button>
+                  </label>
                 )}
               </div>
             </div>
           </div>
-        ) : (
+        ) : address === nftItem?.owner?.walletAddress ? (
           <label
             onClick={handleListNFT}
             htmlFor="listing-modal"
@@ -113,6 +123,15 @@ const Purchase = ({
           >
             <IoMdWallet className={style.buttonIcon} />
             <div className={style.buttonText}>List Item</div>
+          </label>
+        ) : (
+          <label
+            className={`${style.button} border border-darkLine w-fit py-4 bg-darkGrey hover:bg-lightGrey disabled:cursor-default disabled:hover:bg-darkGrey`}
+            onClick={handleMakeOffer}
+            htmlFor="offer-modal"
+          >
+            <HiTag className={style.buttonIcon} />
+            <div className={style.buttonText}>Make Offer</div>
           </label>
         )}
       </div>
