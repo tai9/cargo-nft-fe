@@ -213,7 +213,7 @@ const AccountPage: NextPageWithLayout = ({ user }: any) => {
             </div>
           </Tooltip>
           <div className="text-grey1">
-            Joined {moment(user?.createdAt).format('MMM Do YYYY')}
+            Joined {moment(user?._createdAt).format('MMM Do YYYY')}
           </div>
         </div>
 
