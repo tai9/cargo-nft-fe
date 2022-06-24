@@ -139,3 +139,64 @@ export const getCollectionTransactionQuery = (
     description
 },
 }`
+
+export const getUserTransactionQuery = (
+  walletAddress?: string
+) => `*[_type == "transactions" ${
+  walletAddress ? `&& owner->walletAddress == "${walletAddress}"` : ''
+} ] | order(_createdAt desc) {
+  _createdAt,
+  _id,
+  _updatedAt,
+  confirmations,
+  contractAddress,
+  eventType,
+  from,
+  to,
+  id,
+  price,
+  status,
+  transactionHash,
+  type,
+  "nft":nft->{
+     _id,
+   _createdAt,
+   _updatedAt,
+   "metadata":metadata{
+        description,
+        name,
+        uri,
+        id,
+        "image":image.asset->url
+   },
+   "collection": collection->{
+        _id,
+        _createdAt,
+        _updatedAt,
+        "imageUrl": profileImage.asset->url,
+        "bannerImageUrl": bannerImage.asset->url,
+        volumeTraded,
+        createdBy,
+        contractAddress,
+        "creator": createdBy->userName,
+        title, floorPrice,
+        "allOwners": owners[]->,
+        description
+    },
+  },
+  "owner":owner->,
+  "collection": collection->{
+    _id,
+    _createdAt,
+    _updatedAt,
+    "imageUrl": profileImage.asset->url,
+    "bannerImageUrl": bannerImage.asset->url,
+    volumeTraded,
+    createdBy,
+    contractAddress,
+    "creator": createdBy->userName,
+    title, floorPrice,
+    "allOwners": owners[]->,
+    description
+},
+}`

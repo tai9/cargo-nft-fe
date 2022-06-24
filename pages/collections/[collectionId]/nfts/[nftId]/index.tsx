@@ -192,7 +192,7 @@ const Nft: NextPageWithLayout = () => {
         _type: 'transactions',
         owner: {
           _type: 'reference',
-          _ref: address,
+          _ref: nftItem?.owner?.walletAddress,
         },
         nft: {
           _type: 'reference',
@@ -294,7 +294,7 @@ const Nft: NextPageWithLayout = () => {
         status: tx.receipt.status,
         transactionHash: tx.receipt.transactionHash,
         type: tx.receipt.type,
-        price: 0,
+        price: data?.amount,
         eventType: ETransactionEvent.LIST,
       }
       await client.create(transDoc)

@@ -18,6 +18,7 @@ import {
   Tooltip,
 } from '@mui/material'
 import CoverImg from 'assets/cover.jpeg'
+import ActivityTable from 'components/activity/ActivityTable'
 import { CollapseOutline } from 'components/common'
 import { NormalLayout } from 'components/layout'
 import NFTCard from 'components/NFTCard'
@@ -26,9 +27,11 @@ import {
   getListingQuery,
   getOwnNFTsQuery,
   getUserQuery,
+  getUserTransactionQuery,
   Listing,
   NextPageWithLayout,
   NFTItem,
+  Transaction,
   User,
 } from 'models'
 import moment from 'moment'
@@ -89,6 +92,7 @@ const AccountPage: NextPageWithLayout = ({ user }: any) => {
 
   const [nfts, setNfts] = useState<NFTItem[]>([])
   const [listings, setListings] = useState<Listing[]>([])
+  const [transactions, setTransactions] = useState<Transaction[]>([])
 
   const onUsernameChange = (e: any) => {
     setNewUsername(e.target.value)
@@ -143,9 +147,21 @@ const AccountPage: NextPageWithLayout = ({ user }: any) => {
     []
   )
 
+  const fetchTransactionData = useCallback(async (walletAddress: string) => {
+    try {
+      const transactionData = await client.fetch(
+        getUserTransactionQuery(walletAddress)
+      )
+      setTransactions(transactionData)
+    } catch (err) {
+      console.error(err)
+    }
+  }, [])
+
   useEffect(() => {
     fetchListingsData()
     fetchOwnNFTs(walletAddress as string)
+    fetchTransactionData(walletAddress as string)
   }, [fetchListingsData, fetchOwnNFTs, walletAddress])
 
   return (
@@ -411,7 +427,86 @@ const AccountPage: NextPageWithLayout = ({ user }: any) => {
             </Grid>
           </TabPanel>
           <TabPanel value={tabValue} index="activity">
-            No item to display
+            <div className="flex gap-4 mt-6 justify-between">
+              <IconButton>
+                <BiFilter fontSize={28} color="white" />
+              </IconButton>
+
+              <FormControl>
+                <Select
+                  size="small"
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  defaultValue={50}
+                  sx={{
+                    background: '#303339',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    height: '100%',
+                    borderColor: '#151c22',
+                  }}
+                >
+                  <MenuItem value={10}>Last 7 Days</MenuItem>
+                  <MenuItem value={20}>Last 14 Days</MenuItem>
+                  <MenuItem value={30}>Last 30 Days</MenuItem>
+                  <MenuItem value={40}>Last 60 Days</MenuItem>
+                  <MenuItem value={50}>Last 90 Days</MenuItem>
+                  <MenuItem value={60}>Last Year</MenuItem>
+                </Select>
+              </FormControl>
+            </div>
+
+            <div className="grid grid-cols-6 gap-6 mt-6">
+              <div className="col-span-1">
+                <CollapseOutline title="Event Type">
+                  <Stack>
+                    <FormControl variant="standard" fullWidth>
+                      <FormGroup>
+                        <FormControlLabel
+                          sx={{
+                            justifyContent: 'space-between',
+                            ml: 0,
+                          }}
+                          control={<Checkbox name="buynow" />}
+                          label="Sales"
+                          labelPlacement="start"
+                        />
+                        <FormControlLabel
+                          sx={{
+                            justifyContent: 'space-between',
+                            ml: 0,
+                          }}
+                          control={<Checkbox name="auction" />}
+                          label="Listings"
+                          labelPlacement="start"
+                        />
+                        <FormControlLabel
+                          sx={{
+                            justifyContent: 'space-between',
+                            ml: 0,
+                          }}
+                          control={<Checkbox name="buyWithCard" />}
+                          label="Offers"
+                          labelPlacement="start"
+                        />
+                        <FormControlLabel
+                          sx={{
+                            justifyContent: 'space-between',
+                            ml: 0,
+                          }}
+                          control={<Checkbox name="buyWithCard" />}
+                          label="Transfers"
+                          labelPlacement="start"
+                        />
+                      </FormGroup>
+                    </FormControl>
+                  </Stack>
+                </CollapseOutline>
+              </div>
+              <div className="col-span-5">
+                <ActivityTable transactions={transactions} />
+              </div>
+            </div>
           </TabPanel>
         </div>
       </div>
