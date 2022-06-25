@@ -458,27 +458,25 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
             </div>
             <div className="col-span-5">
               <div className="grid lg:grid-cols-3 md:grid-cols-2 xl:grid-cols-4">
-                {nfts.length === 0 && (
+                {isLoadingNFTs ? (
+                  [1, 2, 3, 4].map((x) => <NFTCardSkeleton key={x} />)
+                ) : nfts.length > 0 ? (
+                  nfts.map((nft) => {
+                    return (
+                      <NFTCard
+                        key={nft._id}
+                        nftItem={nft}
+                        title={collection?.title || ''}
+                        listing={listings.find((l) => l.nft?._id === nft._id)}
+                        collectionId={collectionId as string}
+                      />
+                    )
+                  })
+                ) : (
                   <div className="text-textGrey text-lg mt-6 ml-8">
                     No NFTs yet.
                   </div>
                 )}
-                {nfts.length > 0 &&
-                  (isLoadingNFTs
-                    ? [1, 2, 3, 4].map((x) => <NFTCardSkeleton key={x} />)
-                    : nfts.map((nft) => {
-                        return (
-                          <NFTCard
-                            key={nft._id}
-                            nftItem={nft}
-                            title={collection?.title || ''}
-                            listing={listings.find(
-                              (l) => l.nft?._id === nft._id
-                            )}
-                            collectionId={collectionId as string}
-                          />
-                        )
-                      }))}
               </div>
             </div>
           </div>
