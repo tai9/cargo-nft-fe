@@ -128,6 +128,7 @@ const Nft: NextPageWithLayout = () => {
   )
 
   useEffect(() => {
+    if (!collectionId || !nftId) return
     fetchNFTsData(collectionId as string, nftId as string)
     fetchTransactionsData(nftId as string)
     fetchListingData(nftId as string)
