@@ -1,5 +1,4 @@
 import {
-  Button,
   Container,
   Divider,
   FormControl,
@@ -40,6 +39,7 @@ import { ethers } from 'ethers'
 import { toast } from 'react-toastify'
 
 type NFTCreate = {
+  id?: string
   name: string
   image?: any
   description?: string
@@ -135,13 +135,14 @@ const CreatePage: NextPageWithLayout = () => {
 
         // create an NFT
         const imageAsset = await client.assets.upload('image', nftData.image)
-        setNftData({
-          ...nftData,
-          preview: imageAsset.url,
-        })
+
         const createDoc = {
           _type: 'nfts',
           owner: {
+            _type: 'reference',
+            _ref: address,
+          },
+          createdBy: {
             _type: 'reference',
             _ref: address,
           },
@@ -197,6 +198,12 @@ const CreatePage: NextPageWithLayout = () => {
         }
         await client.create(transDoc)
 
+        setNftData({
+          ...nftData,
+          preview: imageAsset.url,
+          id: nftResult._id,
+        })
+
         setIsCreating(false)
         handleConfetti(true)
         setOpenModal(true)
@@ -212,6 +219,14 @@ const CreatePage: NextPageWithLayout = () => {
       pending: 'Creating your NFT.',
       error: 'Cannot create your NFT.',
     })
+  }
+
+  const handleCloseModal = () => {
+    setOpenModal(false)
+  }
+
+  const handleViewNFT = () => {
+    router.push(`/collections/${nftData.collectionId}/nfts/${nftData.id}`)
   }
 
   return (
@@ -422,21 +437,30 @@ const CreatePage: NextPageWithLayout = () => {
         className="max-w-lg"
         title={`You created ${nftData.name}!`}
         open={openModal}
-        handleClose={() => setOpenModal(false)}
+        handleClose={handleCloseModal}
       >
-        <div className="flex flex-col gap-20 justify-center text-center items-center">
+        <div className="flex flex-col gap-6 justify-center text-center items-center">
           <div className="font-semibold text-grey1">
             You just created {nftData.name}.
           </div>
           <img
-            className="object-cover rounded-xl"
+            className="object-cover rounded-xl h-[200px]"
             src={nftData.preview}
             alt=""
             width={200}
           />
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 w-full">
+            <div className="w-fit mx-auto mb-4">
+              <label
+                className="btn btn-primary px-12 normal-case"
+                onClick={handleViewNFT}
+              >
+                View NFT
+              </label>
+            </div>
+            <div className="border-t-[1px] border-darkLine"></div>
             <div className="font-semibold text-grey1">SHARE</div>
-            <div className="flex gap-3">
+            <div className="flex gap-3 w-full items-center justify-center">
               <IconBox>
                 <FaTwitter fontSize={22} />
               </IconBox>

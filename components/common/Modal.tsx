@@ -28,7 +28,10 @@ export const Modal = ({
     <>
       <input type="checkbox" id={id} className="modal-toggle" />
 
-      <label htmlFor={id} className="modal cursor-pointer">
+      <label
+        htmlFor={id}
+        className={`modal cursor-pointer ${open ? 'modal-open' : ''}`}
+      >
         <label
           className={`modal-box bg-[#303338] relative max-w-2xl mx-auto overflow-hidden w-full rounded-md text-white border border-darkLine ${className}`}
         >
@@ -47,7 +50,7 @@ export const Modal = ({
               />
             </label>
             <div className="border-t-[1px] border-darkLine"></div>
-            <div className="p-8  max-h-[500px] overflow-auto">{children}</div>
+            <div className="p-8  max-h-[600px] overflow-auto">{children}</div>
             {handleSubmit && (
               <>
                 <div className="p-6 text-center">
