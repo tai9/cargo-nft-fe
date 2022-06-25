@@ -3,6 +3,7 @@ import { CollapseOutline } from 'components/common'
 import { NormalLayout } from 'components/layout'
 import { client } from 'lib/sanityClient'
 import {
+  ETransactionEvent,
   getCollectionTransactionQuery,
   NextPageWithLayout,
   Transaction,
@@ -13,12 +14,13 @@ import { BiFilter } from 'react-icons/bi'
 const ActivityPage: NextPageWithLayout = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [statusFilters, setStatusFilters] = useState<string[]>([])
 
   const fetchTransactionData = useCallback(async () => {
     try {
       setIsLoading(true)
       const transactionData = await client.fetch(
-        getCollectionTransactionQuery()
+        getCollectionTransactionQuery('', statusFilters)
       )
       setIsLoading(false)
       setTransactions(transactionData)
@@ -26,11 +28,22 @@ const ActivityPage: NextPageWithLayout = () => {
       setIsLoading(false)
       console.error(err)
     }
-  }, [])
+  }, [statusFilters])
 
   useEffect(() => {
     fetchTransactionData()
   }, [fetchTransactionData])
+
+  const onFilterChange = (e: any) => {
+    const { name, checked } = e.target
+    let arr = [...statusFilters]
+    if (checked) {
+      arr.push(name)
+      setStatusFilters(arr)
+      return
+    }
+    setStatusFilters(arr.filter((x) => x !== name))
+  }
 
   return (
     <div className="container">
@@ -57,6 +70,8 @@ const ActivityPage: NextPageWithLayout = () => {
                 <input
                   type="checkbox"
                   className="checkbox checkbox-primary border-gray-400"
+                  name={ETransactionEvent.SALE}
+                  onChange={onFilterChange}
                 />
               </label>
             </div>
@@ -66,6 +81,8 @@ const ActivityPage: NextPageWithLayout = () => {
                 <input
                   type="checkbox"
                   className="checkbox checkbox-primary border-gray-400"
+                  name={ETransactionEvent.LIST}
+                  onChange={onFilterChange}
                 />
               </label>
             </div>
@@ -75,6 +92,8 @@ const ActivityPage: NextPageWithLayout = () => {
                 <input
                   type="checkbox"
                   className="checkbox checkbox-primary border-gray-400"
+                  name={ETransactionEvent.OFFER}
+                  onChange={onFilterChange}
                 />
               </label>
             </div>
@@ -84,6 +103,8 @@ const ActivityPage: NextPageWithLayout = () => {
                 <input
                   type="checkbox"
                   className="checkbox checkbox-primary border-gray-400"
+                  name={ETransactionEvent.OFFER}
+                  onChange={onFilterChange}
                 />
               </label>
             </div>
@@ -93,6 +114,8 @@ const ActivityPage: NextPageWithLayout = () => {
                 <input
                   type="checkbox"
                   className="checkbox checkbox-primary border-gray-400"
+                  name={ETransactionEvent.TRANSAFER}
+                  onChange={onFilterChange}
                 />
               </label>
             </div>
