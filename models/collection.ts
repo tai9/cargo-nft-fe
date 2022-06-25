@@ -17,7 +17,7 @@ export type Collection = {
   _updatedAt: string
 }
 
-export const getAllcollectionQuery = `*[_type == "marketItems"] | order(_updatedAt desc) {
+export const getAllcollectionQuery = `*[_type == "marketItems"] | order(_createdAt desc) {
   _id,
   _createdAt,
   _updatedAt,
@@ -34,7 +34,7 @@ export const getAllcollectionQuery = `*[_type == "marketItems"] | order(_updated
 
 export const getCollectionByIdQuery = (
   contractAddress: string
-) => `*[_type == "marketItems" && contractAddress == "${contractAddress}" ] | order(_updatedAt desc) {
+) => `*[_type == "marketItems" && contractAddress == "${contractAddress}" ] | order(_createdAt desc) {
   "profileImageId": profileImage.asset->_id,
   "imageUrl": profileImage.asset->url,
   "bannerImageId": bannerImage.asset->_id,

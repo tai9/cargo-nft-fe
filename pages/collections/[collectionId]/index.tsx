@@ -232,7 +232,7 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
         <div className={style.midRow}>
           <div className={style.createdBy}>
             Created by{' '}
-            <Link href={`/${collection?.createdBy._ref}`} passHref>
+            <Link href={`/${collection?.createdBy?._ref}`} passHref>
               <a className="text-[#2081e2]">{collection?.creator}</a>
             </Link>
           </div>
