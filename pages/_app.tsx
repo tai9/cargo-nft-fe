@@ -48,7 +48,7 @@ function MyApp({
           </CargoProvider>
         </ThemeProvider>
         <ToastContainer
-          position="bottom-right"
+          position="top-center"
           autoClose={3000}
           hideProgressBar
           newestOnTop={false}

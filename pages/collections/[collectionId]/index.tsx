@@ -261,7 +261,7 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
                     )}
                   </>
                 ) : (
-                  '-'
+                  '---'
                 )}
               </div>
               <div className={style.statName}>floor price</div>
@@ -281,7 +281,7 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
                     )}
                   </>
                 ) : (
-                  '-'
+                  '---'
                 )}
               </div>
               <div className={style.statName}>total volume</div>

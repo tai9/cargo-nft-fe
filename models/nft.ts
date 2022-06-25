@@ -9,7 +9,7 @@ export type NFTItem = {
   metadata: NFTMetadata
   collection?: Collection
   owner?: User
-  createdBy?: string
+  createdBy?: User
 }
 
 export const getOwnNFTsQuery = (
@@ -55,7 +55,7 @@ ${
     _id,
    _createdAt,
    _updatedAt,
-    "createdBy":createdBy->userName,
+    "createdBy":createdBy->,
     "metadata":metadata{
         description,
         name,

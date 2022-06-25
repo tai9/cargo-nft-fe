@@ -162,179 +162,209 @@ const Nft: NextPageWithLayout = () => {
     quantityDesired: number
   ) => {
     if (!marketplace || !nftListing) return
-    try {
-      setIsPurchasing(true)
-      const tx = await marketplace.direct.buyoutListing(
-        listingId,
-        quantityDesired
-      )
 
-      // update NFT owner
-      await client
-        .patch(nftItem?._id || '')
-        .set({
+    const handlePurchaseNft = new Promise(async (resolve, reject) => {
+      try {
+        setIsPurchasing(true)
+        const tx = await marketplace.direct.buyoutListing(
+          listingId,
+          quantityDesired
+        )
+
+        // update NFT owner
+        await client
+          .patch(nftItem?._id || '')
+          .set({
+            owner: {
+              _ref: address,
+            },
+          })
+          .commit()
+
+        // update listing status
+        await client
+          .patch(nftListing?._id || '')
+          .set({
+            active: false,
+          })
+          .commit()
+
+        // create a transaction
+        const transDoc = {
+          _type: 'transactions',
           owner: {
-            _ref: address,
+            _type: 'reference',
+            _ref: nftItem?.owner?.walletAddress,
           },
-        })
-        .commit()
+          nft: {
+            _type: 'reference',
+            _ref: nftItem?._id,
+          },
+          collection: {
+            _type: 'reference',
+            _ref: nftItem?.collection?._id,
+          },
+          confirmations: tx.receipt.confirmations,
+          contractAddress: tx.receipt.contractAddress || '',
+          from: tx.receipt.from,
+          to: tx.receipt.to,
+          gasUsed: tx.receipt.gasUsed.toString(),
+          status: tx.receipt.status,
+          transactionHash: tx.receipt.transactionHash,
+          type: tx.receipt.type,
+          price: +nftListing.buyoutPricePerToken,
+          eventType: ETransactionEvent.SALE,
+        }
+        await client.create(transDoc)
 
-      // update listing status
-      await client
-        .patch(nftListing?._id || '')
-        .set({
-          active: false,
-        })
-        .commit()
+        await fetchListingData(nftId as string)
 
-      // create a transaction
-      const transDoc = {
-        _type: 'transactions',
-        owner: {
-          _type: 'reference',
-          _ref: nftItem?.owner?.walletAddress,
-        },
-        nft: {
-          _type: 'reference',
-          _ref: nftItem?._id,
-        },
-        collection: {
-          _type: 'reference',
-          _ref: nftItem?.collection?._id,
-        },
-        confirmations: tx.receipt.confirmations,
-        contractAddress: tx.receipt.contractAddress || '',
-        from: tx.receipt.from,
-        to: tx.receipt.to,
-        gasUsed: tx.receipt.gasUsed.toString(),
-        status: tx.receipt.status,
-        transactionHash: tx.receipt.transactionHash,
-        type: tx.receipt.type,
-        price: +nftListing.buyoutPricePerToken,
-        eventType: ETransactionEvent.SALE,
+        setIsPurchasing(false)
+        setOpenModal(false)
+        handleConfetti(true)
+        resolve(true)
+      } catch (err) {
+        reject(true)
+        setIsPurchasing(false)
+        console.log(err)
       }
-      await client.create(transDoc)
+    })
 
-      setIsPurchasing(false)
-      setOpenModal(false)
-      handleConfetti(true)
-      toast.success(`Purchase successful!`)
-    } catch (err) {
-      setIsPurchasing(false)
-      toast.error(`Purchase error!`)
-      console.log(err)
-    }
+    toast.promise(handlePurchaseNft, {
+      pending: `Purchasing ${nftItem?.metadata.name}.`,
+      error: 'Something went wrong.',
+      success: `Purchased ${nftItem?.metadata.name} successful!`,
+    })
   }
 
   const handleListingNFT = async (data?: ListingData) => {
     if (!marketplace || !address) return
 
-    try {
-      setIsListing(true)
+    const handleListingNft = new Promise(async (resolve, reject) => {
+      try {
+        setIsListing(true)
 
-      const listing = {
-        assetContractAddress: nftItem?.collection?.contractAddress || '',
-        tokenId: nftItem?.metadata.id.toString() || '',
-        startTimestamp: new Date(),
-        listingDurationInSeconds: 86400 * (data?.duration || 30),
-        quantity: 1,
-        currencyContractAddress: NATIVE_TOKEN_ADDRESS || '',
-        buyoutPricePerToken: data?.amount?.toString() || '',
+        const listing = {
+          assetContractAddress: nftItem?.collection?.contractAddress || '',
+          tokenId: nftItem?.metadata.id.toString() || '',
+          startTimestamp: new Date(),
+          listingDurationInSeconds: 86400 * (data?.duration || 30),
+          quantity: 1,
+          currencyContractAddress: NATIVE_TOKEN_ADDRESS || '',
+          buyoutPricePerToken: data?.amount?.toString() || '',
+        }
+        const tx = await marketplace.direct.createListing(listing)
+
+        const listingId = tx.id.toString() // the id of the newly created listing
+
+        // create a listing
+        const listingDoc = {
+          _type: 'listings',
+          owner: {
+            _type: 'reference',
+            _ref: address,
+          },
+          nft: {
+            _type: 'reference',
+            _ref: nftItem?._id,
+          },
+          listingId: listingId,
+          startTimestamp: new Date().toISOString(),
+          listingDurationInSeconds: moment()
+            .add(data?.duration || 30, 'days')
+            .toDate()
+            .getTime(),
+          quantity: 1,
+          currencyContractAddress: NATIVE_TOKEN_ADDRESS || '',
+          buyoutPricePerToken: data?.amount?.toString() || '',
+          assetContractAddress: nftItem?.collection?.contractAddress || '',
+          active: true,
+        }
+        await client.create(listingDoc)
+
+        // create a transaction
+        const transDoc = {
+          _type: 'transactions',
+          owner: {
+            _type: 'reference',
+            _ref: address,
+          },
+          nft: {
+            _type: 'reference',
+            _ref: nftItem?._id,
+          },
+          collection: {
+            _type: 'reference',
+            _ref: nftItem?.collection?._id,
+          },
+          id: tx.id.toString(),
+          confirmations: tx.receipt.confirmations,
+          contractAddress: tx.receipt.contractAddress || '',
+          from: tx.receipt.from,
+          to: tx.receipt.to,
+          gasUsed: tx.receipt.gasUsed.toString(),
+          status: tx.receipt.status,
+          transactionHash: tx.receipt.transactionHash,
+          type: tx.receipt.type,
+          price: data?.amount,
+          eventType: ETransactionEvent.LIST,
+        }
+        await client.create(transDoc)
+
+        await fetchListingData(nftId as string)
+
+        setIsListing(false)
+        handleConfetti(true)
+        setOpenListingModal(false)
+        resolve(true)
+      } catch (err) {
+        setIsListing(false)
+        reject(true)
+        console.log(err)
       }
-      const tx = await marketplace.direct.createListing(listing)
+    })
 
-      const listingId = tx.id.toString() // the id of the newly created listing
-
-      // create a listing
-      const listingDoc = {
-        _type: 'listings',
-        owner: {
-          _type: 'reference',
-          _ref: address,
-        },
-        nft: {
-          _type: 'reference',
-          _ref: nftItem?._id,
-        },
-        listingId: listingId,
-        startTimestamp: new Date().toISOString(),
-        listingDurationInSeconds: moment()
-          .add(data?.duration || 30, 'days')
-          .toDate()
-          .getTime(),
-        quantity: 1,
-        currencyContractAddress: NATIVE_TOKEN_ADDRESS || '',
-        buyoutPricePerToken: data?.amount?.toString() || '',
-        assetContractAddress: nftItem?.collection?.contractAddress || '',
-        active: true,
-      }
-      await client.create(listingDoc)
-
-      // create a transaction
-      const transDoc = {
-        _type: 'transactions',
-        owner: {
-          _type: 'reference',
-          _ref: address,
-        },
-        nft: {
-          _type: 'reference',
-          _ref: nftItem?._id,
-        },
-        collection: {
-          _type: 'reference',
-          _ref: nftItem?.collection?._id,
-        },
-        id: tx.id.toString(),
-        confirmations: tx.receipt.confirmations,
-        contractAddress: tx.receipt.contractAddress || '',
-        from: tx.receipt.from,
-        to: tx.receipt.to,
-        gasUsed: tx.receipt.gasUsed.toString(),
-        status: tx.receipt.status,
-        transactionHash: tx.receipt.transactionHash,
-        type: tx.receipt.type,
-        price: data?.amount,
-        eventType: ETransactionEvent.LIST,
-      }
-      await client.create(transDoc)
-
-      setIsListing(false)
-      handleConfetti(true)
-      setOpenListingModal(false)
-      toast.success(`Listed ${nftItem?.metadata.name} successful`)
-    } catch (err) {
-      setIsListing(false)
-      toast.error('Cannot listing this NFT.')
-      console.log(err)
-    }
+    toast.promise(handleListingNft, {
+      pending: `Listing ${nftItem?.metadata.name}.`,
+      error: 'Something went wrong.',
+      success: `Listed ${nftItem?.metadata.name} successful!`,
+    })
   }
 
   const handleConfirmCancelListing = async () => {
-    setIsCancelling(true)
-    // update listing status
-    client
-      .patch(nftListing?._id || '')
-      .set({
-        active: false,
-      })
-      .commit()
-      .then(async () => {
-        await fetchListingData(nftId as string)
-        await fetchNFTsData(collectionId as string, nftId as string)
-        setIsCancelling(false)
-        toast.success(`Cancel listing successful`)
-        handleCloseConfirmModal()
-      })
-      .catch((error) => {
-        setIsCancelling(false)
-        toast.error('Cannot cancel listing.')
-        console.log(error)
-      })
+    const handleCancelListingNft = new Promise(async (resolve, reject) => {
+      setIsCancelling(true)
+      // update listing status
+      client
+        .patch(nftListing?._id || '')
+        .set({
+          active: false,
+        })
+        .commit()
+        .then(async () => {
+          await fetchListingData(nftId as string)
+          await fetchNFTsData(collectionId as string, nftId as string)
+          setIsCancelling(false)
+          handleCloseConfirmModal()
+          resolve(true)
+        })
+        .catch((error) => {
+          reject(true)
+          setIsCancelling(false)
+          console.log(error)
+        })
+    })
+
+    toast.promise(handleCancelListingNft, {
+      pending: `Canceling ${nftItem?.metadata.name} listing.`,
+      error: 'Something went wrong.',
+      success: `Canceled ${nftItem?.metadata.name} listing successful!`,
+    })
   }
 
   const handleMakeOfferNFT = async (data?: ListingData) => {
     console.log(data)
+    toast.info('This feature is coming soon.')
   }
 
   const handleCloseConfirmModal = () => setOpenConfirmModal(false)
@@ -356,8 +386,15 @@ const Nft: NextPageWithLayout = () => {
                   <div className="p-4">
                     <p className=" text-[#8a939b]">
                       Created by{' '}
-                      <span className={style.hoverPrimaryText}>
-                        {nftItem?.createdBy}
+                      <span
+                        className={style.hoverPrimaryText}
+                        onClick={() =>
+                          router.push(`/${nftItem?.createdBy?.walletAddress}`)
+                        }
+                      >
+                        {nftItem?.createdBy?.walletAddress === address
+                          ? 'You'
+                          : nftItem?.createdBy?.userName}
                       </span>
                     </p>
                     <p className="mt-1">{nftItem?.metadata.description}</p>
@@ -427,6 +464,7 @@ const Nft: NextPageWithLayout = () => {
             </div>
             <div className={style.detailsContainer}>
               <GeneralDetails
+                walletAddress={address}
                 nftItem={nftItem}
                 isTransfered={address === nftItem?.owner?.walletAddress}
               />

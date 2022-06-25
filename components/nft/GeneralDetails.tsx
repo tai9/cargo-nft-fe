@@ -26,20 +26,35 @@ const style = {
 type Props = {
   nftItem?: NFTItem
   isTransfered?: boolean
+  walletAddress?: string
 }
 
-const GeneralDetails = ({ nftItem, isTransfered }: Props) => {
+const GeneralDetails = ({ nftItem, isTransfered, walletAddress }: Props) => {
   return (
     <div className={style.wrapper}>
       <div className={style.infoContainer}>
-        <div className={style.accent}>{nftItem?.collection?.title}</div>
+        <div
+          className={style.accent}
+          onClick={() =>
+            Router.push(`/collections/${nftItem?.collection?.contractAddress}`)
+          }
+        >
+          {nftItem?.collection?.title}
+        </div>
         <div className={style.nftTitle}>
           {nftItem?.metadata.name || <Skeleton animation="wave" />}
         </div>
         <div className={style.otherInfo}>
           <div className={style.ownedBy}>
             Owned by{' '}
-            <span className={style.accent}>{nftItem?.owner?.userName}</span>
+            <span
+              className={style.accent}
+              onClick={() => Router.push(`/${nftItem?.owner?.walletAddress}`)}
+            >
+              {nftItem?.owner?.walletAddress === walletAddress
+                ? 'You'
+                : nftItem?.owner?.userName}
+            </span>
           </div>
           <div className={style.likes}>
             <AiFillHeart className={style.likeIcon} /> 2.3K favorites

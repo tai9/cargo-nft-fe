@@ -85,7 +85,7 @@ const Purchase = ({
                   <label
                     onClick={() => handleBuyNFT(nftListing.listingId, 1)}
                     htmlFor="checkout-modal"
-                    className="flex gap-2 items-center py-4 cursor-pointer"
+                    className="flex gap-2 items-center py-2 cursor-pointer"
                   >
                     <IoMdWallet className={style.buttonIcon} />
                     <div className={style.buttonText}>Buy Now</div>
@@ -93,7 +93,7 @@ const Purchase = ({
                 </Button>
                 {address !== nftListing.owner?.walletAddress && (
                   <label
-                    className={`${style.button} border border-darkLine py-4 bg-darkGrey hover:bg-lightGrey disabled:cursor-default disabled:hover:bg-darkGrey`}
+                    className={`${style.button} border border-darkLine py-2 bg-darkGrey hover:bg-lightGrey disabled:cursor-default disabled:hover:bg-darkGrey`}
                     onClick={handleMakeOffer}
                     htmlFor="offer-modal"
                   >
@@ -126,7 +126,7 @@ const Purchase = ({
           </label>
         ) : (
           <label
-            className={`${style.button} border border-darkLine w-fit py-4 bg-darkGrey hover:bg-lightGrey disabled:cursor-default disabled:hover:bg-darkGrey`}
+            className={`${style.button} border border-darkLine w-fit py-2 bg-darkGrey hover:bg-lightGrey disabled:cursor-default disabled:hover:bg-darkGrey`}
             onClick={handleMakeOffer}
             htmlFor="offer-modal"
           >
