@@ -123,6 +123,11 @@ const CreatePage: NextPageWithLayout = () => {
       try {
         setIsCreating(true)
 
+        console.time('response in 1')
+        console.time('response in 2')
+        console.time('response in 3')
+        console.time('response in 4')
+        console.time('response in 5')
         // mint an NFT
         const signatureGenerated = await marketplace.signature.generate({
           metadata: {
@@ -132,9 +137,11 @@ const CreatePage: NextPageWithLayout = () => {
           },
         })
         const tx = await marketplace.signature.mint(signatureGenerated)
+        console.timeEnd('response in 1')
 
         // create an NFT
         const imageAsset = await client.assets.upload('image', nftData.image)
+        console.timeEnd('response in 2')
 
         const createDoc = {
           _type: 'nfts',
@@ -166,6 +173,7 @@ const CreatePage: NextPageWithLayout = () => {
           },
         }
         const nftResult = await client.create(createDoc)
+        console.timeEnd('response in 3')
 
         // create a transaction
         const transDoc = {
@@ -197,6 +205,7 @@ const CreatePage: NextPageWithLayout = () => {
           eventType: ETransactionEvent.MINTED,
         }
         await client.create(transDoc)
+        console.timeEnd('response in 4')
 
         setNftData({
           ...nftData,
@@ -208,6 +217,7 @@ const CreatePage: NextPageWithLayout = () => {
         handleConfetti(true)
         setOpenModal(true)
         resolve(true)
+        console.timeEnd('response in 5')
       } catch (error) {
         setIsCreating(false)
         reject(true)
