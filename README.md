@@ -9,3 +9,5 @@
 - Giảng viên hướng dẫn: TS. Nguyễn Xuân Sâm - Học viện CNBC Viễn thông.
 
 Demo: https://cargo-nft-fe.vercel.app/
+Diagram: https://app.diagrams.net/#G1jNDIGIBiQXydcmhhYASXbPb8cNOl4-2r
+Dbdiagram: https://dbdiagram.io/d/627f13ab7f945876b617f9df
