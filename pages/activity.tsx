@@ -119,6 +119,17 @@ const ActivityPage: NextPageWithLayout = () => {
                 />
               </label>
             </div>
+            <div className="form-control">
+              <label className="label cursor-pointer">
+                <span className="label-text text-base">Minted</span>
+                <input
+                  type="checkbox"
+                  className="checkbox checkbox-primary border-gray-400"
+                  name={ETransactionEvent.MINTED}
+                  onChange={onFilterChange}
+                />
+              </label>
+            </div>
           </CollapseOutline>
 
           <div className="divider" />
