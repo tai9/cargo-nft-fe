@@ -219,7 +219,7 @@ const Nft: NextPageWithLayout = () => {
         await client.create(transDoc)
 
         await fetchListingData(nftId as string)
-
+        await fetchNFTsData(collectionId as string, nftId as string)
         setIsPurchasing(false)
         setOpenModal(false)
         handleConfetti(true)
