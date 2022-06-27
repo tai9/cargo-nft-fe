@@ -21,7 +21,7 @@ function MyApp({
   emotionCache = clientSideEmotionCache,
 }: AppPropsWithLayout) {
   const Layout = Component.Layout ?? EmptyLayout
-  const title = Component.Title ?? 'Cargo'
+  const title = Component.Title ?? 'Cargo Marketplace'
   return (
     <CacheProvider value={emotionCache}>
       <ThirdwebProvider desiredChainId={ChainId.Rinkeby}>
