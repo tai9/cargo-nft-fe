@@ -59,7 +59,9 @@ const Nft: NextPageWithLayout = () => {
   const router = useRouter()
   const { collectionId, nftId } = router.query
 
-  const { handleConfetti } = useContext(CargoContext) as CargoContextType
+  const { addressBalance, handleConfetti } = useContext(
+    CargoContext
+  ) as CargoContextType
 
   const [transactions, setTransactions] = useState<Transaction[]>()
 
@@ -163,6 +165,11 @@ const Nft: NextPageWithLayout = () => {
     quantityDesired: number
   ) => {
     if (!marketplace || !nftListing) return
+
+    if (addressBalance < +nftListing.buyoutPricePerToken) {
+      toast.error('Insufficient balance!')
+      return
+    }
 
     const handlePurchaseNft = new Promise(async (resolve, reject) => {
       try {
