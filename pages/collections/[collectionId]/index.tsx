@@ -118,6 +118,14 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
   const [searchValue, setSearchValue] = useState('')
   const [searchDebounced] = useDebounce(searchValue, 1000)
 
+  const calcTotalVolume = (listings: Listing[]) => {
+    let total = 0
+    listings.forEach((x) => {
+      total += +x.buyoutPricePerToken
+    })
+    return total
+  }
+
   const fetchListingsData = useCallback(async () => {
     try {
       const listingData = await client.fetch(getListingQuery())
@@ -275,10 +283,7 @@ const Collection: NextPageWithLayout = ({ collection }: any) => {
                       alt="eth"
                       className={style.ethLogo}
                     />
-                    {listings.reduce(
-                      (prev, current) => +prev + +current.buyoutPricePerToken,
-                      +listings[0].buyoutPricePerToken
-                    )}
+                    {calcTotalVolume(listings)}
                   </>
                 ) : (
                   '---'
