@@ -35,11 +35,10 @@ import {
   User,
 } from 'models'
 import moment from 'moment'
-import { GetServerSidePropsContext } from 'next'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
-import { AiOutlineCheck, AiOutlineSearch, AiTwotoneEdit } from 'react-icons/ai'
+import { AiOutlineCheck, AiOutlineSearch } from 'react-icons/ai'
 import { BiFilter } from 'react-icons/bi'
 import { BsFillShareFill } from 'react-icons/bs'
 import { FiMoreHorizontal } from 'react-icons/fi'
@@ -80,15 +79,16 @@ function a11yProps(index: TabType) {
 
 type TabType = 'items' | 'activity'
 
-const AccountPage: NextPageWithLayout = ({ user }: any) => {
+const AccountPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { walletAddress } = router.query
 
   const [tabValue, setTabValue] = useState<TabType>('items')
   const [isLoadingNFTs, setIsLoadingNFTs] = useState(false)
   const [editingUsername, setEditingUsername] = useState(false)
-  const [newUsername, setNewUsername] = useState((user as User).userName)
+  const [newUsername, setNewUsername] = useState('')
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false)
+  const [user, setUser] = useState<User>()
 
   const [nfts, setNfts] = useState<NFTItem[]>([])
   const [listings, setListings] = useState<Listing[]>([])
@@ -130,6 +130,17 @@ const AccountPage: NextPageWithLayout = ({ user }: any) => {
     }
   }, [])
 
+  const fetchUserInfo = useCallback(async (walletAddress: string) => {
+    try {
+      const data = await client.fetch(getUserQuery(walletAddress))
+      console.log(data)
+
+      setUser(data[0])
+    } catch (err) {
+      console.error(err)
+    }
+  }, [])
+
   const fetchOwnNFTs = useCallback(
     async (walletAddress: string, sanityClient = client) => {
       const query = getOwnNFTsQuery(walletAddress)
@@ -159,10 +170,17 @@ const AccountPage: NextPageWithLayout = ({ user }: any) => {
   }, [])
 
   useEffect(() => {
+    fetchUserInfo(walletAddress as string)
     fetchListingsData()
     fetchOwnNFTs(walletAddress as string)
     fetchTransactionData(walletAddress as string)
-  }, [fetchListingsData, fetchOwnNFTs, walletAddress])
+  }, [
+    fetchListingsData,
+    fetchOwnNFTs,
+    fetchTransactionData,
+    fetchUserInfo,
+    walletAddress,
+  ])
 
   return (
     <div className="relative">
@@ -192,10 +210,7 @@ const AccountPage: NextPageWithLayout = ({ user }: any) => {
               ) : editingUsername ? (
                 <AiOutlineCheck fontSize={24} onClick={handleUpdateUsername} />
               ) : (
-                <AiTwotoneEdit
-                  fontSize={24}
-                  onClick={() => setEditingUsername(!editingUsername)}
-                />
+                <></>
               )}
             </div>
             {editingUsername ? (
@@ -205,7 +220,7 @@ const AccountPage: NextPageWithLayout = ({ user }: any) => {
                 onChange={onUsernameChange}
               />
             ) : (
-              <div className="text-2xl font-bold">{newUsername}</div>
+              <div className="text-2xl font-bold">{user?.userName}</div>
             )}
           </div>
           <div className="flex gap-4">
@@ -529,23 +544,3 @@ const NFTCardSkeleton = () => (
 AccountPage.Layout = NormalLayout
 
 export default AccountPage
-
-export const getServerSideProps = async (
-  context: GetServerSidePropsContext
-) => {
-  const address = context.params?.walletAddress as string
-  const query = getUserQuery(address)
-  const users: User[] = await client.fetch(query)
-
-  if (users.length === 0) {
-    return {
-      notFound: true,
-    }
-  }
-
-  return {
-    props: {
-      user: users[0],
-    },
-  }
-}
